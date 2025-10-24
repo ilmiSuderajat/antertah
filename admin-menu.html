@@ -379,7 +379,7 @@
             const statusColor = isAvailable ? 'bg-wa-success/20 text-wa-success' : 'bg-red-500/20 text-red-700';
             const statusText = isAvailable ? '✓ Tersedia' : '✕ Tidak Tersedia';
             const statusBadge = `<span class="badge-custom ${statusColor}">${statusText}</span>`;
-            const imageHtml = image_url 
+            const imageHtml = menu.image_url 
                 ? `<img src="${menu.image_url}" alt="${menu.name}" class="menu-image mr-4">` 
                 : '<div class="w-[70px] h-[70px] bg-bg-light rounded-lg mr-4 flex items-center justify-center flex-shrink-0"><span class="text-neutral-text text-lg">🖼️</span></div>';
             
@@ -881,3 +881,4 @@ Diskon: Rp ${order.discount.toLocaleString()}
 </body>
 
 </html>
+
