@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin | Kelola Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Konfigurasi Tailwind CSS dengan Palet Warna Kustom Anda
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'cool-primary': '#1d4ed8',   /* Electric Blue - Untuk Branding/Primer (Blue 700) */
+                        'cool-accent': '#06b6d4',    /* Cyan/Turquoise - Untuk Aksen Makanan/CTA (Cyan 600) */
+                        'bg-light': '#f1f5f9',       /* Abu terang lembut (Slate 100) */
+                        'bg-dark': '#0f172a',        /* Biru gelap (Slate 900) */
+                        'card-light': '#ffffff',     /* Putih */
+                        'card-dark': '#1e293b',      /* Biru gelap card (Slate 800) */
+                        'text-light': '#f1f5f9',     /* Teks untuk background gelap */
+                        'text-dark': '#1e293b',      /* Teks untuk background terang (Slate 800) */
+                        'neutral-text': '#64748b',   /* Teks abu-abu untuk deskripsi (Slate 500) */
+                        'wa-success': '#25D366'      /* Hijau WhatsApp/Sukses */
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .menu-image { 
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Card hover dinamis yang lebih kuat */
+        .card-hover {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px); /* Efek angkat lebih kuat */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15); /* Shadow lebih dramatis */
+        }
+        
+        .badge-custom {
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .btn-action {
+            padding: 8px 16px; /* Dibuat sedikit lebih besar */
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        
+        .modal-content {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25); /* Shadow lebih tajam */
+        }
+        
+        .form-control-custom {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 10px 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control-custom:focus {
+            border-color: #1d4ed8; /* cool-primary */
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15); 
+            outline: none;
+        }
+        
+        /* Header Menggunakan Warna Primer dan Aksen */
+        .header-gradient {
+            background: linear-gradient(135deg, var(--cool-primary) 0%, #3b82f6 100%); /* Electric Blue ke Blue 500 */
+        }
+        
+        /* Utility untuk menggunakan variabel CSS custom dari config Tailwind */
+        :root {
+            --cool-primary: #1d4ed8;
+            --cool-accent: #06b6d4;
+            --bg-light: #f1f5f9;
+            --text-dark: #1e293b;
+            --neutral-text: #64748b;
+        }
+
+        .notification-slide {
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsivitas Mobile: Peningkatan Tampilan Card */
+        @media (max-width: 768px) {
+            .mobile-card-actions {
+                /* Untuk memastikan tombol aksi mobile selalu terlihat */
+                display: flex;
+            }
+            /* Menyesuaikan input file untuk mobile agar lebih mudah disentuh */
+            .file-input-mobile {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-bg-light min-h-screen text-text-dark">
+
+    <header class="header-gradient text-white py-10 shadow-2xl">
+        <div class="container mx-auto px-4 max-w-7xl">
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-1">🏪 Kelola Menu Produk</h1>
+            <p class="text-text-light/80 text-sm md:text-base">Dashboard administrasi yang efisien untuk mengatur daftar item Anda.</p>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        
+        <!-- Tab Navigation -->
+        <div class="mb-6">
+            <div class="flex space-x-1 bg-gray-100 rounded-lg p-1">
+                <button id="menuTab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors bg-white text-cool-primary shadow-sm">
+                    <i class="fas fa-utensils mr-2"></i>Menu
+                </button>
+                <button id="ordersTab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-shopping-cart mr-2"></i>Pesanan
+                </button>
+            </div>
+        </div>
+        
+        <div id="notification" class="hidden notification-slide fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md" role="alert">
+            <div class="bg-card-light rounded-lg shadow-2xl p-4 flex items-center justify-between transition duration-300 transform scale-100 hover:scale-[1.01] border-l-4" id="notification-card">
+                <div class="flex items-center">
+                    <span id="notification-icon" class="text-3xl mr-3"></span>
+                    <span id="notification-message" class="font-medium text-text-dark"></span>
+                </div>
+                <button type="button" class="text-neutral-text hover:text-text-dark text-2xl" onclick="closeNotification()">&times;</button>
+            </div>
+        </div>
+
+        <!-- Menu Tab Content -->
+        <div id="menuContent">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-3 md:space-y-0">
+                <button id="addMenuBtn" class="bg-gradient-to-r from-cool-primary to-blue-500 hover:from-blue-600 hover:to-cool-primary text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition duration-300 flex items-center card-hover w-full md:w-auto" data-bs-toggle="modal" data-bs-target="#menuModal" onclick="resetForm()">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Tambah Menu Baru
+                </button>
+                <input type="text" placeholder="Cari menu..." class="form-control-custom w-full md:w-1/3 max-w-xs" onkeyup="filterMenu(this.value)">
+            </div>
+            
+            <div id="menuContainer">
+
+            <div class="hidden md:block bg-card-light shadow-xl rounded-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-bg-light">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider w-16">ID</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider w-1/4">Item Menu</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider">Kategori</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider w-32">Harga</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider">Deskripsi</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider w-28">Status</th>
+                                <th class="px-6 py-4 text-center text-xs font-bold text-neutral-text uppercase tracking-wider w-40">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menuTableBody" class="bg-card-light divide-y divide-gray-100">
+                            <tr>
+                                <td colspan="7" class="px-6 py-8 text-center text-neutral-text">
+                                    <div class="flex flex-col items-center">
+                                        <svg class="w-12 h-12 text-gray-300 mb-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        <p class="text-lg font-medium">Memuat data menu...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="mobileMenuList" class="md:hidden space-y-4">
+                <div class="text-center py-12 text-neutral-text bg-card-light rounded-xl shadow-lg">
+                    <p>Memuat menu...</p>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- Orders Tab Content -->
+        <div id="ordersContent" class="hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-3 md:space-y-0">
+                <h2 class="text-xl font-bold text-text-dark">Daftar Pesanan</h2>
+                <div class="flex gap-2">
+                    <select id="statusFilter" class="form-control-custom">
+                        <option value="">Semua Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="processing">Diproses</option>
+                        <option value="ready">Siap</option>
+                        <option value="delivered">Selesai</option>
+                        <option value="cancelled">Dibatalkan</option>
+                    </select>
+                    <button id="refreshOrders" class="bg-cool-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-sync-alt mr-1"></i>Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="bg-card-light shadow-xl rounded-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-bg-light">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider">Customer</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider">Items</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider">Total</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider">Waktu</th>
+                                <th class="px-6 py-4 text-center text-xs font-bold text-neutral-text uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody" class="bg-card-light divide-y divide-gray-100">
+                            <tr>
+                                <td colspan="7" class="px-6 py-8 text-center text-neutral-text">
+                                    <div class="flex flex-col items-center">
+                                        <svg class="w-12 h-12 text-gray-300 mb-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        <p class="text-lg font-medium">Memuat data pesanan...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0 pt-5 px-6">
+                    <h5 class="modal-title text-2xl font-extrabold text-text-dark" id="menuModalLabel">Tambah Menu Baru</h5>
+                    <button type="button" class="btn-close text-neutral-text hover:text-text-dark text-3xl leading-none" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+                </div>
+                
+                <div class="modal-body px-6 pb-6 pt-4">
+                    <form id="menuForm">
+                        <input type="hidden" id="menuId" name="id">
+                        
+                        <div class="mb-5">
+                            <label for="name" class="block text-sm font-semibold text-text-dark mb-2">Nama Menu <span class="text-red-500">*</span></label>
+                            <input type="text" class="form-control-custom w-full" id="name" name="name" placeholder="Contoh: Nasi Goreng Special" required>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label for="category" class="block text-sm font-semibold text-text-dark mb-2">Kategori <span class="text-red-500">*</span></label>
+                                <select class="form-control-custom w-full appearance-none" id="category" name="category" required>
+                                    <option value="" disabled selected>Pilih Kategori</option>
+                                    <option value="Makanan Utama">Makanan Utama</option>
+                                    <option value="Minuman">Minuman</option>
+                                    <option value="Makanan Ringan">Makanan Ringan</option>
+                                    <option value="Dessert">Dessert</option>
+                                    <option value="Promo Spesial">Promo Spesial</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="price" class="block text-sm font-semibold text-text-dark mb-2">Harga (Rp) <span class="text-red-500">*</span></label>
+                                <input type="number" class="form-control-custom w-full" id="price" name="price" placeholder="25000" required min="0">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-5 mt-5">
+                            <label for="description" class="block text-sm font-semibold text-text-dark mb-2">Deskripsi</label>
+                            <textarea class="form-control-custom w-full" id="description" name="description" rows="3" placeholder="Deskripsikan menu Anda secara detail (maks. 200 karakter)"></textarea>
+                        </div>
+                        
+                        <div id="imageUrlGroup" class="mb-5 hidden">
+                            <label for="imageUrl" class="block text-sm font-semibold text-text-dark mb-2">URL Gambar Saat Ini</label>
+                            <input type="text" class="form-control-custom w-full bg-bg-light" id="imageUrl" name="image_url" readonly>
+                            <small class="text-xs text-neutral-text mt-1 block">URL ini akan dipertahankan jika tidak memilih file baru.</small>
+                        </div>
+
+                        <div class="mb-5">
+                            <label for="imageFile" class="block text-sm font-semibold text-text-dark mb-2">
+                                Upload Gambar <span class="text-red-500" id="fileRequiredStar">*</span>
+                            </label>
+                            <input class="block w-full text-sm text-text-dark border border-gray-300 rounded-lg cursor-pointer bg-bg-light p-2 file-input-mobile" type="file" id="imageFile" name="imageFile" accept="image/*">
+                            <small class="text-xs text-neutral-text mt-1 block">Maksimal ukuran file 2MB.</small>
+                        </div>
+                        
+                        <div id="isAvailableGroup" class="mb-5 hidden">
+                            <label class="inline-flex items-center cursor-pointer p-3 bg-bg-light rounded-lg w-full border border-gray-200 hover:bg-gray-200 transition">
+                                <input type="checkbox" class="w-5 h-5 text-cool-primary rounded border-gray-300 focus:ring-cool-primary" id="isAvailable" name="is_available">
+                                <span class="ml-3 text-sm font-semibold text-text-dark">Menu Tersedia (Aktif di Daftar Publik)</span>
+                            </label>
+                        </div>
+                        
+                        <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end space-x-3">
+                            <button type="button" class="bg-gray-300 hover:bg-gray-400 text-text-dark font-semibold py-3 px-6 rounded-lg transition duration-200 btn-action" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="bg-gradient-to-r from-cool-primary to-cool-accent hover:from-cool-accent hover:to-cool-primary text-white font-semibold py-3 px-6 rounded-lg shadow-xl transition duration-200 btn-action" id="submitBtn">Simpan Menu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+
+        const token = localStorage.getItem('adminToken');
+
+        // Fungsi Show Notification (Menggunakan warna kustom untuk border)
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const messageEl = document.getElementById('notification-message');
+            const iconEl = document.getElementById('notification-icon');
+            const cardEl = document.getElementById('notification-card');
+            
+            const config = {
+                success: { icon: '✅', color: 'border-wa-success' },
+                danger: { icon: '❌', color: 'border-red-500' },
+                warning: { icon: '⚠️', color: 'border-amber-500' }
+            };
+            
+            const style = config[type] || config.success;
+            
+            cardEl.className = `bg-card-light rounded-lg shadow-2xl p-4 flex items-center justify-between transition duration-300 transform scale-100 hover:scale-[1.01] border-l-4 ${style.color}`;
+            
+            iconEl.textContent = style.icon;
+            messageEl.textContent = message;
+            notification.classList.remove('hidden');
+            
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 5000);
+        }
+
+        function closeNotification() {
+            document.getElementById('notification').classList.add('hidden');
+        }
+
+        // Fungsi Render Item Menu
+        function renderMenuItem(menu) {
+            const isAvailable = menu.is_available === 1 || menu.is_available === true;
+            const statusColor = isAvailable ? 'bg-wa-success/20 text-wa-success' : 'bg-red-500/20 text-red-700';
+            const statusText = isAvailable ? '✓ Tersedia' : '✕ Tidak Tersedia';
+            const statusBadge = `<span class="badge-custom ${statusColor}">${statusText}</span>`;
+            const imageHtml = menu.image_url 
+                ? `<img src="${menu.image_url}" alt="${menu.name}" class="menu-image mr-4">` 
+                : '<div class="w-[70px] h-[70px] bg-bg-light rounded-lg mr-4 flex items-center justify-center flex-shrink-0"><span class="text-neutral-text text-lg">🖼️</span></div>';
+            
+            const desc = menu.description ? menu.description.substring(0, 60) + (menu.description.length > 60 ? '...' : '') : 'Tidak ada deskripsi.';
+            const priceFormatted = `Rp ${menu.price.toLocaleString('id-ID')}`;
+
+            // Desktop Row
+            const rowHtml = `
+                <tr class="hover:bg-bg-light/70 transition duration-150">
+                    <td class="px-6 py-4 whitespace-nowrap"><span class="font-semibold text-neutral-text">#${menu.id}</span></td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            ${imageHtml}
+                            <span class="font-semibold text-text-dark">${menu.name}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap"><span class="badge-custom bg-cool-accent/20 text-cool-accent">${menu.category}</span></td>
+                    <td class="px-6 py-4 whitespace-nowrap"><span class="font-bold text-lg text-cool-primary">${priceFormatted}</span></td>
+                    <td class="px-6 py-4 max-w-xs truncate text-sm text-neutral-text">${desc}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <button class="btn-action bg-cool-primary hover:bg-cool-primary/80 text-white mr-1" onclick="fillFormForEdit(${menu.id})" data-bs-toggle="modal" data-bs-target="#menuModal" title="Edit Menu">
+                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        </button>
+                        <button class="btn-action bg-red-600 hover:bg-red-700 text-white" onclick="deleteMenu(${menu.id}, '${menu.name}')" title="Hapus Menu">
+                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+            // Mobile Card
+            const cardHtml = `
+                <div class="mobile-card card-hover bg-card-light shadow-lg rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center flex-1 min-w-0">
+                            ${menu.image_url ? `<img src="${menu.image_url}" alt="${menu.name}" class="menu-image mr-3 flex-shrink-0">` : '<div class="w-16 h-16 bg-bg-light rounded-lg mr-3 flex items-center justify-center flex-shrink-0"><span class="text-neutral-text text-lg">🖼️</span></div>'}
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-lg text-text-dark truncate">${menu.name}</h3>
+                                <div class="flex items-center mt-1 space-x-2">
+                                    <span class="badge-custom bg-cool-accent/20 text-cool-accent text-xs">${menu.category}</span>
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-100 pt-3">
+                        <p class="text-sm text-neutral-text mb-3">${desc}</p>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xl font-extrabold text-cool-primary">${priceFormatted}</span>
+                        </div>
+                        <div class="flex space-x-2 mobile-card-actions">
+                            <button class="btn-action bg-cool-primary hover:bg-cool-primary/80 text-white flex-1 text-sm" onclick="fillFormForEdit(${menu.id})" data-bs-toggle="modal" data-bs-target="#menuModal">
+                                ✏️ Edit
+                            </button>
+                            <button class="btn-action bg-red-600 hover:bg-red-700 text-white flex-1 text-sm" onclick="deleteMenu(${menu.id}, '${menu.name}')">
+                                🗑️ Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return { rowHtml, cardHtml };
+        }
+
+        // --- CRUD LOGIC (TETAP SAMA) ---
+
+        async function fetchMenu() {
+            try {
+                const response = await fetch(`${BASE_URL}/api/menu/admin`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.status === 401) {
+                    showNotification('Sesi berakhir. Silakan login kembali.', 'danger');
+                    // Tambahkan redirect ke login jika perlu
+                    return;
+                }
+                if (!response.ok) throw new Error('Gagal mengambil data menu.');
+                
+                const menuData = await response.json();
+                const tableBody = document.getElementById('menuTableBody');
+                const mobileList = document.getElementById('mobileMenuList');
+                
+                tableBody.innerHTML = '';
+                mobileList.innerHTML = '';
+                
+                if (menuData.length === 0) {
+                    const emptyMessage = `
+                        <div class="flex flex-col items-center">
+                            <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                            <p class="text-lg font-medium">Belum ada menu</p>
+                            <p class="text-sm">Mulai tambahkan menu baru untuk restoran Anda</p>
+                        </div>
+                    `;
+                    
+                    tableBody.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center text-neutral-text">${emptyMessage}</td></tr>`;
+                    mobileList.innerHTML = `<div class="text-center py-12 text-neutral-text bg-card-light rounded-xl shadow-lg">${emptyMessage}</div>`;
+                    return;
+                }
+
+                menuData.forEach(menu => {
+                    const { rowHtml, cardHtml } = renderMenuItem(menu);
+                    tableBody.insertAdjacentHTML('beforeend', rowHtml);
+                    mobileList.insertAdjacentHTML('beforeend', cardHtml);
+                });
+
+            } catch (error) {
+                console.error('Error fetching menu:', error);
+                showNotification('Gagal memuat daftar menu. Periksa koneksi API server.', 'danger');
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('menuForm').reset();
+            document.getElementById('menuId').value = '';
+            document.getElementById('menuModalLabel').textContent = 'Tambah Menu Baru';
+            document.getElementById('submitBtn').textContent = 'Simpan Menu';
+            document.getElementById('imageUrlGroup').classList.add('hidden');
+            document.getElementById('isAvailableGroup').classList.add('hidden');
+            document.getElementById('imageFile').required = true;
+            document.getElementById('fileRequiredStar').classList.remove('hidden');
+        }
+
+        async function fillFormForEdit(id) {
+            resetForm(); 
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/menu/admin/${id}`, {
+                    headers: {'Authorization': `Bearer ${token}`}
+                });
+                const menu = await response.json();
+                
+                document.getElementById('menuId').value = menu.id;
+                document.getElementById('name').value = menu.name;
+                document.getElementById('category').value = menu.category;
+                document.getElementById('price').value = menu.price;
+                document.getElementById('description').value = menu.description || '';
+                document.getElementById('imageUrl').value = menu.image_url || '';
+                document.getElementById('isAvailable').checked = menu.is_available === 1;
+
+                document.getElementById('menuModalLabel').textContent = `Edit Menu: ${menu.name}`;
+                document.getElementById('submitBtn').textContent = 'Perbarui Menu';
+                document.getElementById('imageUrlGroup').classList.remove('hidden');
+                document.getElementById('isAvailableGroup').classList.remove('hidden');
+                document.getElementById('imageFile').required = false; 
+                document.getElementById('fileRequiredStar').classList.add('hidden');
+            } catch (error) {
+                console.error('Error filling form:', error);
+                showNotification('Gagal memuat detail menu.', 'danger');
+            }
+        }
+
+        document.getElementById('menuForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            document.getElementById('submitBtn').disabled = true;
+            const originalText = document.getElementById('submitBtn').textContent;
+            document.getElementById('submitBtn').textContent = 'Memproses...';
+
+            const id = document.getElementById('menuId').value;
+            id ? await updateMenu(id) : await createMenu();
+
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').textContent = originalText;
+        });
+
+        async function createMenu() {
+            const formData = new FormData();
+            formData.append('name', document.getElementById('name').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('price', document.getElementById('price').value);
+            formData.append('category', document.getElementById('category').value);
+            
+            const imageFile = document.getElementById('imageFile').files[0];
+            if (imageFile) {
+                formData.append('image', imageFile); 
+            } else if (document.getElementById('imageFile').required) {
+                showNotification('Harap unggah file gambar.', 'danger');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/menu`, {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Gagal menambahkan menu.');
+
+                showNotification('Menu baru berhasil ditambahkan!', 'success');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('menuModal'));
+                if (modal) modal.hide();
+                fetchMenu();
+            } catch (error) {
+                console.error('Error creating menu:', error);
+                showNotification(`Gagal menambah menu: ${error.message || 'Terjadi kesalahan.'}`, 'danger');
+            }
+        }
+
+        async function updateMenu(id) {
+            const formData = new FormData();
+            formData.append('name', document.getElementById('name').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('price', document.getElementById('price').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('image_url', document.getElementById('imageUrl').value || '');
+            formData.append('is_available', document.getElementById('isAvailable').checked ? '1' : '0');
+            
+            const imageFile = document.getElementById('imageFile').files[0];
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/menu/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    method: 'PUT',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Gagal memperbarui menu.');
+
+                showNotification(`Menu "${document.getElementById('name').value}" berhasil diperbarui!`, 'success');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('menuModal'));
+                if (modal) modal.hide();
+                fetchMenu();
+            } catch (error) {
+                console.error('Error updating menu:', error);
+                showNotification(`Gagal memperbarui menu: ${error.message || 'Terjadi kesalahan.'}`, 'danger');
+            }
+        }
+
+        async function deleteMenu(id, name) {
+            if (!confirm(`Yakin ingin menghapus menu "${name}"? Tindakan ini tidak dapat dibatalkan.`)) return;
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/menu/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Gagal menghapus menu.');
+
+                showNotification(`Menu "${name}" berhasil dihapus.`, 'success');
+                fetchMenu();
+            } catch (error) {
+                console.error('Error deleting menu:', error);
+                showNotification(`Gagal menghapus menu: ${error.message || 'Terjadi kesalahan.'}`, 'danger');
+            }
+        }
+
+        // ========== TAB FUNCTIONALITY ==========
+        function switchTab(tabName) {
+            const menuTab = document.getElementById('menuTab');
+            const ordersTab = document.getElementById('ordersTab');
+            const menuContent = document.getElementById('menuContent');
+            const ordersContent = document.getElementById('ordersContent');
+
+            if (tabName === 'menu') {
+                menuTab.classList.add('bg-white', 'text-cool-primary', 'shadow-sm');
+                menuTab.classList.remove('text-gray-500', 'hover:text-gray-700');
+                ordersTab.classList.remove('bg-white', 'text-cool-primary', 'shadow-sm');
+                ordersTab.classList.add('text-gray-500', 'hover:text-gray-700');
+                
+                menuContent.classList.remove('hidden');
+                ordersContent.classList.add('hidden');
+            } else if (tabName === 'orders') {
+                ordersTab.classList.add('bg-white', 'text-cool-primary', 'shadow-sm');
+                ordersTab.classList.remove('text-gray-500', 'hover:text-gray-700');
+                menuTab.classList.remove('bg-white', 'text-cool-primary', 'shadow-sm');
+                menuTab.classList.add('text-gray-500', 'hover:text-gray-700');
+                
+                ordersContent.classList.remove('hidden');
+                menuContent.classList.add('hidden');
+                
+                // Load orders when switching to orders tab
+                fetchOrders();
+            }
+        }
+
+        // ========== ORDERS MANAGEMENT ==========
+        let orders = [];
+
+        async function fetchOrders() {
+            try {
+                const token = localStorage.getItem('adminToken');
+                if (!token) {
+                    showNotification('Token admin tidak ditemukan. Silakan login ulang.', 'danger');
+                    return;
+                }
+
+                const response = await fetch(`${BASE_URL}/api/orders`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Gagal mengambil data pesanan');
+
+                const result = await response.json();
+                orders = result.orders || [];
+                renderOrders();
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                showNotification(`Gagal mengambil data pesanan: ${error.message}`, 'danger');
+            }
+        }
+
+        function renderOrders() {
+            const tableBody = document.getElementById('ordersTableBody');
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            let filteredOrders = orders;
+            if (statusFilter) {
+                filteredOrders = orders.filter(order => order.status === statusFilter);
+            }
+
+            if (filteredOrders.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center text-neutral-text">
+                            <div class="flex flex-col items-center">
+                                <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-3"></i>
+                                <p class="text-lg font-medium">Tidak ada pesanan</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = filteredOrders.map(order => {
+                const statusColors = {
+                    'pending': 'bg-yellow-100 text-yellow-800',
+                    'processing': 'bg-blue-100 text-blue-800',
+                    'ready': 'bg-green-100 text-green-800',
+                    'delivered': 'bg-gray-100 text-gray-800',
+                    'cancelled': 'bg-red-100 text-red-800'
+                };
+
+                const statusLabels = {
+                    'pending': 'Pending',
+                    'processing': 'Diproses',
+                    'ready': 'Siap',
+                    'delivered': 'Selesai',
+                    'cancelled': 'Dibatalkan'
+                };
+
+                const itemsText = order.items.map(item => 
+                    `${item.name} x${item.quantity}`
+                ).join(', ');
+
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-dark">
+                            #${order.id}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div>
+                                <div class="text-sm font-medium text-text-dark">${order.customer.name}</div>
+                                <div class="text-sm text-neutral-text">${order.customer.phone}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-neutral-text">
+                            <div class="max-w-xs truncate" title="${itemsText}">
+                                ${itemsText}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-dark">
+                            Rp ${order.total.toLocaleString()}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[order.status]}">
+                                ${statusLabels[order.status]}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-text">
+                            ${new Date(order.timestamp).toLocaleString('id-ID')}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                            <div class="flex justify-center space-x-2">
+                                <button onclick="viewOrder(${order.id})" class="text-cool-primary hover:text-blue-700">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button onclick="updateOrderStatus(${order.id})" class="text-green-600 hover:text-green-700">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function viewOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            const itemsText = order.items.map(item => 
+                `• ${item.name} x${item.quantity} = Rp ${(item.price * item.quantity).toLocaleString()}`
+            ).join('\n');
+
+            const message = `📋 *Detail Pesanan #${order.id}*
+
+👤 *Customer:*
+Nama: ${order.customer.name}
+No. HP: ${order.customer.phone}
+
+🛍️ *Items:*
+${itemsText}
+
+💰 *Ringkasan:*
+Subtotal: Rp ${order.subtotal.toLocaleString()}
+Ongkir: Rp ${order.shipping.toLocaleString()}
+Diskon: Rp ${order.discount.toLocaleString()}
+*TOTAL: Rp ${order.total.toLocaleString()}*
+
+📱 *Status:* ${order.status}
+⏰ *Waktu:* ${new Date(order.timestamp).toLocaleString('id-ID')}`;
+
+            alert(message);
+        }
+
+        async function updateOrderStatus(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            const statusOptions = {
+                'pending': 'Pending',
+                'processing': 'Diproses', 
+                'ready': 'Siap',
+                'delivered': 'Selesai',
+                'cancelled': 'Dibatalkan'
+            };
+
+            const currentStatus = order.status;
+            const availableStatuses = Object.keys(statusOptions).filter(status => status !== currentStatus);
+            
+            if (availableStatuses.length === 0) {
+                showNotification('Status pesanan sudah final', 'warning');
+                return;
+            }
+
+            const newStatus = prompt(
+                `Ubah status pesanan #${orderId}:\n\n` +
+                `Status saat ini: ${statusOptions[currentStatus]}\n\n` +
+                `Pilih status baru:\n` +
+                availableStatuses.map((status, index) => `${index + 1}. ${statusOptions[status]}`).join('\n') +
+                `\n\nMasukkan nomor (1-${availableStatuses.length}):`
+            );
+
+            if (!newStatus || isNaN(newStatus)) return;
+
+            const statusIndex = parseInt(newStatus) - 1;
+            if (statusIndex < 0 || statusIndex >= availableStatuses.length) {
+                showNotification('Pilihan status tidak valid', 'danger');
+                return;
+            }
+
+            const selectedStatus = availableStatuses[statusIndex];
+
+            try {
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch(`${BASE_URL}/api/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: selectedStatus })
+                });
+
+                if (!response.ok) throw new Error('Gagal mengupdate status pesanan');
+
+                showNotification(`Status pesanan #${orderId} berhasil diubah ke ${statusOptions[selectedStatus]}`, 'success');
+                fetchOrders();
+            } catch (error) {
+                console.error('Error updating order status:', error);
+                showNotification(`Gagal mengupdate status: ${error.message}`, 'danger');
+            }
+        }
+
+        // ========== EVENT LISTENERS ==========
+        document.getElementById('menuTab').addEventListener('click', () => switchTab('menu'));
+        document.getElementById('ordersTab').addEventListener('click', () => switchTab('orders'));
+        document.getElementById('statusFilter').addEventListener('change', renderOrders);
+        document.getElementById('refreshOrders').addEventListener('click', fetchOrders);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchMenu();
+            // Initialize with menu tab
+            switchTab('menu');
+        });
+    </script>
+
+</body>
+</html>

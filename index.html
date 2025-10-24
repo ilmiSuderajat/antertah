@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnterTah - Jasa Antar & Kirim Makanan</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'cool-primary': '#1d4ed8',
+                        'cool-accent': '#06b6d4',
+                        'bg-light': '#f1f5f9',
+                        'bg-dark': '#0f172a',
+                        'card-light': '#ffffff',
+                        'card-dark': '#1e293b',
+                        'text-light': '#f1f5f9',
+                        'text-dark': '#1e293b',
+                        'neutral-text': '#64748b',
+                        'wa-success': '#25D366'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                        'spin-slow': 'spin 2s linear infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Service Card Animations */
+        .service-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .service-card:hover::before {
+            left: 100%;
+        }
+
+        /* Glass Effect */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            header {
+                background-size: contain;
+                background-position: bottom;
+                background-attachment: scroll;
+            }
+
+            header > div {
+                background-size: contain;
+                background-position: center;
+                background-attachment: scroll;
+            }
+        }
+    </style>
+    <script>
+        // Skrip ini diletakkan di <head> untuk mencegah FOUC (Flash of Unstyled Content)
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+</head>
+
+<body class="bg-bg-light dark:bg-bg-dark text-text-dark dark:text-text-light transition-colors duration-500 font-sans">
+
+    <nav class="bg-card-light dark:bg-card-dark shadow-lg sticky top-0 z-50 backdrop-blur-md bg-opacity-95 border-b border-gray-100 dark:border-gray-700 transition-colors duration-500">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a class="inline-flex items-center text-xl sm:text-2xl font-extrabold text-cool-primary dark:text-cool-accent transition-all hover:scale-105" href="index.html">
+                    <i class="fas fa-motorcycle text-yellow-500 mr-2 float-animation"></i> AnterTah
+                </a>
+
+                <div class="hidden md:flex md:space-x-4 lg:space-x-8 items-center">
+                    <div class="relative group">
+                        <button class="text-gray-600 dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent px-2 py-2 text-sm font-medium focus:outline-none transition duration-300">
+                            <i class="fas fa-handshake mr-1"></i> Layanan <i class="fas fa-chevron-down text-xs ml-1 transition-transform group-hover:rotate-180"></i>
+                        </button>
+                        <div class="absolute hidden group-hover:block w-40 mt-1 bg-white dark:bg-gray-700 rounded-xl shadow-2xl z-10 transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 rounded-t-xl">Jasa Antar (Ojek)</a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition duration-200 rounded-b-xl">Kirim Barang (Kurir)</a>
+                        </div>
+                    </div>
+                    <a href="home.html" class="text-gray-600 dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent px-2 py-2 text-sm font-medium focus:outline-none transition duration-300">
+                        <i class="fas fa-utensils mr-1"></i> Kuliner
+                    </a>
+                    <a href="#" class="text-gray-600 dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent px-2 py-2 text-sm font-medium transition duration-300">Tentang Kami</a>
+                </div>
+
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <button id="theme-toggle" class="p-2 rounded-full text-gray-600 dark:text-cool-accent hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cool-primary dark:focus:ring-cool-accent transition duration-300 hover:scale-110" aria-label="Toggle Light/Dark Theme">
+                        <i id="theme-icon" class="fas fa-moon text-lg"></i>
+                    </button>
+                    <button class="hidden sm:inline-block text-cool-primary border border-cool-primary dark:text-cool-accent dark:border-cool-accent hover:bg-cool-primary hover:text-white dark:hover:bg-cool-accent dark:hover:text-gray-900 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-300 ease-in-out hover:scale-105"><a href="login.html">Driver Login</a></button>
+                    <button class="bg-cool-accent text-gray-900 dark:bg-cool-primary dark:text-white hover:bg-cyan-600 dark:hover:bg-blue-700 px-3 py-1.5 text-sm rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg hover:scale-105"> <a href="login.html">Daftar / Masuk</a></button>
+                    <div class="md:hidden">
+                        <button id="menu-toggle" class="p-2 text-gray-600 dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent focus:outline-none transition duration-300" aria-label="Toggle Menu" aria-expanded="false">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="h-0 overflow-hidden md:hidden bg-card-light dark:bg-card-dark shadow-inner transition-all duration-500 ease-in-out">
+            <div class="px-4 pt-4 pb-4 space-y-4 sm:px-6 border-t border-gray-100 dark:border-gray-700">
+
+                <div class="grid grid-cols-3 gap-3">
+                    <a href="#" class="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-700 dark:to-gray-600 hover:from-cool-primary/10 hover:to-cool-primary/20 dark:hover:from-cool-primary/20 dark:hover:to-cool-primary/30 transition-all duration-300 shadow-md hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-motorcycle text-2xl text-cool-primary mb-1"></i>
+                        <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">Ojek</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-cyan-50 to-cyan-100 dark:from-gray-700 dark:to-gray-600 hover:from-cool-accent/10 hover:to-cool-accent/20 dark:hover:from-cool-accent/20 dark:hover:to-cool-accent/30 transition-all duration-300 shadow-md hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-box-open text-2xl text-cool-accent mb-1"></i>
+                        <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">Kurir</span>
+                    </a>
+                    <a href="home.html" class="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-gray-700 dark:to-gray-600 hover:from-yellow-500/10 hover:to-yellow-500/20 dark:hover:from-yellow-500/20 dark:hover:to-yellow-500/30 transition-all duration-300 shadow-md hover:shadow-xl transform hover:scale-105">
+                        <i class="fas fa-utensils text-2xl text-yellow-500 mb-1"></i>
+                        <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">Kuliner</span>
+                    </a>
+                </div>
+
+                <div class="space-y-1 pt-3 border-t border-gray-100 dark:border-gray-700">
+                    <a href="#" class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 block px-3 py-2 rounded-md text-sm font-medium transition duration-200">
+                        <i class="fas fa-info-circle w-4 mr-2"></i> Tentang Kami
+                    </a>
+                    <a href="#" class="text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 block px-3 py-2 rounded-md text-sm font-medium transition duration-200">
+                        <i class="fas fa-headset w-4 mr-2"></i> Bantuan & FAQ
+                    </a>
+                </div>
+
+                <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <a href="login.html" class="block w-full bg-cool-accent text-gray-900 dark:bg-cool-primary dark:text-white hover:bg-cyan-600 dark:hover:bg-blue-700 px-4 py-2 rounded-lg text-base font-semibold transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 text-center">Daftar / Masuk</a>
+                    <a href="login.html" class="block w-full mt-2 text-cool-primary border border-cool-primary dark:text-cool-accent dark:border-cool-accent hover:bg-cool-primary hover:text-white dark:hover:bg-cool-accent dark:hover:text-gray-900 px-3 py-2 rounded-lg text-base font-semibold transition-all duration-300 transform hover:scale-105 text-center">Driver Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Header -->
+    <header class="text-white py-16 sm:py-24 md:py-32 relative overflow-hidden transition-colors duration-500"
+        style="background-image: linear-gradient(to top, rgba(15, 23, 42, 0.8), rgba(29, 78, 216, 0.6)), url('./img/bg.png');
+               background-position: center;
+               background-size: cover;
+               background-repeat: no-repeat;
+               background-attachment: fixed;">
+
+    <div class="absolute inset-0 opacity-0 dark:opacity-100 transition-opacity duration-500"
+         style="background-image: linear-gradient(to top, rgba(15, 23, 42, 0.9), rgba(29, 78, 216, 0.7)), url('./img/bg.png');
+                background-position: center;
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-attachment: fixed;"></div>
+
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h1 class="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-3 sm:mb-4 transition-all duration-700 animate-fade-in">
+                AnterTah: <span class="text-cool-accent dark:text-cool-primary">Kirim Cepat</span> Terpercaya dan Hemat!
+            </h1>
+            <p class="text-md sm:text-lg md:text-xl mb-6 sm:mb-8 max-w-3xl mx-auto transition-all duration-700 animate-slide-up leading-relaxed">
+                Gerakan Perubahan Ekonomi Desa!
+            </p>
+
+            <div class="flex justify-center transition-transform duration-500 ease-in-out hover:scale-[1.02] animate-scale-in">
+                <div class="flex w-full max-w-sm sm:max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden border-2 border-cool-accent/50 dark:border-cool-primary/50">
+                    <span class="p-3 sm:p-4 flex items-center text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-map-marker-alt text-red-500 text-base sm:text-xl"></i>
+                    </span>
+                    <input type="text" class="w-full p-3 sm:p-4 text-sm sm:text-base text-gray-800 dark:text-white dark:bg-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cool-accent" placeholder="Mau kemana atau pesan apa?" aria-label="Aksi Utama">
+                    <button class="bg-cool-accent text-gray-900 dark:bg-cool-primary dark:text-white hover:bg-cyan-600 dark:hover:bg-blue-700 px-4 sm:px-6 font-bold text-sm sm:text-base transition-all duration-300 shadow-lg hover:shadow-xl">Cari!</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-12 sm:py-16 bg-bg-light dark:bg-bg-dark transition-colors duration-500">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12 text-text-dark dark:text-text-light border-b-2 border-cool-primary/50 dark:border-cool-accent/50 pb-3 transition-colors duration-500 animate-fade-in">Pilih Layanan Terbaik AnterNa</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 text-center">
+
+                <div class="service-card bg-card-light dark:bg-card-dark p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-cool-primary/20 dark:hover:shadow-cool-accent/20 transform hover:-translate-y-3 hover:scale-105 transition-all duration-300 group border border-gray-100 dark:border-gray-700 hover:border-cool-primary/50 dark:hover:border-cool-accent/50 animate-slide-up">
+                    <div class="text-5xl sm:text-6xl text-cool-primary dark:text-cool-accent mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300"><i class="fas fa-motorcycle"></i></div>
+                    <h4 class="text-lg sm:text-xl font-semibold mb-3 text-text-dark dark:text-text-light">Jasa Antar (Ojek)</h4>
+                    <p class="text-sm sm:text-base text-neutral-text dark:text-gray-400 mb-4 leading-relaxed">Pergi ke mana saja dengan aman dan nyaman. Layanan antar personal tercepat.</p>
+                    <a href="#" class="inline-block text-sm border-2 border-cool-primary text-cool-primary dark:border-cool-accent dark:text-cool-accent hover:bg-cool-primary hover:text-white dark:hover:bg-cool-accent dark:hover:text-gray-900 px-6 py-2 rounded-full font-semibold transition-all duration-300 hover:scale-110 shadow-md hover:shadow-lg">Pesan Antar</a>
+                </div>
+
+                <div class="service-card bg-card-light dark:bg-card-dark p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-cool-accent/20 dark:hover:shadow-cool-primary/20 transform hover:-translate-y-3 hover:scale-105 transition-all duration-300 group border border-gray-100 dark:border-gray-700 hover:border-cool-accent/50 dark:hover:border-cool-primary/50 animate-slide-up" style="animation-delay: 0.1s;">
+                    <div class="text-5xl sm:text-6xl text-cool-accent dark:text-cool-primary mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300"><i class="fas fa-burger"></i></div>
+                    <h4 class="text-lg sm:text-xl font-semibold mb-3 text-text-dark dark:text-text-light">Kirim Makanan</h4>
+                    <p class="text-sm sm:text-base text-neutral-text dark:text-gray-400 mb-4 leading-relaxed">Ribuan menu dari resto favorit. Makanan hangat, diantar cepat sampai di tangan Anda.</p>
+                    <a href="home.html" class="inline-block text-sm bg-gradient-to-r from-cool-accent to-cyan-600 text-white dark:from-cool-primary dark:to-blue-700 hover:from-cyan-600 hover:to-cyan-700 dark:hover:from-blue-700 dark:hover:to-blue-800 px-6 py-2 rounded-full font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110">Lihat Menu</a>
+                </div>
+
+                <div class="service-card bg-card-light dark:bg-card-dark p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:shadow-cool-primary/20 dark:hover:shadow-cool-accent/20 transform hover:-translate-y-3 hover:scale-105 transition-all duration-300 group border border-gray-100 dark:border-gray-700 hover:border-cool-primary/50 dark:hover:border-cool-accent/50 animate-slide-up" style="animation-delay: 0.2s;">
+                    <div class="text-5xl sm:text-6xl text-cool-primary dark:text-cool-accent mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300"><i class="fas fa-box-open"></i></div>
+                    <h4 class="text-lg sm:text-xl font-semibold mb-3 text-text-dark dark:text-text-light">Kirim Barang</h4>
+                    <p class="text-sm sm:text-base text-neutral-text dark:text-gray-400 mb-4 leading-relaxed">Kirim paket, dokumen, atau barang besar dengan kurir terpercaya. Pantauan real-time.</p>
+                    <a href="#" class="inline-block text-sm border-2 border-cool-primary text-cool-primary dark:border-cool-accent dark:text-cool-accent hover:bg-cool-primary hover:text-white dark:hover:bg-cool-accent dark:hover:text-gray-900 px-6 py-2 rounded-full font-semibold transition-all duration-300 hover:scale-110 shadow-md hover:shadow-lg">Kirim Sekarang</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 sm:py-16 bg-gradient-to-br from-bg-dark via-gray-900 to-bg-dark dark:from-black dark:via-gray-950 dark:to-black relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 left-10 w-72 h-72 bg-cool-accent rounded-full blur-3xl animate-pulse"></div>
+            <div class="absolute bottom-10 right-10 w-96 h-96 bg-cool-primary rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+        </div>
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-white animate-fade-in">Mau Penghasilan Tambahan? Bergabunglah dengan <span class="text-cool-accent dark:text-cool-primary">AnterNa!</span></h2>
+            <p class="text-base sm:text-lg mb-6 sm:mb-8 text-gray-300 max-w-2xl mx-auto animate-slide-up leading-relaxed">Dapatkan waktu fleksibel, penghasilan harian, dan bonus <span class="font-bold">top-tier</span>. Jadilah mitra kami.</p>
+            <button class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 hover:from-yellow-300 hover:to-yellow-400 px-8 py-3 rounded-full text-base sm:text-lg font-bold shadow-2xl transition-all duration-300 transform hover:scale-110 hover:shadow-yellow-400/50 animate-scale-in">
+                Gabung Driver Sekarang <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </section>
+
+    <footer class="bg-gradient-to-b from-card-dark to-black dark:from-black dark:to-gray-950 py-8 sm:py-10 border-t border-gray-800 transition-colors duration-500">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12">
+                <div class="col-span-2 sm:col-span-1 md:col-span-1">
+                    <h5 class="text-lg sm:text-xl font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-motorcycle text-cool-accent mr-2"></i> AnterNa
+                    </h5>
+                    <p class="text-gray-400 text-xs sm:text-sm leading-relaxed">Logistik pintar, melayani kota dengan kecepatan dan keandalan.</p>
+                </div>
+                <div>
+                    <h5 class="text-base sm:text-lg font-semibold text-white mb-4">Informasi</h5>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-cool-accent text-xs sm:text-sm transition-all duration-200 hover:translate-x-1 inline-block">Pusat Bantuan</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-cool-accent text-xs sm:text-sm transition-all duration-200 hover:translate-x-1 inline-block">Karir</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-base sm:text-lg font-semibold text-white mb-4">Layanan Cepat</h5>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-cool-accent text-xs sm:text-sm transition-all duration-200 hover:translate-x-1 inline-block">Jasa Antar</a></li>
+                        <li><a href="home.html" class="text-gray-400 hover:text-cool-accent text-xs sm:text-sm transition-all duration-200 hover:translate-x-1 inline-block">Pesan Kuliner</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h5 class="text-base sm:text-lg font-semibold text-white mb-4">Ikuti Kami</h5>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-pink-500 transition-all duration-300 hover:scale-125 transform" aria-label="Instagram"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-blue-500 transition-all duration-300 hover:scale-125 transform" aria-label="Facebook"><i class="fab fa-facebook-f fa-lg"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-sky-400 transition-all duration-300 hover:scale-125 transform" aria-label="Twitter"><i class="fab fa-twitter fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center text-gray-500 text-xs mt-8 pt-4 border-t border-gray-800">
+                &copy; 2025 AnterTah. Hak Cipta Dilindungi.
+            </div>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script>
+        
+        const html = document.documentElement;
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        // --- Dark Mode Logic ---
+        function updateThemeIcon(isDarkMode) {
+            themeIcon.classList.toggle('fa-sun', isDarkMode);
+            themeIcon.classList.toggle('fa-moon', !isDarkMode);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const isDarkMode = html.classList.toggle('dark');
+            localStorage.theme = isDarkMode ? 'dark' : 'light';
+            updateThemeIcon(isDarkMode);
+
+            // Show notification
+            showNotification(isDarkMode ? '🌙 Dark Mode Aktif' : '☀️ Light Mode Aktif');
+        });
+
+        // --- Mobile Menu Logic ---
+        menuToggle.addEventListener('click', () => {
+            const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+            menuToggle.setAttribute('aria-expanded', !isExpanded);
+
+            if (!isExpanded) {
+                // Set height to scrollHeight to trigger animation
+                mobileMenu.style.height = mobileMenu.scrollHeight + 'px';
+            } else {
+                // Set height to 0 to collapse
+                mobileMenu.style.height = '0px';
+            }
+        });
+
+        // Close mobile menu on resize to prevent layout issues
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                mobileMenu.style.height = '0px';
+                menuToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Initialize icon on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateThemeIcon(html.classList.contains('dark'));
+        });
+
+        // --- Notification Function ---
+        function showNotification(message, type = 'success') {
+            const existing = document.querySelector('.notification-toast');
+            if (existing) existing.remove();
+
+            const notification = document.createElement('div');
+            notification.className = 'notification-toast fixed top-20 right-4 z-[9999] animate-slide-up';
+
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+
+            notification.innerHTML = `
+                <div class="${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3">
+                    <span class="text-sm font-medium">${message}</span>
+                    <button onclick="this.closest('.notification-toast').remove()" class="ml-2 hover:opacity-80">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

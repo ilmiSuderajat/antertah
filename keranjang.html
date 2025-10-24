@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keranjang | AnterNa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'cool-primary': '#1d4ed8',
+                        'cool-accent': '#06b6d4',
+                        'bg-light': '#f1f5f9',
+                        'bg-dark': '#0f172a',
+                        'card-light': '#ffffff',
+                        'card-dark': '#1e293b',
+                        'text-light': '#f1f5f9',
+                        'text-dark': '#1e293b',
+                        'neutral-text': '#64748b',
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .floating-checkout { box-shadow: 0 -10px 30px rgba(0,0,0,0.08); }
+        .dark .floating-checkout { box-shadow: 0 -10px 30px rgba(0,0,0,0.25); }
+        .notification-toast {
+            animation: slideInRight 0.3s ease-out;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-bg-light dark:bg-bg-dark text-text-dark dark:text-text-light min-h-screen pb-32">
+    <header class="bg-card-light dark:bg-card-dark shadow sticky top-0 z-30">
+        <div class="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+            <button onclick="window.history.back()" class="text-neutral-text hover:text-cool-primary"><i class="fas fa-arrow-left"></i></button>
+            <h1 class="text-base font-bold">Keranjang</h1>
+            <a href="home.html" class="text-cool-primary hover:underline text-sm">Belanja lagi</a>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-4">
+        <div id="emptyState" class="hidden text-center py-16">
+            <i class="fas fa-shopping-basket text-6xl text-gray-300 mb-3"></i>
+            <h3 class="text-xl font-bold mb-1">Keranjang Kosong</h3>
+            <p class="text-neutral-text mb-4">Ayo tambah menu favorit Anda.</p>
+            <a href="kuliner.html" class="inline-flex items-center gap-2 bg-cool-primary text-white px-4 py-2 rounded-lg">
+                <i class="fas fa-plus"></i> Tambah Menu
+            </a>
+        </div>
+
+        <div id="cartList" class="space-y-3"></div>
+
+        <div id="summary" class="mt-6 bg-card-light dark:bg-card-dark rounded-2xl p-4 border border-gray-100 dark:border-gray-700">
+            <h2 class="text-sm font-bold mb-3">Ringkasan</h2>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between"><span class="text-neutral-text">Subtotal</span><span id="subtotal">Rp 0</span></div>
+                <div class="flex justify-between"><span class="text-neutral-text">Ongkir</span><span id="shipping">Rp 10.000</span></div>
+                <div class="flex justify-between"><span class="text-neutral-text">Diskon</span><span id="discount">Rp 0</span></div>
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-2 flex justify-between text-base font-bold">
+                    <span>Total</span><span id="total">Rp 0</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark p-4 floating-checkout">
+        <div class="max-w-4xl mx-auto flex gap-2">
+            <button id="clearBtn" class="flex-1 border border-red-500 text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition">Kosongkan</button>
+            <button id="checkoutBtn" class="flex-1 bg-cool-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Checkout</button>
+        </div>
+    </div>
+<script src="config.js"></script>
+    <script>
+       
+        const SHIPPING_COST = 10000;
+
+        function rupiah(n){ return `Rp ${(+n||0).toLocaleString('id-ID')}` }
+
+        function showNotification(message, type = 'success') {
+            const existing = document.querySelector('.notification-toast');
+            if (existing) existing.remove();
+
+            const notification = document.createElement('div');
+            notification.className = 'notification-toast fixed top-20 right-4 z-50';
+            
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+            
+            notification.innerHTML = `
+                <div class="${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3">
+                    <span class="text-sm font-medium">${message}</span>
+                    <button onclick="this.closest('.notification-toast').remove()" class="hover:opacity-80">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        async function loadCart(){
+            const token = localStorage.getItem('authToken');
+            if(!token){ 
+                showNotification('Silakan login terlebih dahulu', 'error');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+                return; 
+            }
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/cart`, { 
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'ngrok-skip-browser-warning': 'true'
+                    } 
+                });
+                
+                if(!res.ok) {
+                    if (res.status === 401) {
+                        showNotification('Sesi berakhir, silakan login kembali', 'error');
+                        localStorage.removeItem('authToken');
+                        setTimeout(() => window.location.href = 'login.html', 1500);
+                        return;
+                    }
+                    throw new Error('Gagal memuat keranjang');
+                }
+                
+                const data = await res.json();
+                const items = data.items || [];
+                renderCart(items);
+            } catch (error) {
+                console.error('Load cart error:', error);
+                showNotification('Gagal memuat keranjang', 'error');
+                document.getElementById('emptyState').classList.remove('hidden');
+                document.getElementById('summary').classList.add('hidden');
+            }
+        }
+
+        function renderCart(items){
+            const list = document.getElementById('cartList');
+            const empty = document.getElementById('emptyState');
+            const summary = document.getElementById('summary');
+            
+            list.innerHTML = '';
+            
+            if(items.length === 0){ 
+                empty.classList.remove('hidden');
+                summary.classList.add('hidden');
+                updateSummary([]);
+                return;
+            }
+            
+            empty.classList.add('hidden');
+            summary.classList.remove('hidden');
+            
+            items.forEach(it => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-3 bg-card-light dark:bg-card-dark border border-gray-100 dark:border-gray-700 rounded-xl p-3 hover:shadow-md transition';
+                
+                const imageUrl = it.image_url || it.image || 'https://placehold.co/100x100/e2e8f0/64748b?text=No+Image';
+                
+                row.innerHTML = `
+                    <img src="${imageUrl}" alt="${it.name}" class="w-14 h-14 rounded-lg object-cover bg-gray-100" onerror="this.src='https://placehold.co/100x100/e2e8f0/64748b?text=No+Image'"/>
+                    <div class="flex-1">
+                        <div class="text-sm font-semibold">${it.name}</div>
+                        <div class="text-xs text-neutral-text">${rupiah(it.price)}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" onclick="changeQty(${it.item_id}, ${it.quantity - 1})">
+                            <i class="fas fa-minus text-xs"></i>
+                        </button>
+                        <span class="w-6 text-center text-sm font-medium">${it.quantity}</span>
+                        <button class="w-7 h-7 rounded-full bg-cool-primary text-white hover:bg-blue-700 transition" onclick="changeQty(${it.item_id}, ${it.quantity + 1})">
+                            <i class="fas fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                    <button class="text-red-500 hover:text-red-600 ml-2 transition" onclick="removeItem(${it.item_id}, '${it.name}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                list.appendChild(row);
+            });
+            updateSummary(items);
+        }
+
+        function updateSummary(items){
+            const subtotal = items.reduce((s, it) => s + (it.price * it.quantity), 0);
+            const discount = 0;
+            const shipping = items.length > 0 ? SHIPPING_COST : 0;
+            const total = subtotal + shipping - discount;
+            
+            document.getElementById('subtotal').textContent = rupiah(subtotal);
+            document.getElementById('shipping').textContent = rupiah(shipping);
+            document.getElementById('discount').textContent = rupiah(discount);
+            document.getElementById('total').textContent = rupiah(total);
+        }
+
+        async function changeQty(itemId, qty){
+            const token = localStorage.getItem('authToken');
+            if(!token) return;
+            
+            if(qty <= 0){ 
+                return removeItem(itemId);
+            }
+            
+            if(qty > 99) {
+                showNotification('Maksimal 99 item per produk', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/cart/${itemId}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'Authorization': `Bearer ${token}`,
+                        'ngrok-skip-browser-warning': 'true'
+                    },
+                    body: JSON.stringify({ quantity: qty })
+                });
+                
+                if(!res.ok) throw new Error('Gagal mengubah jumlah');
+                
+                showNotification('Jumlah berhasil diperbarui', 'success');
+                loadCart();
+            } catch (error) {
+                console.error('Change quantity error:', error);
+                showNotification('Gagal mengubah jumlah', 'error');
+            }
+        }
+
+        async function removeItem(itemId, itemName = 'item'){
+            if(!confirm(`Hapus "${itemName}" dari keranjang?`)) return;
+            
+            const token = localStorage.getItem('authToken');
+            if(!token) return;
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/cart/${itemId}`, { 
+                    method: 'DELETE', 
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'ngrok-skip-browser-warning': 'true'
+                    }
+                });
+                
+                if(!res.ok) throw new Error('Gagal menghapus item');
+                
+                showNotification('Item berhasil dihapus', 'success');
+                loadCart();
+            } catch (error) {
+                console.error('Remove item error:', error);
+                showNotification('Gagal menghapus item', 'error');
+            }
+        }
+
+        async function clearCart(){
+            const token = localStorage.getItem('authToken');
+            if(!token) return;
+            
+            if(!confirm('Kosongkan semua item di keranjang?')) return;
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/cart`, { 
+                    method: 'DELETE', 
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'ngrok-skip-browser-warning': 'true'
+                    }
+                });
+                
+                if(!res.ok) throw new Error('Gagal mengosongkan keranjang');
+                
+                showNotification('Keranjang berhasil dikosongkan', 'success');
+                loadCart();
+            } catch (error) {
+                console.error('Clear cart error:', error);
+                showNotification('Gagal mengosongkan keranjang', 'error');
+            }
+        }
+
+        async function checkout(){
+            const token = localStorage.getItem('authToken');
+            if(!token) {
+                showNotification('Silakan login terlebih dahulu', 'error');
+                return;
+            }
+
+            try {
+                // Verify cart is not empty
+                const res = await fetch(`${BASE_URL}/api/cart`, { 
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'ngrok-skip-browser-warning': 'true'
+                    } 
+                });
+                
+                if(!res.ok) throw new Error('Gagal memuat keranjang');
+                
+                const data = await res.json();
+                const items = data.items || [];
+                
+                if(items.length === 0) {
+                    showNotification('Keranjang masih kosong', 'error');
+                    return;
+                }
+                
+                // Redirect to checkout page
+                window.location.href = 'cekout.html';
+            } catch (error) {
+                console.error('Checkout error:', error);
+                showNotification('Gagal melanjutkan ke checkout', 'error');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('clearBtn').addEventListener('click', clearCart);
+        document.getElementById('checkoutBtn').addEventListener('click', checkout);
+        
+        // Dark mode initialization
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+        
+        // Load cart on page load
+        document.addEventListener('DOMContentLoaded', loadCart);
+    </script>
+</body>
+</html>

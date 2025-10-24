@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifikasi OTP - AnterNa</title>
+  <link href="./style.css" rel="stylesheet">
+</head>
+<body class="bg-slate-900 text-white flex items-center justify-center min-h-screen">
+  <div class="bg-slate-800 p-8 rounded-2xl w-96 shadow-xl">
+    <h1 class="text-2xl font-bold mb-6 text-center">Verifikasi Kode OTP</h1>
+    <input id="otp" type="text" placeholder="Masukkan kode OTP" class="w-full p-3 rounded mb-4 text-black">
+    <button id="verifyOtp" class="w-full bg-green-600 hover:bg-green-700 py-3 rounded font-semibold">Verifikasi</button>
+    <p id="msg" class="text-center text-sm mt-3 text-gray-300"></p>
+  </div>
+<script src="config.js"></script>
+  <script>
+    const BASE_URL = 'https://c7f35974faa1.ngrok-free.app';
+    const params = new URLSearchParams(window.location.search);
+    const phone = params.get('phone');
+    const msg = document.getElementById('msg');
+
+    document.getElementById('verifyOtp').addEventListener('click', async () => {
+      const otp = document.getElementById('otp').value.trim();
+      if (!otp) return msg.textContent = 'Kode OTP tidak boleh kosong';
+
+      msg.textContent = 'Memverifikasi...';
+
+      const res = await fetch(`${BASE_URL}/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, otp })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        msg.textContent = 'Verifikasi berhasil! ✅';
+        setTimeout(() => alert('Selamat datang!'), 1000);
+      } else {
+        msg.textContent = data.error || 'Kode OTP salah';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnterNa - Lengkapi Profil & Alamat</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Google Maps API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMap"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'cool-primary': '#059669', // Hijau Keren
+                        'cool-accent': '#34D399',  // Hijau Terang
+                        'bg-light': '#F9FAFB',
+                        'bg-dark': '#111827',
+                        'card-light': '#FFFFFF',
+                        'card-dark': '#1F2937',
+                        'neutral-text': '#4B5563',
+                        'error-red': '#EF4444',
+                        'wa-success': '#25D366'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .input-group {
+            position: relative;
+        }
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9CA3AF; /* gray-400 */
+        }
+        .input-field {
+            padding-left: 3rem !important; /* Ruang untuk ikon */
+        }
+        select.input-field {
+             /* Hapus padding-left untuk select agar panah tetap normal */
+            padding-left: 1rem !important; 
+        }
+    </style>
+</head>
+<body class="bg-bg-light dark:bg-bg-dark min-h-screen flex items-center justify-center p-4 font-sans">
+    <div class="w-full max-w-lg lg:max-w-xl"> <header class="text-center mb-8 pt-4">
+            <h1 class="text-4xl font-extrabold text-cool-primary dark:text-cool-accent leading-tight">Lengkapi Detail Pengiriman</h1>
+            <p class="mt-2 text-base text-neutral-text dark:text-gray-400">Pastikan data Anda akurat untuk pengiriman yang lancar.</p>
+        </header>
+
+        <div class="bg-card-light dark:bg-card-dark p-6 sm:p-8 rounded-3xl shadow-2xl shadow-cool-primary/10 dark:shadow-cool-accent/5 border border-gray-100 dark:border-gray-800 space-y-8">
+            <form id="profile-form" class="space-y-6">
+                
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 border-b pb-2 border-gray-200 dark:border-gray-700">Penerima & Alamat Utama</h2>
+                
+                <!-- GPS Location Section -->
+                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-lg font-semibold text-blue-800 dark:text-blue-200 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2"></i>
+                            Lokasi GPS Real-time
+                        </h3>
+                        <button type="button" id="get-location-btn" 
+                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition duration-200 flex items-center">
+                            <i class="fas fa-crosshairs mr-1"></i>
+                            Ambil Lokasi
+                        </button>
+                    </div>
+                    
+                    <!-- Location Status -->
+                    <div id="location-status" class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Klik "Ambil Lokasi" untuk mendapatkan koordinat GPS yang akurat
+                    </div>
+                    
+                    <!-- Map Container -->
+                    <div id="map-container" class="hidden">
+                        <div id="map" class="w-full h-64 rounded-lg border border-gray-300 dark:border-gray-600"></div>
+                        <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-hand-pointer mr-1"></i>
+                            Klik pada peta untuk memilih lokasi yang tepat
+                        </div>
+                    </div>
+                    
+                    <!-- Selected Location Info -->
+                    <div id="selected-location" class="hidden mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-600 dark:text-green-400 mt-1 mr-2"></i>
+                            <div>
+                                <div class="text-sm font-medium text-green-800 dark:text-green-200">Lokasi Terpilih:</div>
+                                <div id="selected-address" class="text-sm text-green-700 dark:text-green-300"></div>
+                                <div id="selected-coords" class="text-xs text-green-600 dark:text-green-400 mt-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <i class="fas fa-user mr-1 text-cool-primary"></i> Nama Lengkap (Penerima)
+                    </label>
+                    <div class="input-group">
+                        <i class="fas fa-signature"></i>
+                        <input id="name" name="name" type="text" required 
+                               class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white transition duration-200" 
+                               placeholder="Cth: Budi Santoso">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"> 
+                    
+                    <div>
+                        <label for="provinsi" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Provinsi</label>
+                        <select id="provinsi" name="provinsi" required 
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white transition duration-200">
+                            <option value="" disabled selected>Pilih Provinsi...</option>
+                            </select>
+                    </div>
+
+                    <div>
+                        <label for="kabupaten" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kabupaten/Kota</label>
+                        <select id="kabupaten" name="kabupaten" required disabled
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 transition duration-200">
+                            <option value="" disabled selected>Pilih Kabupaten/Kota...</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="kecamatan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kecamatan</label>
+                        <select id="kecamatan" name="kecamatan" required disabled
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 transition duration-200">
+                            <option value="" disabled selected>Pilih Kecamatan...</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="kelurahan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kelurahan/Desa</label>
+                        <select id="kelurahan" name="kelurahan" required disabled
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 transition duration-200">
+                            <option value="" disabled selected>Pilih Kelurahan/Desa...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    
+                    <div>
+                        <label for="kampung" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <i class="fas fa-map-marker-alt mr-1 text-cool-primary"></i> Nama Jalan / Patokan
+                        </label>
+                         <div class="input-group">
+                            <i class="fas fa-road"></i>
+                            <input id="kampung" name="kampung" type="text" required 
+                                class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white transition duration-200" 
+                                placeholder="Cth: Jl. Pahlawan No. 45 / Dekat Warung Pak RT">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="rtrw" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <i class="fas fa-house-user mr-1 text-cool-primary"></i> RT/RW
+                        </label>
+                         <div class="input-group">
+                            <i class="fas fa-hashtag"></i>
+                            <input id="rtrw" name="rtrw" type="text" required 
+                                class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white transition duration-200" 
+                                placeholder="Cth: 005/012">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="message-container" class="text-center text-sm font-medium h-6 pt-2">
+                    </div>
+
+                <div>
+                    <button type="submit" id="save-button"
+                            class="w-full flex items-center justify-center py-3 px-4 rounded-xl shadow-lg text-base font-bold text-white bg-wa-success hover:bg-green-600 focus:ring-4 focus:ring-green-300 transition duration-300 transform hover:scale-[1.01] active:scale-95 disabled:bg-gray-400 disabled:shadow-none"
+                            aria-live="polite">
+                        <i class="fas fa-check-circle mr-2" id="button-icon"></i> 
+                        <span id="button-text">Simpan & Mulai Belanja</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <footer class="mt-8 text-center text-sm text-gray-400 dark:text-gray-600">
+            &copy; 2025 AnterNa. Layanan Pengiriman Cepat.
+        </footer>
+    </div>
+    <script src="config.js"></script>
+    <script>
+// ===================================
+// GOOGLE MAPS & GPS LOCATION FEATURES
+// ===================================
+
+let map;
+let marker;
+let geocoder;
+let selectedLocation = null;
+
+// Initialize Google Maps
+function initMap() {
+    console.log('Google Maps API loaded');
+    
+    // Default location (Jakarta)
+    const defaultLocation = { lat: -6.2088, lng: 106.8456 };
+    
+    // Initialize map
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 15,
+        center: defaultLocation,
+        mapTypeId: 'roadmap',
+        styles: [
+            {
+                featureType: 'poi',
+                elementType: 'labels',
+                stylers: [{ visibility: 'off' }]
+            }
+        ]
+    });
+    
+    // Initialize geocoder
+    geocoder = new google.maps.Geocoder();
+    
+    // Add click listener to map
+    map.addListener('click', (event) => {
+        const lat = event.latLng.lat();
+        const lng = event.latLng.lng();
+        
+        // Update marker position
+        if (marker) {
+            marker.setPosition(event.latLng);
+        } else {
+            marker = new google.maps.Marker({
+                position: event.latLng,
+                map: map,
+               draggable: true,
+                title: 'Lokasi Terpilih'
+            });
+        }
+        
+        // Get address from coordinates
+        getAddressFromCoordinates(lat, lng);
+        
+        // Update selected location
+        selectedLocation = { lat, lng };
+        updateLocationInfo(lat, lng);
+    });
+    
+    // Add drag listener to marker (will be added when marker is created)
+}
+
+// Get current GPS location
+function getCurrentLocation() {
+    const locationBtn = document.getElementById('get-location-btn');
+    const locationStatus = document.getElementById('location-status');
+    const mapContainer = document.getElementById('map-container');
+    
+    // Update button state
+    locationBtn.disabled = true;
+    locationBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Mengambil Lokasi...';
+    locationStatus.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Mengambil lokasi GPS...';
+    
+    if (!navigator.geolocation) {
+        locationStatus.innerHTML = '<i class="fas fa-exclamation-triangle mr-1 text-red-500"></i>Browser tidak mendukung GPS';
+        locationBtn.disabled = false;
+        locationBtn.innerHTML = '<i class="fas fa-crosshairs mr-1"></i>Ambil Lokasi';
+        return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+            
+            console.log(`GPS Location: ${lat}, ${lng} (Accuracy: ${accuracy}m)`);
+            
+            // Update map center and add marker
+            map.setCenter({ lat, lng });
+            map.setZoom(18);
+            
+            if (marker) {
+                marker.setPosition({ lat, lng });
+            } else {
+                marker = new google.maps.Marker({
+                    position: { lat, lng },
+                    map: map,
+                    draggable: true,
+                    title: 'Lokasi Anda',
+                    animation: google.maps.Animation.DROP
+                });
+                
+                // Add drag listener to marker
+                marker.addListener('dragend', (event) => {
+                    const dragLat = event.latLng.lat();
+                    const dragLng = event.latLng.lng();
+                    getAddressFromCoordinates(dragLat, dragLng);
+                    selectedLocation = { lat: dragLat, lng: dragLng };
+                    updateLocationInfo(dragLat, dragLng);
+                });
+            }
+            
+            // Get address from coordinates
+            getAddressFromCoordinates(lat, lng);
+            
+            // Update selected location
+            selectedLocation = { lat, lng };
+            updateLocationInfo(lat, lng);
+            
+            // Show map and success message
+            mapContainer.classList.remove('hidden');
+            locationStatus.innerHTML = `<i class="fas fa-check-circle mr-1 text-green-500"></i>Lokasi ditemukan! (Akurasi: ${Math.round(accuracy)}m)`;
+            
+            // Reset button
+            locationBtn.disabled = false;
+            locationBtn.innerHTML = '<i class="fas fa-crosshairs mr-1"></i>Ambil Lokasi';
+        },
+        (error) => {
+            console.error('GPS Error:', error);
+            let errorMessage = '';
+            
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage = 'Akses lokasi ditolak. Silakan izinkan akses lokasi.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage = 'Lokasi tidak tersedia.';
+                    break;
+                case error.TIMEOUT:
+                    errorMessage = 'Timeout saat mengambil lokasi.';
+                    break;
+                default:
+                    errorMessage = 'Terjadi kesalahan saat mengambil lokasi.';
+                    break;
+            }
+            
+            locationStatus.innerHTML = `<i class="fas fa-exclamation-triangle mr-1 text-red-500"></i>${errorMessage}`;
+            locationBtn.disabled = false;
+            locationBtn.innerHTML = '<i class="fas fa-crosshairs mr-1"></i>Ambil Lokasi';
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000
+        }
+    );
+}
+
+// Get address from coordinates using reverse geocoding
+function getAddressFromCoordinates(lat, lng) {
+    const latlng = { lat, lng };
+    
+    geocoder.geocode({ location: latlng }, (results, status) => {
+        if (status === 'OK' && results[0]) {
+            const address = results[0].formatted_address;
+            console.log('Address found:', address);
+            
+            // Update selected location info
+            document.getElementById('selected-address').textContent = address;
+            document.getElementById('selected-coords').textContent = `Koordinat: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            
+            // Show selected location info
+            document.getElementById('selected-location').classList.remove('hidden');
+            
+            // Auto-fill address fields if possible
+            autoFillAddressFields(results[0]);
+        } else {
+            console.error('Geocoding failed:', status);
+            document.getElementById('selected-address').textContent = 'Alamat tidak ditemukan';
+        }
+    });
+}
+
+// Auto-fill address fields based on geocoding results
+function autoFillAddressFields(result) {
+    const addressComponents = result.address_components;
+    
+    // Try to extract address components
+    let streetNumber = '';
+    let route = '';
+    let sublocality = '';
+    let locality = '';
+    let administrativeAreaLevel2 = '';
+    let administrativeAreaLevel1 = '';
+    
+    addressComponents.forEach(component => {
+        const types = component.types;
+        
+        if (types.includes('street_number')) {
+            streetNumber = component.long_name;
+        }
+        if (types.includes('route')) {
+            route = component.long_name;
+        }
+        if (types.includes('sublocality') || types.includes('sublocality_level_1')) {
+            sublocality = component.long_name;
+        }
+        if (types.includes('locality')) {
+            locality = component.long_name;
+        }
+        if (types.includes('administrative_area_level_2')) {
+            administrativeAreaLevel2 = component.long_name;
+        }
+        if (types.includes('administrative_area_level_1')) {
+            administrativeAreaLevel1 = component.long_name;
+        }
+    });
+    
+    // Update kampung field with street info
+    const kampungField = document.getElementById('kampung');
+    if (kampungField && (streetNumber || route)) {
+        const streetInfo = [streetNumber, route].filter(Boolean).join(' ');
+        if (streetInfo) {
+            kampungField.value = streetInfo;
+        }
+    }
+}
+
+// Update location info display
+function updateLocationInfo(lat, lng) {
+    const selectedLocationDiv = document.getElementById('selected-location');
+    const selectedAddress = document.getElementById('selected-address');
+    const selectedCoords = document.getElementById('selected-coords');
+    
+    selectedCoords.textContent = `Koordinat: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    selectedLocationDiv.classList.remove('hidden');
+}
+
+// ===================================
+// KONSTANTA DAN INISIALISASI
+// ===================================
+const profileForm = document.getElementById('profile-form');
+const saveButton = document.getElementById('save-button');
+const messageContainer = document.getElementById('message-container');
+
+// --- Debugging: Ambil Sesi ---
+const authToken = localStorage.getItem('authToken');
+const userPhone = localStorage.getItem('userPhone');
+console.log(`[INIT] AuthToken ditemukan: ${!!authToken}`);
+console.log(`[INIT] UserPhone ditemukan: ${!!userPhone}`);
+
+// --- Variabel Dropdown ---
+const provinsiSelect = document.getElementById('provinsi');
+const kabupatenSelect = document.getElementById('kabupaten');
+const kecamatanSelect = document.getElementById('kecamatan');
+const kelurahanSelect = document.getElementById('kelurahan');
+
+// URL Base API alamat (Harus sesuai dengan yang Anda buat di server.js)
+const ADDRESS_API_BASE = `${BASE_URL}/api/wilayah`; 
+console.log(`[INIT] URL API Wilayah: ${ADDRESS_API_BASE}`);
+ 
+// ===================================
+// 1. Fungsi Utility (Pesan & Disable)
+// ===================================
+
+/**
+ * Fungsi untuk logging pesan debug yang konsisten
+ * @param {string} message - Pesan yang akan dicetak di console.
+ * @param {string} type - Tipe log ('info', 'warn', 'error', 'debug').
+ */
+function logDebug(message, type = 'debug') {
+    const timestamp = new Date().toLocaleTimeString();
+    const typeUpper = type.toUpperCase();
+    switch (type) {
+        case 'info':
+            console.info(`[${typeUpper} - ${timestamp}] ${message}`);
+            break;
+        case 'warn':
+            console.warn(`[${typeUpper} - ${timestamp}] ${message}`);
+            break;
+        case 'error':
+            console.error(`[${typeUpper} - ${timestamp}] ${message}`);
+            break;
+        case 'debug':
+        default:
+            console.log(`[${typeUpper} - ${timestamp}] ${message}`);
+            break;
+    }
+}
+
+// Fungsi untuk menampilkan pesan di bawah form
+function displayMessage(text, isError = false) { 
+    logDebug(`Menampilkan pesan UI: ${text} (Error: ${isError})`, isError ? 'warn' : 'info');
+    messageContainer.textContent = text;
+    messageContainer.className = `text-center text-sm font-medium h-6 ${isError ? 'text-error-red' : 'text-wa-success'}`;
+}
+
+// Fungsi untuk mereset dropdown dan menonaktifkannya
+function resetAndDisable(element, placeholder) {
+    logDebug(`Reset dan Disable dropdown: ${element.id} dengan placeholder: ${placeholder}`);
+    element.innerHTML = `<option value="" disabled selected>${placeholder}</option>`;
+    element.disabled = true;
+}
+
+// ===================================
+// 2. Fungsi Fetch & Populate Dropdown
+// ===================================
+
+async function fetchAndPopulate(endpoint, selectElement, dependencyId = null) {
+    // Tentukan URL API (menggunakan parent_id untuk turunan)
+    
+    const token = localStorage.getItem('authToken');
+    const url = dependencyId ? 
+        `${ADDRESS_API_BASE}/${endpoint}?parent_id=${dependencyId}` : 
+        `${ADDRESS_API_BASE}/${endpoint}`;
+        
+    logDebug(`Memulai fetch data ${endpoint}. URL: ${url}`);
+
+    try {
+        const res = await fetch(url,{
+            headers: {'Authorization': `Bearer ${token}`}
+    });
+        
+        logDebug(`Fetch ${endpoint} selesai. Status: ${res.status}`);
+
+        if (!res.ok) {
+            logDebug(`Gagal fetch ${endpoint}: Respon server tidak OK. Status: ${res.status}`, 'error');
+            throw new Error(`Server responded with status ${res.status}`);
+        }
+        
+        const data = await res.json(); 
+        logDebug(`Data ${endpoint} diterima. Jumlah item: ${data ? data.length : 0}`);
+
+        selectElement.disabled = false;
+        selectElement.innerHTML = `<option value="" disabled selected>Pilih ${endpoint}...</option>`;
+
+        if (data && Array.isArray(data) && data.length > 0) {
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.nama;
+                option.dataset.name = item.nama; 
+                selectElement.appendChild(option);
+            });
+        } else {
+            logDebug(`Data ${endpoint} kosong. Menonaktifkan dropdown.`, 'warn');
+            resetAndDisable(selectElement, `Tidak ada data ${endpoint} ditemukan.`);
+        }
+    } catch (error) {
+        logDebug(`Kesalahan fatal saat memuat data ${endpoint}: ${error.message}`, 'error');
+        displayMessage(`Gagal memuat data ${selectElement.id}. Pastikan server berjalan dan koneksi internet stabil.`, true);
+        resetAndDisable(selectElement, `Gagal memuat data.`);
+    }
+}
+
+// ===================================
+// 3. Logika Awal & Event Listeners
+// ===================================
+
+// Cek Token dan Sesi di awal
+if (!authToken || !userPhone) {
+    logDebug("Sesi tidak valid (Token/Phone hilang). Mengarahkan ke login.html.", 'error');
+    alert("Sesi tidak valid. Silakan login ulang.");
+    window.location.href = 'login.html';
+}
+
+// 🔑 3.1. Memuat Provinsi saat halaman dimuat
+logDebug('Memuat data Provinsi saat inisialisasi.');
+fetchAndPopulate('provinsi', provinsiSelect);
+
+// 🔑 3.1.1. Event Listener untuk GPS Location Button
+document.getElementById('get-location-btn').addEventListener('click', getCurrentLocation);
+
+// 🔑 3.2. Event Listener: Provinsi -> Kabupaten
+provinsiSelect.addEventListener('change', () => {
+    const provinsiId = provinsiSelect.value;
+    const provinsiName = provinsiSelect.options[provinsiSelect.selectedIndex].dataset.name;
+    logDebug(`Provinsi dipilih: ID=${provinsiId}, Nama=${provinsiName}. Memuat Kabupaten/Kota...`);
+    
+    resetAndDisable(kabupatenSelect, 'Memuat Kabupaten/Kota...');
+    resetAndDisable(kecamatanSelect, 'Pilih Kecamatan...');
+    resetAndDisable(kelurahanSelect, 'Pilih Kelurahan/Desa...');
+    
+    if (provinsiId) {
+        fetchAndPopulate('kabupaten', kabupatenSelect, provinsiId);
+    }
+});
+
+// 🔑 3.3. Event Listener: Kabupaten -> Kecamatan
+kabupatenSelect.addEventListener('change', () => {
+    const kabupatenId = kabupatenSelect.value;
+    const kabupatenName = kabupatenSelect.options[kabupatenSelect.selectedIndex].dataset.name;
+    logDebug(`Kabupaten/Kota dipilih: ID=${kabupatenId}, Nama=${kabupatenName}. Memuat Kecamatan...`);
+    
+    resetAndDisable(kecamatanSelect, 'Memuat Kecamatan...');
+    resetAndDisable(kelurahanSelect, 'Pilih Kelurahan/Desa...');
+    
+    if (kabupatenId) {
+        fetchAndPopulate('kecamatan', kecamatanSelect, kabupatenId);
+    }
+});
+
+// 🔑 3.4. Event Listener: Kecamatan -> Kelurahan
+kecamatanSelect.addEventListener('change', () => {
+    const kecamatanId = kecamatanSelect.value;
+    const kecamatanName = kecamatanSelect.options[kecamatanSelect.selectedIndex].dataset.name;
+    logDebug(`Kecamatan dipilih: ID=${kecamatanId}, Nama=${kecamatanName}. Memuat Kelurahan/Desa...`);
+    
+    resetAndDisable(kelurahanSelect, 'Memuat Kelurahan/Desa...');
+    
+    if (kecamatanId) {
+        fetchAndPopulate('kelurahan', kelurahanSelect, kecamatanId);
+    }
+});
+
+
+// ===================================
+// 4. Logika Submit Form
+// ===================================
+
+profileForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    logDebug('Form Submit dipicu. Memulai proses validasi dan pengiriman.');
+    
+    // Ambil data wajib dari input teks
+    const name = document.getElementById('name').value.trim();
+    const kampung = document.getElementById('kampung').value.trim();
+    const rtrw = document.getElementById('rtrw').value.trim();
+
+    // Ambil ID dan Nama dari Dropdown yang dipilih
+    const provinsiOption = provinsiSelect.options[provinsiSelect.selectedIndex];
+    const kabupatenOption = kabupatenSelect.options[kabupatenSelect.selectedIndex];
+    const kecamatanOption = kecamatanSelect.options[kecamatanSelect.selectedIndex];
+    const kelurahanOption = kelurahanSelect.options[kelurahanSelect.selectedIndex];
+
+    const dataToSend = {
+        name,
+        provinsi_id: provinsiOption.value,
+        provinsi_name: provinsiOption.dataset.name,
+        kabupaten_id: kabupatenOption.value,
+        kabupaten_name: kabupatenOption.dataset.name,
+        kecamatan_id: kecamatanOption.value,
+        kecamatan_name: kecamatanOption.dataset.name,
+        kelurahan_id: kelurahanOption.value,
+        kelurahan_name: kelurahanOption.dataset.name,
+        kampung, 
+        rtrw,
+        // GPS Location Data
+        gps_latitude: selectedLocation ? selectedLocation.lat : null,
+        gps_longitude: selectedLocation ? selectedLocation.lng : null,
+        gps_accuracy: selectedLocation ? 'high' : null,
+        gps_timestamp: selectedLocation ? new Date().toISOString() : null
+    };
+
+    logDebug('Data yang akan dikirim (cek ID & Nama wilayah):', 'debug');
+    console.log(dataToSend);
+
+    // Cek validasi untuk semua field wajib, termasuk dropdown
+    if (!name || !kampung || !rtrw || !provinsiOption.value || !kabupatenOption.value || !kecamatanOption.value || !kelurahanOption.value) {
+        logDebug('Validasi gagal: Ada kolom wajib yang kosong.', 'warn');
+        return displayMessage("Semua kolom (termasuk alamat lengkap) wajib diisi.", true);
+    }
+    
+    // Cek validasi GPS Location (opsional tapi direkomendasikan)
+    if (!selectedLocation) {
+        const confirmWithoutGPS = confirm("Lokasi GPS belum dipilih. Ini akan membuat pengiriman kurang akurat. Apakah Anda yakin ingin melanjutkan?");
+        if (!confirmWithoutGPS) {
+            return displayMessage("Silakan pilih lokasi GPS terlebih dahulu untuk akurasi pengiriman yang lebih baik.", true);
+        }
+    }
+
+    displayMessage("Menyimpan data...", false);
+    saveButton.disabled = true;
+
+    try {
+        const apiUrl = `${BASE_URL}/setup-profile`;
+        logDebug(`Mengirim data ke: ${apiUrl} dengan AuthToken: ${authToken.substring(0, 10)}...`);
+
+        // KIRIM DATA LENGKAP (ID dan Nama) KE BACKEND
+        const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(dataToSend)
+        });
+
+        const data = await res.json();
+        logDebug(`Respon submit diterima. Status: ${res.status}`);
+        console.log(data); // Tampilkan seluruh respon server
+
+        if (res.ok) {
+            // Simpan Nama ke Session Storage untuk greeting
+            localStorage.setItem('userName', name); 
+            logDebug(`Setup Profil BERHASIL. Nama user (${name}) disimpan.`, 'info');
+            
+            displayMessage(data.message || 'Data berhasil disimpan!', false);
+            
+            // Redirect ke Halaman Utama
+            // File: setup-profile.js, bagian INIT
+            console.log(`[INIT] AuthToken ditemukan: ${authToken}`); // Apakah token ditampilkan?
+            console.log(`[INIT] UserPhone ditemukan: ${userPhone}`); // Apakah phone ditampilkan?
+            logDebug('Mengarahkan ke home.html dalam 1 detik...');
+            setTimeout(() => {
+                window.location.href = 'home.html'; 
+            }, 1000);
+        } else {
+            logDebug(`Setup Profil GAGAL. Pesan Error: ${data.error || 'Respon status tidak OK.'}`, 'error');
+            displayMessage(data.error || 'Gagal menyimpan data. Coba lagi.', true);
+            saveButton.disabled = false;
+        }
+    } catch (error) {
+        logDebug(`Kesalahan Fetch/Jaringan saat submit: ${error.message}`, 'error');
+        console.error("Setup error:", error);
+        displayMessage('Terjadi kesalahan jaringan/server.', true);
+        saveButton.disabled = false;
+    }
+});
+    </script>
+</body>
+</html>

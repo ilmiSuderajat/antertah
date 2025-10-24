@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnterTah | Kuliner</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'cool-primary': '#1d4ed8',
+                        'cool-accent': '#06b6d4',
+                        'bg-light': '#f1f5f9',
+                        'bg-dark': '#0f172a',
+                        'card-light': '#ffffff',
+                        'card-dark': '#1e293b',
+                        'text-light': '#f1f5f9',
+                        'text-dark': '#1e293b',
+                        'neutral-text': '#64748b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(-20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Dark Mode Toggle Button Styles */
+        .dark-mode-toggle {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            border-radius: 24px;
+            background: linear-gradient(to right, #fbbf24, #f59e0b);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dark .dark-mode-toggle {
+            background: linear-gradient(to right, #1e293b, #334155);
+        }
+
+        .dark-mode-toggle .toggle-circle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .dark .dark-mode-toggle .toggle-circle {
+            transform: translateX(24px);
+            background: #0f172a;
+        }
+
+        /* Category Card Animations */
+        .category-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .category-card:hover::before {
+            left: 100%;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Restaurant Card Animations */
+        .restaurant-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .restaurant-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .restaurant-card:hover::before {
+            left: 100%;
+        }
+
+        .restaurant-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+        }
+
+        .restaurant-card img {
+            transition: transform 0.4s ease;
+        }
+
+        .restaurant-card:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Bottom Nav Active State */
+        .bottom-nav-item.active {
+            color: #1d4ed8;
+        }
+
+        .bottom-nav-item {
+            transition: all 0.3s ease;
+        }
+
+        /* Search Input Animation */
+        input:focus {
+            transform: scale(1.01);
+        }
+    </style>
+</head>
+<body class="bg-bg-light dark:bg-bg-dark text-text-dark dark:text-text-light min-h-screen font-sans pb-16 md:pb-0">
+    
+    <!-- Header Kuliner -->
+    <header class="bg-card-light dark:bg-card-dark shadow-md sticky top-0 z-50 backdrop-blur-md bg-opacity-95">
+        <div class="flex items-center justify-between p-4 h-16">
+            <!-- Back Button -->
+            <a href="home.html" class="text-cool-primary dark:text-cool-accent hover:scale-110 transition transform">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </a>
+
+            <!-- Title -->
+            <h1 class="absolute left-1/2 transform -translate-x-1/2 text-lg font-bold text-text-dark dark:text-text-light">
+                Kuliner
+            </h1>
+
+            <!-- Right Actions -->
+            <div class="flex items-center gap-2">
+                <!-- Dark Mode Toggle -->
+                <div id="darkModeToggle" class="dark-mode-toggle">
+                    <div class="toggle-circle">
+                        <i class="fas fa-sun text-yellow-500 text-xs"></i>
+                    </div>
+                </div>
+
+                <!-- Shopping Cart -->
+                <a id="cartButton" href="keranjang.html" class="relative">
+                    <i class="fas fa-shopping-basket text-xl text-neutral-text dark:text-gray-300"></i>
+                    <span id="cartBadge" class="absolute -top-1 -right-1 w-4 h-4 text-xs font-bold text-white bg-red-600 rounded-full flex items-center justify-center">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pb-20 md:pb-8">
+        <!-- Search Bar -->
+        <div class="px-4 py-4 bg-card-light dark:bg-card-dark md:bg-transparent">
+            <div class="max-w-7xl mx-auto">
+                <div class="relative">
+                    <input id="searchInput" type="text" placeholder="Cari makanan atau restoran..."
+                           class="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cool-primary focus:border-cool-primary dark:bg-gray-700 dark:text-text-light placeholder-gray-400 transition md:max-w-md">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+            <!-- Kategori Kuliner -->
+            <div class="py-4">
+                <h2 class="text-base font-bold mb-3 text-text-dark dark:text-text-light">Kategori</h2>
+
+                <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-3">
+                    <!-- Category Cards -->
+                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
+                        <div class="text-3xl mb-2">🍔</div>
+                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Nasi & Lauk</span>
+                    </a>
+                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
+                        <div class="text-3xl mb-2">☕</div>
+                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Minuman</span>
+                    </a>
+                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
+                        <div class="text-3xl mb-2">🥗</div>
+                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Sehat</span>
+                    </a>
+                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
+                        <div class="text-3xl mb-2">🍰</div>
+                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Kue</span>
+                    </a>
+                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
+                        <div class="text-3xl mb-2">🍨</div>
+                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Dessert</span>
+                    </a>
+                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
+                        <div class="text-3xl mb-2">🌭</div>
+                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Jajanan</span>
+                    </a>
+                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
+                        <div class="text-3xl mb-2">🍕</div>
+                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Pizza</span>
+                    </a>
+                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
+                        <div class="text-3xl mb-2">🍜</div>
+                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Mie</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Restoran Populer -->
+            <div class="py-4">
+                <h2 class="text-base font-bold mb-3 text-text-dark dark:text-text-light">Restoran Populer</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <!-- Restaurant Card 1 -->
+                    <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
+                        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                            <img src="https://placehold.co/60x60/1d4ed8/FFFFFF?text=R1" class="w-full h-full object-cover" alt="Restoran">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Restoran Nasi Uduk Mantap</h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
+                                <span class="text-xs text-gray-400">•</span>
+                                <span class="text-xs text-yellow-500">★ 4.8</span>
+                            </div>
+                            <p class="text-xs text-cool-primary dark:text-cool-accent font-medium mt-1">Gratis ongkir min. Rp 25K</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
+                    </div>
+
+                    <!-- Restaurant Card 2 -->
+                    <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
+                        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                            <img src="https://placehold.co/60x60/06b6d4/FFFFFF?text=R2" class="w-full h-full object-cover" alt="Restoran">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Warung Kopi Senja</h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs text-red-600 dark:text-red-400 font-medium">Tutup</span>
+                                <span class="text-xs text-gray-400">•</span>
+                                <span class="text-xs text-yellow-500">★ 4.5</span>
+                            </div>
+                            <p class="text-xs text-neutral-text dark:text-gray-400 mt-1">Ongkir Rp 5.000</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
+                    </div>
+
+                    <!-- Restaurant Card 3 -->
+                    <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
+                        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                            <img src="https://placehold.co/60x60/f59e0b/FFFFFF?text=R3" class="w-full h-full object-cover" alt="Restoran">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Martabak Manis Gila</h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
+                                <span class="text-xs text-gray-400">•</span>
+                                <span class="text-xs text-yellow-500">★ 4.9</span>
+                            </div>
+                            <p class="text-xs text-orange-500 font-medium mt-1">Promo Member</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
+                    </div>
+
+                    <!-- Restaurant Card 4 -->
+                    <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
+                        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                            <img src="https://placehold.co/60x60/10b981/FFFFFF?text=R4" class="w-full h-full object-cover" alt="Restoran">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Bakso Malang Cak Imin</h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
+                                <span class="text-xs text-gray-400">•</span>
+                                <span class="text-xs text-yellow-500">★ 4.7</span>
+                            </div>
+                            <p class="text-xs text-neutral-text dark:text-gray-400 mt-1">Ongkir Rp 3.000</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
+                    </div>
+
+                    <!-- Restaurant Card 5 -->
+                    <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
+                        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                            <img src="https://placehold.co/60x60/8b5cf6/FFFFFF?text=R5" class="w-full h-full object-cover" alt="Restoran">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Sate Ayam Pak Kumis</h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
+                                <span class="text-xs text-gray-400">•</span>
+                                <span class="text-xs text-yellow-500">★ 4.6</span>
+                            </div>
+                            <p class="text-xs text-cool-primary dark:text-cool-accent font-medium mt-1">Gratis ongkir min. Rp 20K</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
+                    </div>
+
+                    <!-- Restaurant Card 6 -->
+                    <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
+                        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                            <img src="https://placehold.co/60x60/ec4899/FFFFFF?text=R6" class="w-full h-full object-cover" alt="Restoran">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Ayam Geprek Bensu</h3>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
+                                <span class="text-xs text-gray-400">•</span>
+                                <span class="text-xs text-yellow-500">★ 4.8</span>
+                            </div>
+                            <p class="text-xs text-cool-primary dark:text-cool-accent font-medium mt-1">Gratis ongkir min. Rp 30K</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menu Makanan -->
+            <div class="py-4">
+                <h2 class="text-base font-bold mb-3 text-text-dark dark:text-text-light">Menu Makanan</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Menu Item 1 -->
+                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div class="flex gap-3">
+                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="https://placehold.co/80x80/1d4ed8/FFFFFF?text=🍛" class="w-full h-full object-cover" alt="Nasi Gudeg">
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">Nasi Gudeg</h3>
+                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">Nasi dengan gudeg, tempe, dan sambal</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-bold text-cool-primary">Rp 15.000</span>
+                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
+                                            data-id="1" data-name="Nasi Gudeg" data-price="15000" data-image="https://placehold.co/80x80/1d4ed8/FFFFFF?text=🍛">
+                                        <i class="fas fa-plus mr-1"></i>Tambah
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menu Item 2 -->
+                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div class="flex gap-3">
+                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="https://placehold.co/80x80/06b6d4/FFFFFF?text=☕" class="w-full h-full object-cover" alt="Kopi Susu">
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">Kopi Susu</h3>
+                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">Kopi hitam dengan susu segar</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-bold text-cool-primary">Rp 8.000</span>
+                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
+                                            data-id="2" data-name="Kopi Susu" data-price="8000" data-image="https://placehold.co/80x80/06b6d4/FFFFFF?text=☕">
+                                        <i class="fas fa-plus mr-1"></i>Tambah
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menu Item 3 -->
+                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div class="flex gap-3">
+                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="https://placehold.co/80x80/059669/FFFFFF?text=🍜" class="w-full h-full object-cover" alt="Bakso">
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">Bakso Malang</h3>
+                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">Bakso dengan mie dan sayuran segar</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-bold text-cool-primary">Rp 12.000</span>
+                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
+                                            data-id="3" data-name="Bakso Malang" data-price="12000" data-image="https://placehold.co/80x80/059669/FFFFFF?text=🍜">
+                                        <i class="fas fa-plus mr-1"></i>Tambah
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menu Item 4 -->
+                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div class="flex gap-3">
+                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="https://placehold.co/80x80/f59e0b/FFFFFF?text=🍰" class="w-full h-full object-cover" alt="Kue">
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">Kue Lapis</h3>
+                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">Kue lapis legit dengan keju</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-bold text-cool-primary">Rp 20.000</span>
+                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
+                                            data-id="4" data-name="Kue Lapis" data-price="20000" data-image="https://placehold.co/80x80/f59e0b/FFFFFF?text=🍰">
+                                        <i class="fas fa-plus mr-1"></i>Tambah
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menu Item 5 -->
+                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div class="flex gap-3">
+                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="https://placehold.co/80x80/ef4444/FFFFFF?text=🍕" class="w-full h-full object-cover" alt="Pizza">
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">Pizza Margherita</h3>
+                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">Pizza dengan tomat, mozzarella, dan basil</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-bold text-cool-primary">Rp 35.000</span>
+                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
+                                            data-id="5" data-name="Pizza Margherita" data-price="35000" data-image="https://placehold.co/80x80/ef4444/FFFFFF?text=🍕">
+                                        <i class="fas fa-plus mr-1"></i>Tambah
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menu Item 6 -->
+                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div class="flex gap-3">
+                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="https://placehold.co/80x80/8b5cf6/FFFFFF?text=🥗" class="w-full h-full object-cover" alt="Salad">
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">Salad Buah</h3>
+                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">Campuran buah segar dengan yogurt</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-bold text-cool-primary">Rp 18.000</span>
+                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
+                                            data-id="6" data-name="Salad Buah" data-price="18000" data-image="https://placehold.co/80x80/8b5cf6/FFFFFF?text=🥗">
+                                        <i class="fas fa-plus mr-1"></i>Tambah
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <footer class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
+        <div class="flex justify-around items-center h-16">
+            <a href="home.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span>Beranda</span>
+            </a>
+            <a href="kuliner.html" class="bottom-nav-item active text-cool-primary flex flex-col items-center text-xs font-bold transition">
+                <i class="fas fa-search text-xl mb-1"></i>
+                <span>Cari</span>
+            </a>
+            <a href="#" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
+                <i class="fas fa-list-alt text-xl mb-1"></i>
+                <span>Pesanan</span>
+            </a>
+            <a href="profile.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span>Akun</span>
+            </a>
+        </div>
+    </footer>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="inline-block align-bottom bg-card-light dark:bg-card-dark rounded-t-3xl px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <!-- Modal Header -->
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-text-dark dark:text-text-light">Keranjang Belanja</h3>
+                    <button id="closeCartModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Cart Items -->
+                <div id="cartItems" class="space-y-3 mb-4 max-h-64 overflow-y-auto">
+                    <!-- Cart items will be populated here -->
+                </div>
+
+                <!-- Cart Summary -->
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-lg font-bold text-text-dark dark:text-text-light">Total:</span>
+                        <span id="cartTotal" class="text-lg font-bold text-cool-primary">Rp 0</span>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex gap-2">
+                        <button id="clearCart" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            <i class="fas fa-trash mr-2"></i>Kosongkan
+                        </button>
+                        <button id="checkoutBtn" class="flex-1 bg-cool-primary hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            <i class="fas fa-shopping-cart mr-2"></i>Checkout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="config.js"></script>
+    <script>
+ 
+        // ===================================
+        // CART SYSTEM (dengan sinkron ke API)
+        // ===================================
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        
+        // Check if user is authenticated
+        function checkAuth() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                console.warn('User not authenticated');
+                return false;
+            }
+            return true;
+        }
+
+        // Cart functions
+        async function addToCart(item) {
+            if (!checkAuth()) {
+                showNotification('⚠️ Silakan login terlebih dahulu', 'error');
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('authToken');
+                // Sinkron ke server
+                const res = await fetch(`${BASE_URL}/api/cart`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ id: item.id, name: item.name, price: item.price, image: item.image })
+                });
+                if (!res.ok) throw new Error('post-failed');
+                showAddToCartAnimation(item.name);
+                await refreshCartBadge();
+                return;
+            } catch (e) {
+                console.error('Cart sync error:', e);
+                // Fallback ke local jika offline/ gagal
+                const existingItem = cart.find(cartItem => cartItem.id === item.id);
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    cart.push({ ...item, quantity: 1 });
+                }
+                saveCart();
+                updateCartUI();
+                showAddToCartAnimation(item.name);
+            }
+        }
+
+        function removeFromCart(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
+            saveCart();
+            updateCartUI();
+        }
+
+        function updateQuantity(itemId, newQuantity) {
+            const item = cart.find(cartItem => cartItem.id === itemId);
+            if (item) {
+                if (newQuantity <= 0) {
+                    removeFromCart(itemId);
+                } else {
+                    item.quantity = newQuantity;
+                    saveCart();
+                    updateCartUI();
+                }
+            }
+        }
+
+        function clearCart() {
+            cart = [];
+            saveCart();
+            updateCartUI();
+        }
+
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function updateCartUI() {
+            const cartBadge = document.getElementById('cartBadge');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            
+            // Update cart badge
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartBadge.textContent = totalItems;
+            cartBadge.style.display = totalItems > 0 ? 'flex' : 'none';
+            
+            // Update cart items
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-shopping-cart text-4xl mb-2"></i>
+                        <p>Keranjang kosong</p>
+                    </div>
+                `;
+            } else {
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                        <img src="${item.image}" alt="${item.name}" class="w-12 h-12 rounded-lg object-cover">
+                        <div class="flex-1">
+                            <h4 class="font-medium text-sm text-text-dark dark:text-text-light">${item.name}</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Rp ${item.price.toLocaleString()}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})" 
+                                    class="w-6 h-6 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-xs hover:bg-gray-400 dark:hover:bg-gray-500">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <span class="w-8 text-center text-sm font-medium">${item.quantity}</span>
+                            <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})" 
+                                    class="w-6 h-6 bg-cool-primary text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-700">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <button onclick="removeFromCart(${item.id})" 
+                                class="text-red-500 hover:text-red-700 text-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+            
+            // Update total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotal.textContent = `Rp ${total.toLocaleString()}`;
+        }
+
+        async function refreshCartBadge() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) return;
+                const res = await fetch(`${BASE_URL}/api/cart`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) return;
+                const data = await res.json();
+                const totalItems = (data.items || []).reduce((s, it) => s + (it.quantity || 0), 0);
+                const cartBadge = document.getElementById('cartBadge');
+                if (cartBadge) {
+                    cartBadge.textContent = totalItems;
+                    cartBadge.style.display = totalItems > 0 ? 'flex' : 'none';
+                }
+            } catch (error) {
+                console.error('Refresh cart badge error:', error);
+            }
+        }
+        
+        // Add notification function
+        function showNotification(message, type = 'success') {
+            const existing = document.querySelector('.notification-toast');
+            if (existing) existing.remove();
+
+            const notification = document.createElement('div');
+            notification.className = 'notification-toast fixed top-20 right-4 z-[9999] animate-slide-up';
+            
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-yellow-500';
+            
+            notification.innerHTML = `
+                <div class="${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3">
+                    <span class="text-sm font-medium">${message}</span>
+                    <button onclick="this.closest('.notification-toast').remove()" class="ml-2 hover:opacity-80">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function showAddToCartAnimation(itemName) {
+            // Create toast notification
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+            toast.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-check-circle"></i>
+                    <span>${itemName} ditambahkan ke keranjang</span>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // ===================================
+        // DARK MODE FUNCTIONALITY
+        // ===================================
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateDarkModeIcon(isDark);
+        }
+
+        function updateDarkModeIcon(isDark) {
+            const icon = document.querySelector('.toggle-circle i');
+            if (icon) {
+                icon.className = isDark ? 'fas fa-moon text-blue-300 text-xs' : 'fas fa-sun text-yellow-500 text-xs';
+            }
+        }
+
+        function applyInitialTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            updateDarkModeIcon(theme === 'dark');
+        }
+
+        // ===================================
+        // INITIALIZATION
+        // ===================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("Halaman Kuliner siap.");
+
+            // Apply initial theme
+            applyInitialTheme();
+
+            // Dark Mode Toggle
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', toggleDarkMode);
+            }
+
+            // Search functionality (placeholder)
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+                    console.log('Searching for:', query);
+                    // TODO: Implement search logic
+                });
+            }
+
+            // Refresh badge dari API saat halaman siap
+            refreshCartBadge();
+
+            // Close cart modal
+            const closeCartModal = document.getElementById('closeCartModal');
+            if (closeCartModal) {
+                closeCartModal.addEventListener('click', () => {
+                    document.getElementById('cartModal').classList.add('hidden');
+                });
+            }
+
+            // Hapus handler modal keranjang lama (kini diarahkan ke keranjang.html)
+
+            // Add to cart buttons
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const item = {
+                        id: parseInt(button.dataset.id),
+                        name: button.dataset.name,
+                        price: parseInt(button.dataset.price),
+                        image: button.dataset.image
+                    };
+                    addToCart(item);
+                });
+            });
+
+            // Initialize cart UI
+            updateCartUI();
+        });
+    </script>
+</body>
+</html>
