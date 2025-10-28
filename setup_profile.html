@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnterNa - Lengkapi Profil & Alamat</title>
+    <title>AnterTah - Lengkapi Profil & Alamat</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     
-    <!-- Google Maps API -->
+    <!-- Google Maps API - Ganti YOUR_GOOGLE_MAPS_API_KEY dengan kunci API yang valid -->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMap"></script>
     
     <script>
@@ -18,18 +18,39 @@
             theme: {
                 extend: {
                     colors: {
-                        'cool-primary': '#059669', // Hijau Keren
-                        'cool-accent': '#34D399',  // Hijau Terang
-                        'bg-light': '#F9FAFB',
-                        'bg-dark': '#111827',
-                        'card-light': '#FFFFFF',
-                        'card-dark': '#1F2937',
-                        'neutral-text': '#4B5563',
-                        'error-red': '#EF4444',
+                        'cool-primary': '#1d4ed8',
+                        'cool-accent': '#06b6d4',
+                        'bg-light': '#f1f5f9',
+                        'bg-dark': '#0f172a',
+                        'card-light': '#ffffff',
+                        'card-dark': '#1e293b',
+                        'text-light': '#f1f5f9',
+                        'text-dark': '#1e293b',
+                        'neutral-text': '#64748b',
                         'wa-success': '#25D366'
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                        'spin-slow': 'spin 2s linear infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
                     }
                 }
             }
@@ -44,162 +65,429 @@
             left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #9CA3AF; /* gray-400 */
+            color: #64748b;
         }
         .input-field {
-            padding-left: 3rem !important; /* Ruang untuk ikon */
+            padding-left: 3rem !important;
         }
         select.input-field {
-             /* Hapus padding-left untuk select agar panah tetap normal */
             padding-left: 1rem !important; 
+        }
+        
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        
+        .step-indicator.active {
+            background-color: #1d4ed8;
+            color: white;
+        }
+        
+        .step-indicator.completed {
+            background-color: #06b6d4;
+            color: white;
+        }
+        
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card-shadow:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1d4ed8 0%, #06b6d4 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(29, 78, 216, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .map-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1rem;
+        }
+        
+        .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .pulse-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #1d4ed8;
+            transform: translate(-50%, -50%);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(29, 78, 216, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(29, 78, 216, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(29, 78, 216, 0);
+            }
+        }
+        
+        .form-section {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .form-section.hidden {
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background-color: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1d4ed8 0%, #06b6d4 100%);
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 640px) {
+            .mobile-scroll {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .mobile-scroll::-webkit-scrollbar {
+                height: 4px;
+            }
+            
+            .mobile-scroll::-webkit-scrollbar-track {
+                background: #f1f5f9;
+            }
+            
+            .mobile-scroll::-webkit-scrollbar-thumb {
+                background: #64748b;
+                border-radius: 4px;
+            }
         }
     </style>
 </head>
-<body class="bg-bg-light dark:bg-bg-dark min-h-screen flex items-center justify-center p-4 font-sans">
-    <div class="w-full max-w-lg lg:max-w-xl"> <header class="text-center mb-8 pt-4">
-            <h1 class="text-4xl font-extrabold text-cool-primary dark:text-cool-accent leading-tight">Lengkapi Detail Pengiriman</h1>
-            <p class="mt-2 text-base text-neutral-text dark:text-gray-400">Pastikan data Anda akurat untuk pengiriman yang lancar.</p>
-        </header>
+<body class="bg-bg-light dark:bg-bg-dark min-h-screen font-sans">
+    <!-- Progress Bar -->
+    <div class="progress-bar fixed top-0 left-0 right-0 z-50">
+        <div id="progress-fill" class="progress-fill" style="width: 33%;"></div>
+    </div>
+    
+    <!-- Header -->
+    <header class="bg-card-light dark:bg-card-dark shadow-sm sticky top-0 z-40 pt-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-md text-neutral-text hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="text-xl font-semibold text-text-dark dark:text-text-light ml-2 md:ml-0">AnterTah</h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                        <i class="fas fa-moon text-neutral-text dark:text-text-light"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
-        <div class="bg-card-light dark:bg-card-dark p-6 sm:p-8 rounded-3xl shadow-2xl shadow-cool-primary/10 dark:shadow-cool-accent/5 border border-gray-100 dark:border-gray-800 space-y-8">
-            <form id="profile-form" class="space-y-6">
-                
-                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200 border-b pb-2 border-gray-200 dark:border-gray-700">Penerima & Alamat Utama</h2>
-                
-                <!-- GPS Location Section -->
-                <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-lg font-semibold text-blue-800 dark:text-blue-200 flex items-center">
-                            <i class="fas fa-map-marker-alt mr-2"></i>
-                            Lokasi GPS Real-time
-                        </h3>
-                        <button type="button" id="get-location-btn" 
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition duration-200 flex items-center">
-                            <i class="fas fa-crosshairs mr-1"></i>
-                            Ambil Lokasi
-                        </button>
-                    </div>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden fixed inset-0 z-30 bg-gray-800 bg-opacity-50">
+        <div class="bg-card-light dark:bg-card-dark w-64 h-full shadow-lg">
+            <div class="p-4">
+                <button onclick="toggleMobileMenu()" class="mb-4 p-2 rounded-md text-neutral-text hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+                <nav class="space-y-2">
+                    <a href="#" class="block px-4 py-2 rounded-md text-text-dark dark:text-text-light hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fas fa-home mr-2"></i> Beranda
+                    </a>
+                    <a href="#" class="block px-4 py-2 rounded-md bg-blue-50 dark:bg-blue-900/20 text-cool-primary">
+                        <i class="fas fa-user mr-2"></i> Profil
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
+        <div class="max-w-2xl mx-auto">
+            <!-- Step Indicators -->
+            <div class="flex justify-between mb-8">
+                <div class="flex flex-col items-center">
+                    <div id="step-1" class="step-indicator active w-10 h-10 rounded-full flex items-center justify-center font-semibold mb-2">1</div>
+                    <span class="text-xs text-neutral-text">Data Pribadi</span>
+                </div>
+                <div class="flex-1 h-1 bg-gray-200 dark:bg-gray-700 self-center mx-2"></div>
+                <div class="flex flex-col items-center">
+                    <div id="step-2" class="step-indicator w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-semibold mb-2">2</div>
+                    <span class="text-xs text-neutral-text">Alamat</span>
+                </div>
+                <div class="flex-1 h-1 bg-gray-200 dark:bg-gray-700 self-center mx-2"></div>
+                <div class="flex flex-col items-center">
+                    <div id="step-3" class="step-indicator w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-semibold mb-2">3</div>
+                    <span class="text-xs text-neutral-text">Konfirmasi</span>
+                </div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="bg-card-light dark:bg-card-dark rounded-2xl shadow-xl card-shadow p-6 sm:p-8">
+                <!-- Step 1: Personal Data -->
+                <div id="form-step-1" class="form-section">
+                    <h2 class="text-2xl font-bold text-text-dark dark:text-text-light mb-6">Data Pribadi</h2>
                     
-                    <!-- Location Status -->
-                    <div id="location-status" class="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        Klik "Ambil Lokasi" untuk mendapatkan koordinat GPS yang akurat
-                    </div>
-                    
-                    <!-- Map Container -->
-                    <div id="map-container" class="hidden">
-                        <div id="map" class="w-full h-64 rounded-lg border border-gray-300 dark:border-gray-600"></div>
-                        <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-hand-pointer mr-1"></i>
-                            Klik pada peta untuk memilih lokasi yang tepat
+                    <div class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-text-dark dark:text-text-light mb-2">
+                                Nama Lengkap
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-user"></i>
+                                <input id="name" name="name" type="text" required 
+                                       class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-card-dark dark:text-text-light transition duration-200" 
+                                       placeholder="Masukkan nama lengkap Anda">
+                            </div>
                         </div>
-                    </div>
-                    
-                    <!-- Selected Location Info -->
-                    <div id="selected-location" class="hidden mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                        <div class="flex items-start">
-                            <i class="fas fa-check-circle text-green-600 dark:text-green-400 mt-1 mr-2"></i>
-                            <div>
-                                <div class="text-sm font-medium text-green-800 dark:text-green-200">Lokasi Terpilih:</div>
-                                <div id="selected-address" class="text-sm text-green-700 dark:text-green-300"></div>
-                                <div id="selected-coords" class="text-xs text-green-600 dark:text-green-400 mt-1"></div>
+                        
+                        <div>
+                            <label for="phone" class="block text-sm font-medium text-text-dark dark:text-text-light mb-2">
+                                Nomor Telepon
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-phone"></i>
+                                <input id="phone" name="phone" type="tel" required 
+                                       class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-card-dark dark:text-text-light transition duration-200" 
+                                       placeholder="Masukkan nomor telepon Anda">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-text-dark dark:text-text-light mb-2">
+                                Email (Opsional)
+                            </label>
+                            <div class="input-group">
+                                <i class="fas fa-envelope"></i>
+                                <input id="email" name="email" type="email" 
+                                       class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-card-dark dark:text-text-light transition duration-200" 
+                                       placeholder="Masukkan email Anda">
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        <i class="fas fa-user mr-1 text-cool-primary"></i> Nama Lengkap (Penerima)
-                    </label>
-                    <div class="input-group">
-                        <i class="fas fa-signature"></i>
-                        <input id="name" name="name" type="text" required 
-                               class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white transition duration-200" 
-                               placeholder="Cth: Budi Santoso">
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"> 
                     
-                    <div>
-                        <label for="provinsi" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Provinsi</label>
-                        <select id="provinsi" name="provinsi" required 
-                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white transition duration-200">
-                            <option value="" disabled selected>Pilih Provinsi...</option>
-                            </select>
-                    </div>
-
-                    <div>
-                        <label for="kabupaten" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kabupaten/Kota</label>
-                        <select id="kabupaten" name="kabupaten" required disabled
-                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 transition duration-200">
-                            <option value="" disabled selected>Pilih Kabupaten/Kota...</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label for="kecamatan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kecamatan</label>
-                        <select id="kecamatan" name="kecamatan" required disabled
-                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 transition duration-200">
-                            <option value="" disabled selected>Pilih Kecamatan...</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="kelurahan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kelurahan/Desa</label>
-                        <select id="kelurahan" name="kelurahan" required disabled
-                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800 dark:disabled:text-gray-500 transition duration-200">
-                            <option value="" disabled selected>Pilih Kelurahan/Desa...</option>
-                        </select>
+                    <div class="mt-8 flex justify-end">
+                        <button onclick="nextStep(1)" class="btn-primary px-6 py-3 rounded-xl text-white font-medium">
+                            Lanjutkan <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Step 2: Address -->
+                <div id="form-step-2" class="form-section hidden">
+                    <h2 class="text-2xl font-bold text-text-dark dark:text-text-light mb-6">Alamat Pengiriman</h2>
                     
-                    <div>
-                        <label for="kampung" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            <i class="fas fa-map-marker-alt mr-1 text-cool-primary"></i> Nama Jalan / Patokan
-                        </label>
-                         <div class="input-group">
-                            <i class="fas fa-road"></i>
-                            <input id="kampung" name="kampung" type="text" required 
-                                class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white transition duration-200" 
-                                placeholder="Cth: Jl. Pahlawan No. 45 / Dekat Warung Pak RT">
+                    <div class="space-y-6">
+                        <!-- GPS Location Section -->
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-lg font-semibold text-cool-primary flex items-center">
+                                    <i class="fas fa-map-marker-alt mr-2"></i>
+                                    Lokasi GPS
+                                </h3>
+                                <button type="button" id="get-location-btn" 
+                                        class="px-4 py-2 bg-cool-primary hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition duration-200 flex items-center">
+                                    <i class="fas fa-crosshairs mr-1"></i>
+                                    Ambil Lokasi
+                                </button>
+                            </div>
+                            
+                            <!-- Location Status -->
+                            <div id="location-status" class="text-sm text-neutral-text mb-3">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Klik "Ambil Lokasi" untuk mendapatkan koordinat GPS yang akurat
+                            </div>
+                            
+                            <!-- Map Container -->
+                            <div id="map-container" class="hidden">
+                                <div class="map-container">
+                                    <div id="map" class="w-full h-64"></div>
+                                    <div class="map-overlay"></div>
+                                </div>
+                                <div class="mt-2 text-xs text-neutral-text">
+                                    <i class="fas fa-hand-pointer mr-1"></i>
+                                    Klik pada peta untuk memilih lokasi yang tepat
+                                </div>
+                            </div>
+                            
+                            <!-- Selected Location Info -->
+                            <div id="selected-location" class="hidden mt-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                                <div class="flex items-start">
+                                    <i class="fas fa-check-circle text-wa-success mt-1 mr-2"></i>
+                                    <div>
+                                        <div class="text-sm font-medium text-green-800 dark:text-green-200">Lokasi Terpilih:</div>
+                                        <div id="selected-address" class="text-sm text-green-700 dark:text-green-300"></div>
+                                        <div id="selected-coords" class="text-xs text-green-600 dark:text-green-400 mt-1"></div>
+                                        <input type="text" name="latitude" id="latitude" hidden>
+                                        <input type="text" name="longitude" id="longitude" hidden>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"> 
+                            <div>
+                                <label for="provinsi" class="block text-sm font-medium text-text-dark dark:text-text-light mb-2">Provinsi</label>
+                                <select id="provinsi" name="provinsi" required 
+                                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-card-dark dark:text-text-light transition duration-200">
+                                    <option value="" disabled selected>Pilih Provinsi...</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="kabupaten" class="block text-sm font-medium text-text-dark dark:text-text-light mb-2">Kabupaten/Kota</label>
+                                <select id="kabupaten" name="kabupaten" required disabled
+                                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-card-dark dark:text-text-light disabled:bg-gray-100 dark:disabled:bg-gray-800 dark:disabled:text-neutral-text transition duration-200">
+                                    <option value="" disabled selected>Pilih Kabupaten/Kota...</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="kecamatan" class="block text-sm font-medium text-text-dark dark:text-text-light mb-2">Kecamatan</label>
+                                <select id="kecamatan" name="kecamatan" required disabled
+                                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-card-dark dark:text-text-light disabled:bg-gray-100 dark:disabled:bg-gray-800 dark:disabled:text-neutral-text transition duration-200">
+                                    <option value="" disabled selected>Pilih Kecamatan...</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="kelurahan" class="block text-sm font-medium text-text-dark dark:text-text-light mb-2">Kelurahan/Desa</label>
+                                <select id="kelurahan" name="kelurahan" required disabled
+                                        class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-card-dark dark:text-text-light disabled:bg-gray-100 dark:disabled:bg-gray-800 dark:disabled:text-neutral-text transition duration-200">
+                                    <option value="" disabled selected>Pilih Kelurahan/Desa...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="kampung" class="block text-sm font-medium text-text-dark dark:text-text-light mb-2">
+                                    Nama Jalan / Patokan
+                                </label>
+                                <div class="input-group">
+                                    <i class="fas fa-road"></i>
+                                    <input id="kampung" name="kampung" type="text" required 
+                                           class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-card-dark dark:text-text-light transition duration-200" 
+                                           placeholder="Jl. Pahlawan No. 45 / Dekat Warung Pak RT">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="rtrw" class="block text-sm font-medium text-text-dark dark:text-text-light mb-2">
+                                    RT/RW
+                                </label>
+                                <div class="input-group">
+                                    <i class="fas fa-hashtag"></i>
+                                    <input id="rtrw" name="rtrw" type="text" required 
+                                           class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-card-dark dark:text-text-light transition duration-200" 
+                                           placeholder="005/012">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <div>
-                        <label for="rtrw" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            <i class="fas fa-house-user mr-1 text-cool-primary"></i> RT/RW
-                        </label>
-                         <div class="input-group">
-                            <i class="fas fa-hashtag"></i>
-                            <input id="rtrw" name="rtrw" type="text" required 
-                                class="input-field w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-cool-accent focus:border-cool-primary dark:bg-gray-700 dark:text-white transition duration-200" 
-                                placeholder="Cth: 005/012">
+                    <div class="mt-8 flex justify-between">
+                        <button onclick="prevStep(2)" class="px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-600 text-text-dark dark:text-text-light font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                            <i class="fas fa-arrow-left mr-2"></i> Kembali
+                        </button>
+                        <button onclick="nextStep(2)" class="btn-primary px-6 py-3 rounded-xl text-white font-medium">
+                            Lanjutkan <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Confirmation -->
+                <div id="form-step-3" class="form-section hidden">
+                    <h2 class="text-2xl font-bold text-text-dark dark:text-text-light mb-6">Konfirmasi Data</h2>
+                    
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-text-dark dark:text-text-light mb-4">Ringkasan Data</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-sm font-medium text-neutral-text">Data Pribadi</h4>
+                                <div class="mt-2 space-y-1">
+                                    <p class="text-sm text-text-dark dark:text-text-light"><span class="font-medium">Nama:</span> <span id="confirm-name"></span></p>
+                                    <p class="text-sm text-text-dark dark:text-text-light"><span class="font-medium">Telepon:</span> <span id="confirm-phone"></span></p>
+                                    <p class="text-sm text-text-dark dark:text-text-light"><span class="font-medium">Email:</span> <span id="confirm-email"></span></p>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-sm font-medium text-neutral-text">Alamat Pengiriman</h4>
+                                <div class="mt-2 space-y-1">
+                                    <p class="text-sm text-text-dark dark:text-text-light"><span id="confirm-address"></span></p>
+                                    <p class="text-sm text-text-dark dark:text-text-light"><span class="font-medium">Koordinat:</span> <span id="confirm-coords"></span></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div id="message-container" class="text-center text-sm font-medium h-6 pt-2">
+                    
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 mb-6">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle text-cool-primary mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="text-sm font-medium text-cool-primary">Penting!</h4>
+                                <p class="text-sm text-neutral-text mt-1">Pastikan semua data yang Anda masukkan sudah benar. Data ini akan digunakan untuk proses pengiriman pesanan Anda.</p>
+                            </div>
+                        </div>
                     </div>
-
-                <div>
-                    <button type="submit" id="save-button"
-                            class="w-full flex items-center justify-center py-3 px-4 rounded-xl shadow-lg text-base font-bold text-white bg-wa-success hover:bg-green-600 focus:ring-4 focus:ring-green-300 transition duration-300 transform hover:scale-[1.01] active:scale-95 disabled:bg-gray-400 disabled:shadow-none"
-                            aria-live="polite">
-                        <i class="fas fa-check-circle mr-2" id="button-icon"></i> 
-                        <span id="button-text">Simpan & Mulai Belanja</span>
-                    </button>
+                    
+                    <div class="mt-8 flex justify-between">
+                        <button onclick="prevStep(3)" class="px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-600 text-text-dark dark:text-text-light font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                            <i class="fas fa-arrow-left mr-2"></i> Kembali
+                        </button>
+                        <button type="submit" id="save-button" class="btn-primary px-6 py-3 rounded-xl text-white font-medium">
+                            <i class="fas fa-check-circle mr-2"></i> Simpan & Mulai Belanja
+                        </button>
+                    </div>
                 </div>
-            </form>
+            </div>
+            
+            <!-- Message Container -->
+            <div id="message-container" class="mt-4 text-center text-sm font-medium h-6"></div>
         </div>
-        
-        <footer class="mt-8 text-center text-sm text-gray-400 dark:text-gray-600">
-            &copy; 2025 AnterNa. Layanan Pengiriman Cepat.
-        </footer>
-    </div>
+    </main>
+    
+    <footer class="mt-12 text-center text-sm text-neutral-text">
+        &copy; 2025 AnterTah. Layanan Pengiriman Cepat.
+    </footer>
+    
     <script src="config.js"></script>
     <script>
 // ===================================
@@ -210,6 +498,7 @@ let map;
 let marker;
 let geocoder;
 let selectedLocation = null;
+let mapInitialized = false;
 
 // Initialize Google Maps
 function initMap() {
@@ -250,6 +539,15 @@ function initMap() {
                draggable: true,
                 title: 'Lokasi Terpilih'
             });
+            
+            // Add drag listener to marker
+            marker.addListener('dragend', (event) => {
+                const dragLat = event.latLng.lat();
+                const dragLng = event.latLng.lng();
+                getAddressFromCoordinates(dragLat, dragLng);
+                selectedLocation = { lat: dragLat, lng: dragLng };
+                updateLocationInfo(dragLat, dragLng);
+            });
         }
         
         // Get address from coordinates
@@ -260,7 +558,8 @@ function initMap() {
         updateLocationInfo(lat, lng);
     });
     
-    // Add drag listener to marker (will be added when marker is created)
+    mapInitialized = true;
+    console.log('Map initialized successfully');
 }
 
 // Get current GPS location
@@ -289,41 +588,52 @@ function getCurrentLocation() {
             
             console.log(`GPS Location: ${lat}, ${lng} (Accuracy: ${accuracy}m)`);
             
-            // Update map center and add marker
-            map.setCenter({ lat, lng });
-            map.setZoom(18);
+            // Update form fields with coordinates
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
             
-            if (marker) {
-                marker.setPosition({ lat, lng });
-            } else {
-                marker = new google.maps.Marker({
-                    position: { lat, lng },
-                    map: map,
-                    draggable: true,
-                    title: 'Lokasi Anda',
-                    animation: google.maps.Animation.DROP
-                });
+            // Update map center and add marker
+            if (mapInitialized) {
+                map.setCenter({ lat, lng });
+                map.setZoom(18);
                 
-                // Add drag listener to marker
-                marker.addListener('dragend', (event) => {
-                    const dragLat = event.latLng.lat();
-                    const dragLng = event.latLng.lng();
-                    getAddressFromCoordinates(dragLat, dragLng);
-                    selectedLocation = { lat: dragLat, lng: dragLng };
-                    updateLocationInfo(dragLat, dragLng);
-                });
+                if (marker) {
+                    marker.setPosition({ lat, lng });
+                } else {
+                    marker = new google.maps.Marker({
+                        position: { lat, lng },
+                        map: map,
+                        draggable: true,
+                        title: 'Lokasi Anda',
+                        animation: google.maps.Animation.DROP
+                    });
+                    
+                    // Add drag listener to marker
+                    marker.addListener('dragend', (event) => {
+                        const dragLat = event.latLng.lat();
+                        const dragLng = event.latLng.lng();
+                        getAddressFromCoordinates(dragLat, dragLng);
+                        selectedLocation = { lat: dragLat, lng: dragLng };
+                        updateLocationInfo(dragLat, dragLng);
+                        
+                        // Update form fields
+                        document.getElementById('latitude').value = dragLat;
+                        document.getElementById('longitude').value = dragLng;
+                    });
+                }
+                
+                // Get address from coordinates
+                getAddressFromCoordinates(lat, lng);
+                
+                // Update selected location
+                selectedLocation = { lat, lng };
+                updateLocationInfo(lat, lng);
+                
+                // Show map and success message
+                mapContainer.classList.remove('hidden');
             }
             
-            // Get address from coordinates
-            getAddressFromCoordinates(lat, lng);
-            
-            // Update selected location
-            selectedLocation = { lat, lng };
-            updateLocationInfo(lat, lng);
-            
-            // Show map and success message
-            mapContainer.classList.remove('hidden');
-            locationStatus.innerHTML = `<i class="fas fa-check-circle mr-1 text-green-500"></i>Lokasi ditemukan! (Akurasi: ${Math.round(accuracy)}m)`;
+            locationStatus.innerHTML = `<i class="fas fa-check-circle mr-1 text-wa-success"></i>Lokasi ditemukan! (Akurasi: ${Math.round(accuracy)}m)`;
             
             // Reset button
             locationBtn.disabled = false;
@@ -362,6 +672,11 @@ function getCurrentLocation() {
 
 // Get address from coordinates using reverse geocoding
 function getAddressFromCoordinates(lat, lng) {
+    if (!geocoder) {
+        console.error('Geocoder not initialized');
+        return;
+    }
+    
     const latlng = { lat, lng };
     
     geocoder.geocode({ location: latlng }, (results, status) => {
@@ -441,9 +756,111 @@ function updateLocationInfo(lat, lng) {
 }
 
 // ===================================
+// FORM STEP NAVIGATION
+// ===================================
+
+function nextStep(currentStep) {
+    // Validate current step
+    if (currentStep === 1) {
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        
+        if (!name || !phone) {
+            displayMessage("Mohon lengkapi semua field yang diperlukan", true);
+            return;
+        }
+        
+        // Update confirmation data
+        document.getElementById('confirm-name').textContent = name;
+        document.getElementById('confirm-phone').textContent = phone;
+        document.getElementById('confirm-email').textContent = document.getElementById('email').value || 'Tidak diisi';
+    } else if (currentStep === 2) {
+        const kampung = document.getElementById('kampung').value.trim();
+        const rtrw = document.getElementById('rtrw').value.trim();
+        const provinsi = document.getElementById('provinsi').value;
+        const kabupaten = document.getElementById('kabupaten').value;
+        const kecamatan = document.getElementById('kecamatan').value;
+        const kelurahan = document.getElementById('kelurahan').value;
+        
+        if (!kampung || !rtrw || !provinsi || !kabupaten || !kecamatan || !kelurahan) {
+            displayMessage("Mohon lengkapi semua field alamat", true);
+            return;
+        }
+        
+        // Update confirmation data
+        const provinsiText = document.getElementById('provinsi').options[document.getElementById('provinsi').selectedIndex].text;
+        const kabupatenText = document.getElementById('kabupaten').options[document.getElementById('kabupaten').selectedIndex].text;
+        const kecamatanText = document.getElementById('kecamatan').options[document.getElementById('kecamatan').selectedIndex].text;
+        const kelurahanText = document.getElementById('kelurahan').options[document.getElementById('kelurahan').selectedIndex].text;
+        
+        const fullAddress = `${kampung}, RT/RW ${rtrw}, ${kelurahanText}, ${kecamatanText}, ${kabupatenText}, ${provinsiText}`;
+        document.getElementById('confirm-address').textContent = fullAddress;
+        
+        const latitude = document.getElementById('latitude').value;
+        const longitude = document.getElementById('longitude').value;
+        document.getElementById('confirm-coords').textContent = latitude && longitude ? 
+            `${latitude}, ${longitude}` : 'Belum dipilih';
+    }
+    
+    // Hide current step
+    document.getElementById(`form-step-${currentStep}`).classList.add('hidden');
+    
+    // Show next step
+    document.getElementById(`form-step-${currentStep + 1}`).classList.remove('hidden');
+    
+    // Update step indicators
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    document.getElementById(`step-${currentStep}`).classList.add('completed');
+    document.getElementById(`step-${currentStep + 1}`).classList.add('active');
+    
+    // Update progress bar
+    updateProgressBar(currentStep + 1);
+}
+
+function prevStep(currentStep) {
+    // Hide current step
+    document.getElementById(`form-step-${currentStep}`).classList.add('hidden');
+    
+    // Show previous step
+    document.getElementById(`form-step-${currentStep - 1}`).classList.remove('hidden');
+    
+    // Update step indicators
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    document.getElementById(`step-${currentStep - 1}`).classList.add('active');
+    document.getElementById(`step-${currentStep - 1}`).classList.remove('completed');
+    
+    // Update progress bar
+    updateProgressBar(currentStep - 1);
+}
+
+function updateProgressBar(step) {
+    const progressFill = document.getElementById('progress-fill');
+    const percentage = (step / 3) * 100;
+    progressFill.style.width = `${percentage}%`;
+}
+
+// ===================================
+// MOBILE MENU & DARK MODE
+// ===================================
+
+function toggleMobileMenu() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenu.classList.toggle('hidden');
+}
+
+function toggleDarkMode() {
+    document.documentElement.classList.toggle('dark');
+    localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+}
+
+// Check for saved dark mode preference
+if (localStorage.getItem('darkMode') === 'true') {
+    document.documentElement.classList.add('dark');
+}
+
+// ===================================
 // KONSTANTA DAN INISIALISASI
 // ===================================
-const profileForm = document.getElementById('profile-form');
 const saveButton = document.getElementById('save-button');
 const messageContainer = document.getElementById('message-container');
 
@@ -496,7 +913,7 @@ function logDebug(message, type = 'debug') {
 function displayMessage(text, isError = false) { 
     logDebug(`Menampilkan pesan UI: ${text} (Error: ${isError})`, isError ? 'warn' : 'info');
     messageContainer.textContent = text;
-    messageContainer.className = `text-center text-sm font-medium h-6 ${isError ? 'text-error-red' : 'text-wa-success'}`;
+    messageContainer.className = `mt-4 text-center text-sm font-medium h-6 ${isError ? 'text-red-500' : 'text-wa-success'}`;
 }
 
 // Fungsi untuk mereset dropdown dan menonaktifkannya
@@ -617,17 +1034,18 @@ kecamatanSelect.addEventListener('change', () => {
     }
 });
 
-
 // ===================================
 // 4. Logika Submit Form
 // ===================================
 
-profileForm.addEventListener('submit', async (e) => {
+saveButton.addEventListener('click', async (e) => {
     e.preventDefault();
     logDebug('Form Submit dipicu. Memulai proses validasi dan pengiriman.');
     
     // Ambil data wajib dari input teks
     const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
     const kampung = document.getElementById('kampung').value.trim();
     const rtrw = document.getElementById('rtrw').value.trim();
 
@@ -637,8 +1055,14 @@ profileForm.addEventListener('submit', async (e) => {
     const kecamatanOption = kecamatanSelect.options[kecamatanSelect.selectedIndex];
     const kelurahanOption = kelurahanSelect.options[kelurahanSelect.selectedIndex];
 
+    // Get GPS coordinates from form fields
+    const latitude = document.getElementById('latitude').value;
+    const longitude = document.getElementById('longitude').value;
+
     const dataToSend = {
         name,
+        phone,
+        email,
         provinsi_id: provinsiOption.value,
         provinsi_name: provinsiOption.dataset.name,
         kabupaten_id: kabupatenOption.value,
@@ -650,8 +1074,8 @@ profileForm.addEventListener('submit', async (e) => {
         kampung, 
         rtrw,
         // GPS Location Data
-        gps_latitude: selectedLocation ? selectedLocation.lat : null,
-        gps_longitude: selectedLocation ? selectedLocation.lng : null,
+        latitude: latitude ?? (selectedLocation ? selectedLocation.lat : null),
+        longitude: longitude ?? (selectedLocation ? selectedLocation.lng : null),
         gps_accuracy: selectedLocation ? 'high' : null,
         gps_timestamp: selectedLocation ? new Date().toISOString() : null
     };
@@ -660,13 +1084,13 @@ profileForm.addEventListener('submit', async (e) => {
     console.log(dataToSend);
 
     // Cek validasi untuk semua field wajib, termasuk dropdown
-    if (!name || !kampung || !rtrw || !provinsiOption.value || !kabupatenOption.value || !kecamatanOption.value || !kelurahanOption.value) {
+    if (!name || !phone || !kampung || !rtrw || !provinsiOption.value || !kabupatenOption.value || !kecamatanOption.value || !kelurahanOption.value) {
         logDebug('Validasi gagal: Ada kolom wajib yang kosong.', 'warn');
         return displayMessage("Semua kolom (termasuk alamat lengkap) wajib diisi.", true);
     }
     
     // Cek validasi GPS Location (opsional tapi direkomendasikan)
-    if (!selectedLocation) {
+    if (!selectedLocation && !latitude && !longitude) {
         const confirmWithoutGPS = confirm("Lokasi GPS belum dipilih. Ini akan membuat pengiriman kurang akurat. Apakah Anda yakin ingin melanjutkan?");
         if (!confirmWithoutGPS) {
             return displayMessage("Silakan pilih lokasi GPS terlebih dahulu untuk akurasi pengiriman yang lebih baik.", true);
@@ -702,9 +1126,6 @@ profileForm.addEventListener('submit', async (e) => {
             displayMessage(data.message || 'Data berhasil disimpan!', false);
             
             // Redirect ke Halaman Utama
-            // File: setup-profile.js, bagian INIT
-            console.log(`[INIT] AuthToken ditemukan: ${authToken}`); // Apakah token ditampilkan?
-            console.log(`[INIT] UserPhone ditemukan: ${userPhone}`); // Apakah phone ditampilkan?
             logDebug('Mengarahkan ke home.html dalam 1 detik...');
             setTimeout(() => {
                 window.location.href = 'home.html'; 

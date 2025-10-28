@@ -8,7 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -491,7 +493,7 @@
                 <i class="fas fa-search text-xl mb-1"></i>
                 <span>Cari</span>
             </a>
-            <a href="#" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium">
+            <a href="pesanan.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium">
                 <i class="fas fa-list-alt text-xl mb-1"></i>
                 <span>Pesanan</span>
             </a>
@@ -755,67 +757,112 @@
                 `;
             }
         }
+function renderRecommendations(menuItems) {
+    const container = document.getElementById('recommendation-list-container');
+    container.innerHTML = '';
 
-        function renderRecommendations(menuItems) {
-            const container = document.getElementById('recommendation-list-container');
-            container.innerHTML = '';
+    if (menuItems.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
+                <p class="text-neutral-text">Belum ada menu tersedia</p>
+            </div>
+        `;
+        return;
+    }
 
-            if (menuItems.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-12">
-                        <i class="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
-                        <p class="text-neutral-text">Belum ada menu tersedia</p>
+    menuItems.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = "product-card bg-card-light dark:bg-card-dark rounded-2xl shadow-lg overflow-hidden cursor-pointer animate-scale-in";
+        card.style.animationDelay = `${index * 0.05}s`;
+
+        // ✅ Ambil semua gambar dari image_urls (bisa string JSON atau array)
+        const imageUrls = item.image_urls 
+            ? (typeof item.image_urls === 'string' ? JSON.parse(item.image_urls) : item.image_urls)
+            : (item.image_url ? [item.image_url] : []);
+
+        // ✅ Generate HTML untuk setiap gambar dalam slider
+        const imagesHtml = imageUrls.length > 0 
+            ? imageUrls.map(url => {
+                const fullUrl = url.startsWith('http') 
+                    ? url 
+                    : `${BASE_URL}/uploads/menu/${url}`;
+                return `
+                    <div class="swiper-slide">
+                        <img src="${fullUrl}" alt="${item.name}" class="w-full h-36 object-cover" 
+                            onerror="this.src='https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'">
+                    </div>`;
+            }).join('')
+            : `
+                <div class="swiper-slide">
+                    <img src="https://placehold.co/400x300/e2e8f0/64748b?text=No+Image" 
+                         class="w-full h-36 object-cover">
+                </div>`;
+
+        // ✅ Bangun isi kartu produk
+        const priceText = item.price ? `Rp ${parseInt(item.price).toLocaleString('id-ID')}` : 'Hubungi';
+        card.innerHTML = `
+            <div class="relative bg-gray-200 dark:bg-gray-700 rounded-t-2xl overflow-hidden">
+                <!-- Swiper Container -->
+                <div class="swiper mySwiper-${index}">
+                    <div class="swiper-wrapper">
+                        ${imagesHtml}
                     </div>
-                `;
-                return;
+                    <div class="swiper-pagination"></div>
+                </div>
+
+                ${item.promo 
+                    ? `<span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">${item.promo}</span>` 
+                    : ''}
+                ${!item.is_available 
+                    ? `<div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <span class="text-white font-bold">Tidak Tersedia</span>
+                       </div>` 
+                    : ''}
+            </div>
+
+            <div class="p-4">
+                <h4 class="font-bold text-base line-clamp-2 mb-2 min-h-[2.5rem]">${item.name}</h4>
+                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2 flex items-center">
+                    <i class="fas fa-tag mr-1"></i>
+                    ${item.category || 'Lainnya'}
+                </p>
+                <div class="flex items-center justify-between mt-3">
+                    <div class="flex items-center text-sm">
+                        <span class="text-yellow-500 mr-1"><i class="fas fa-star"></i></span>
+                        <span class="font-semibold">${item.rating || '4.5'}</span>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center justify-between">
+                    <span class="text-cool-primary dark:text-cool-accent font-bold text-lg">${priceText}</span>
+                    <button class="bg-cool-primary hover:bg-blue-700 text-white p-2 rounded-lg transition-all transform hover:scale-110 shadow-md" onclick="addToCart(${item.id}, event)">
+                        <i class="fas fa-plus text-sm"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Event klik kartu → buka detail produk
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('button')) {
+                showProductDetail(item);
             }
+        });
 
-            menuItems.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = "product-card bg-card-light dark:bg-card-dark rounded-2xl shadow-lg overflow-hidden cursor-pointer animate-scale-in";
-                card.style.animationDelay = `${index * 0.05}s`;
+        container.appendChild(card);
+    });
 
-                const imageUrl = item.image_url || 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image';
-                const priceText = item.price ? `Rp ${parseInt(item.price).toLocaleString('id-ID')}` : 'Hubungi';
-
-                card.innerHTML = `
-                    <div class="relative h-36 overflow-hidden bg-gray-200 dark:bg-gray-700">
-                        <img src="${imageUrl}" alt="${item.name}" class="w-full h-full object-cover" loading="lazy">
-                        ${item.promo ? `<span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">${item.promo}</span>` : ''}
-                        ${!item.is_available ? `<div class="absolute inset-0 bg-black/50 flex items-center justify-center"><span class="text-white font-bold">Tidak Tersedia</span></div>` : ''}
-                    </div>
-                    <div class="p-4">
-                        <h4 class="font-bold text-base line-clamp-2 mb-2 min-h-[2.5rem]">${item.name}</h4>
-                        <p class="text-xs text-neutral-text dark:text-gray-400 mb-2 flex items-center">
-                            <i class="fas fa-tag mr-1"></i>
-                            ${item.category || 'Lainnya'}
-                        </p>
-                        <div class="flex items-center justify-between mt-3">
-                            <div class="flex items-center text-sm">
-                                <span class="text-yellow-500 mr-1">
-                                    <i class="fas fa-star"></i>
-                                </span>
-                                <span class="font-semibold">${item.rating || '4.5'}</span>
-                            </div>
-                        </div>
-                        <div class="mt-3 flex items-center justify-between">
-                            <span class="text-cool-primary dark:text-cool-accent font-bold text-lg">${priceText}</span>
-                            <button class="bg-cool-primary hover:bg-blue-700 text-white p-2 rounded-lg transition-all transform hover:scale-110 shadow-md" onclick="addToCart(${item.id}, event)">
-                                <i class="fas fa-plus text-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                card.addEventListener('click', (e) => {
-                    if (!e.target.closest('button')) {
-                        showProductDetail(item);
-                    }
-                });
-                
-                container.appendChild(card);
+    // ✅ Setelah semua kartu dirender, aktifkan semua slider Swiper
+    setTimeout(() => {
+        document.querySelectorAll('.swiper').forEach((el) => {
+            new Swiper(el, {
+                loop: true,
+                autoplay: { delay: 2500, disableOnInteraction: false },
+                pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
             });
-        }
+        });
+    }, 100);
+}
 
         // ========== CATEGORY FILTER ==========
         document.querySelectorAll('.category-tab').forEach(tab => {
@@ -841,72 +888,114 @@
         });
 
         // ========== PRODUCT DETAIL MODAL ==========
-        function showProductDetail(item) {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in';
-            modal.onclick = (e) => {
-                if (e.target === modal) modal.remove();
-            };
+function showProductDetail(item) {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in';
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+    };
 
-            const imageUrl = item.image_url || 'https://placehold.co/600x400/e2e8f0/64748b?text=No+Image';
-            const priceText = item.price ? `Rp ${parseInt(item.price).toLocaleString('id-ID')}` : 'Hubungi';
+    // ✅ Ambil semua gambar dari image_urls atau image_url
+    const imageUrls = item.image_urls 
+        ? (typeof item.image_urls === 'string' ? JSON.parse(item.image_urls) : item.image_urls)
+        : (item.image_url ? [item.image_url] : []);
 
-            modal.innerHTML = `
-                <div class="bg-card-light dark:bg-card-dark rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto animate-scale-in">
-                    <div class="relative h-64 overflow-hidden">
-                        <img src="${imageUrl}" alt="${item.name}" class="w-full h-full object-cover">
-                        <button class="absolute top-4 right-4 bg-white dark:bg-gray-800 text-gray-800 dark:text-white w-10 h-10 rounded-full shadow-lg hover:scale-110 transition-transform" onclick="this.closest('.fixed').remove()">
-                            <i class="fas fa-times"></i>
-                        </button>
+    const imagesHtml = imageUrls.length > 0
+        ? imageUrls.map(url => {
+            const fullUrl = url.startsWith('http') ? url : `${BASE_URL}/uploads/menu/${url}`;
+            return `
+                <div class="swiper-slide">
+                    <img src="${fullUrl}" alt="${item.name}" 
+                         class="w-full h-72 object-cover select-none"
+                         onerror="this.src='https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'">
+                </div>`;
+        }).join('')
+        : `
+            <div class="swiper-slide">
+                <img src="https://placehold.co/400x300/e2e8f0/64748b?text=No+Image" 
+                     class="w-full h-72 object-cover">
+            </div>
+        `;
+
+    const priceText = item.price 
+        ? `Rp ${parseInt(item.price).toLocaleString('id-ID')}` 
+        : 'Hubungi';
+
+    modal.innerHTML = `
+        <div class="bg-card-light dark:bg-card-dark rounded-2xl max-w-md w-full max-h-[95vh] overflow-y-auto animate-scale-in relative">
+
+            <!-- Tombol close -->
+            <button class="absolute top-3 right-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-white w-10 h-10 rounded-full shadow-md hover:scale-110 transition-transform z-20" onclick="this.closest('.fixed').remove()">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <!-- ✅ Swiper Slider -->
+            <div class="swiper productSwiper">
+                <div class="swiper-wrapper">
+                    ${imagesHtml}
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+
+            <div class="p-6">
+                <h3 class="text-2xl font-bold mb-2">${item.name}</h3>
+                
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="flex items-center text-yellow-500">
+                        <i class="fas fa-star mr-1"></i>
+                        <span class="font-semibold">${item.rating || '4.5'}</span>
                     </div>
-                    
-                    <div class="p-6">
-                        <h3 class="text-2xl font-bold mb-2">${item.name}</h3>
-                        
-                        <div class="flex items-center space-x-4 mb-4">
-                            <div class="flex items-center text-yellow-500">
-                                <i class="fas fa-star mr-1"></i>
-                                <span class="font-semibold">${item.rating || '4.5'}</span>
-                            </div>
-                            <span class="text-neutral-text text-sm">
-                                <i class="fas fa-tag mr-1"></i>
-                                ${item.category || 'Lainnya'}
-                            </span>
-                        </div>
-                        
-                        <p class="text-neutral-text dark:text-gray-400 mb-4 text-sm leading-relaxed">
-                            ${item.description || 'Menu lezat yang wajib dicoba! Dibuat dengan bahan berkualitas dan cita rasa yang menggugah selera.'}
-                        </p>
-                        
-                        <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <span class="text-2xl font-bold text-cool-primary dark:text-cool-accent">${priceText}</span>
-                                ${!item.is_available ? '<span class="text-red-500 font-semibold">Tidak Tersedia</span>' : ''}
-                            </div>
-                            
-                            <div class="flex items-center space-x-2 mb-4">
-                                <button class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" onclick="decreaseQty()">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <input type="number" id="qty-input" value="1" min="1" class="w-16 text-center border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 dark:bg-gray-700" readonly>
-                                <button class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" onclick="increaseQty()">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <button class="w-full bg-gradient-to-r from-cool-primary to-blue-600 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-105 shadow-lg ${!item.is_available ? 'opacity-50 cursor-not-allowed' : ''}" 
-                                onclick="${item.is_available ? `addToCartWithQty(${item.id})` : ''}" 
-                                ${!item.is_available ? 'disabled' : ''}>
-                            <i class="fas fa-shopping-cart mr-2"></i>
-                            ${item.is_available ? 'Tambah ke Keranjang' : 'Stok Habis'}
+                    <span class="text-neutral-text text-sm">
+                        <i class="fas fa-tag mr-1"></i>
+                        ${item.category || 'Lainnya'}
+                    </span>
+                </div>
+
+                <p class="text-neutral-text dark:text-gray-400 mb-4 text-sm leading-relaxed">
+                    ${item.description || 'Produk berkualitas tinggi dengan rasa dan tampilan menarik. Wajib dicoba!'}
+                </p>
+
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-2xl font-bold text-cool-primary dark:text-cool-accent">${priceText}</span>
+                        ${!item.is_available 
+                            ? '<span class="text-red-500 font-semibold">Tidak Tersedia</span>' 
+                            : ''}
+                    </div>
+
+                    <div class="flex items-center space-x-2 mb-4">
+                        <button class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" onclick="decreaseQty()">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" id="qty-input" value="1" min="1" 
+                            class="w-16 text-center border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 dark:bg-gray-700" readonly>
+                        <button class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" onclick="increaseQty()">
+                            <i class="fas fa-plus"></i>
                         </button>
                     </div>
                 </div>
-            `;
-            
-            document.body.appendChild(modal);
-        }
+
+                <button class="w-full bg-gradient-to-r from-cool-primary to-blue-600 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-105 shadow-lg ${!item.is_available ? 'opacity-50 cursor-not-allowed' : ''}" 
+                    onclick="${item.is_available ? `addToCartWithQty(${item.id})` : ''}" 
+                    ${!item.is_available ? 'disabled' : ''}>
+                    <i class="fas fa-shopping-cart mr-2"></i>
+                    ${item.is_available ? 'Tambah ke Keranjang' : 'Stok Habis'}
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // ✅ Inisialisasi Swiper (setelah modal muncul)
+    setTimeout(() => {
+        new Swiper('.productSwiper', {
+            loop: true,
+            pagination: { el: '.swiper-pagination', clickable: true },
+            autoplay: { delay: 2500, disableOnInteraction: false },
+        });
+    }, 100);
+}
 
         // ========== CART FUNCTIONS ==========
         async function addToCart(itemId, event) {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keranjang | AnterNa</title>
+    <title>Keranjang | AnterTah</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -39,6 +39,23 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+        .shipping-info {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .shipping-loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #1d4ed8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-bg-light dark:bg-bg-dark text-text-dark dark:text-text-light min-h-screen pb-32">
@@ -66,7 +83,17 @@
             <h2 class="text-sm font-bold mb-3">Ringkasan</h2>
             <div class="space-y-2 text-sm">
                 <div class="flex justify-between"><span class="text-neutral-text">Subtotal</span><span id="subtotal">Rp 0</span></div>
-                <div class="flex justify-between"><span class="text-neutral-text">Ongkir</span><span id="shipping">Rp 10.000</span></div>
+                <div class="flex justify-between">
+                    <span class="text-neutral-text">Ongkir</span>
+                    <div class="flex items-center">
+                        <span id="shipping">Rp 0</span>
+                        <div id="shipping-loading" class="ml-2 shipping-loading hidden"></div>
+                    </div>
+                </div>
+                <div id="shipping-info" class="shipping-info hidden">
+                    <i class="fas fa-map-marker-alt mr-1"></i>
+                    <span id="shipping-distance">Menghitung jarak...</span>
+                </div>
                 <div class="flex justify-between"><span class="text-neutral-text">Diskon</span><span id="discount">Rp 0</span></div>
                 <div class="border-t border-gray-200 dark:border-gray-700 pt-2 flex justify-between text-base font-bold">
                     <span>Total</span><span id="total">Rp 0</span>
@@ -83,8 +110,10 @@
     </div>
 <script src="config.js"></script>
     <script>
-       
-        const SHIPPING_COST = 10000;
+        // Variabel global untuk menyimpan data ongkir
+        let shippingCosts = {};
+        let totalShippingCost = 0;
+        let cartItems = [];
 
         function rupiah(n){ return `Rp ${(+n||0).toLocaleString('id-ID')}` }
 
@@ -137,8 +166,13 @@
                 }
                 
                 const data = await res.json();
-                const items = data.items || [];
-                renderCart(items);
+                cartItems = data.items || [];
+                renderCart(cartItems);
+                
+                // Hitung ongkir untuk setiap item
+                if (cartItems.length > 0) {
+                    calculateAllShippingCosts();
+                }
             } catch (error) {
                 console.error('Load cart error:', error);
                 showNotification('Gagal memuat keranjang', 'error');
@@ -147,6 +181,80 @@
             }
         }
 
+        async function calculateAllShippingCosts() {
+            // Tampilkan loading
+            document.getElementById('shipping-loading').classList.remove('hidden');
+            document.getElementById('shipping-info').classList.remove('hidden');
+            document.getElementById('shipping-distance').textContent = 'Menghitung jarak...';
+            
+            // Reset total ongkir
+            totalShippingCost = 0;
+            shippingCosts = {};
+            
+            // Buat array promises untuk menghitung ongkir setiap item
+            const shippingPromises = cartItems.map(async (item) => {
+                console.log('Processing item:', item);
+                try {
+                    const res = await fetch(`${BASE_URL}/api/shipping-cost/${item.item_id}`, {
+                        headers: { 
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                            'ngrok-skip-browser-warning': 'true'
+                        }
+                    });
+                    
+                    if (!res.ok) {
+                        throw new Error(`Gagal menghitung ongkir untuk ${item.name}`);
+                    }
+                    
+                    const data = await res.json();
+                    
+                    // Simpan ongkir per item
+                    shippingCosts[item.menu_id] = {
+                        cost: data.shipping_cost,
+                        distance: parseFloat(data.distance_km)
+                    };
+                    
+                    // Tambahkan ke total ongkir
+                    totalShippingCost += data.shipping_cost;
+                    
+                    return data;
+                } catch (error) {
+                    console.error(`Error calculating shipping for ${item.name}:`, error);
+                    // Gunakan ongkir default jika gagal
+                    const defaultCost = 10000;
+                    shippingCosts[item.menu_id] = {
+                        cost: defaultCost,
+                        distance: 0,
+                        error: true
+                    };
+                    totalShippingCost += defaultCost;
+                    return null;
+                }
+            });
+            
+            // Tunggu semua promises selesai
+            await Promise.all(shippingPromises);
+            
+            // Update UI dengan total ongkir
+            document.getElementById('shipping-loading').classList.add('hidden');
+            updateSummary(cartItems);
+            
+            // Tampilkan info jarak
+            if (Object.keys(shippingCosts).length > 0) {
+                const distances = Object.values(shippingCosts)
+                    .filter(cost => !cost.error)
+                    .map(cost => cost.distance);
+                
+                if (distances.length > 0) {
+                    const maxDistance = Math.max(...distances);
+                    document.getElementById('shipping-distance').textContent = 
+                        `Jarak terjauh: ${maxDistance.toFixed(2)} km`;
+                } else {
+                    document.getElementById('shipping-distance').textContent = 
+                        'Tidak dapat menghitung jarak, menggunakan ongkir default';
+                }
+            }
+        }
         function renderCart(items){
             const list = document.getElementById('cartList');
             const empty = document.getElementById('emptyState');
@@ -168,13 +276,58 @@
                 const row = document.createElement('div');
                 row.className = 'flex items-center gap-3 bg-card-light dark:bg-card-dark border border-gray-100 dark:border-gray-700 rounded-xl p-3 hover:shadow-md transition';
                 
-                const imageUrl = it.image_url || it.image || 'https://placehold.co/100x100/e2e8f0/64748b?text=No+Image';
+                let imageUrl = '';
+        
+                // Coba ambil dari image_urls (array) atau image_url (string)
+                if (it.image_urls && it.image_urls.length > 0) {
+                    // Jika image_urls adalah string JSON, parse dulu
+                    const imageUrls = typeof it.image_urls === 'string' 
+                                       ? JSON.parse(it.image_urls) 
+                                       : it.image_urls;
+                    // Ambil URL pertama dari array
+                    imageUrl = imageUrls[0];
+                } else if (it.image_url) {
+                    // Jika ada image_url (single image)
+                    imageUrl = it.image_url;
+                }
+                
+                let fullImageUrl = '';
+                if (imageUrl) {
+                    if (imageUrl.startsWith('http')) {
+                        // Sudah URL lengkap
+                        fullImageUrl = imageUrl;
+                    } else if (imageUrl.startsWith('/')) {
+                        // Path relatif dari root
+                        fullImageUrl = `${BASE_URL}${imageUrl}`;
+                    } else {
+                        // Path relatif dari uploads/menu
+                        fullImageUrl = `${BASE_URL}/uploads/menu/${imageUrl}`;
+                    }
+                } else {
+                    // Tidak ada gambar, gunakan placeholder
+                    fullImageUrl = 'https://placehold.co/300x200/e2e8f0/64748b?text=No+Image';
+                }
+                
+                // Tampilkan ongkir per item jika sudah dihitung
+                let itemShippingInfo = '';
+                if (shippingCosts[it.menu_id]) {
+                    const cost = shippingCosts[it.menu_id].cost;
+                    const distance = shippingCosts[it.menu_id].distance;
+                    itemShippingInfo = `
+                        <div class="text-xs text-neutral-text">
+                            <i class="fas fa-truck mr-1"></i>
+                            Ongkir: ${rupiah(cost)}
+                            ${distance ? `(${distance.toFixed(2)} km)` : ''}
+                        </div>
+                    `;
+                }
                 
                 row.innerHTML = `
-                    <img src="${imageUrl}" alt="${it.name}" class="w-14 h-14 rounded-lg object-cover bg-gray-100" onerror="this.src='https://placehold.co/100x100/e2e8f0/64748b?text=No+Image'"/>
+                    <img src="${fullImageUrl}" alt="${it.name}" class="w-14 h-14 rounded-lg object-cover bg-gray-100" onerror="this.src='https://placehold.co/100x100/e2e8f0/64748b?text=No+Image'"/>
                     <div class="flex-1">
                         <div class="text-sm font-semibold">${it.name}</div>
                         <div class="text-xs text-neutral-text">${rupiah(it.price)}</div>
+                        ${itemShippingInfo}
                     </div>
                     <div class="flex items-center gap-2">
                         <button class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" onclick="changeQty(${it.item_id}, ${it.quantity - 1})">
@@ -191,13 +344,12 @@
                 `;
                 list.appendChild(row);
             });
-            updateSummary(items);
         }
 
         function updateSummary(items){
             const subtotal = items.reduce((s, it) => s + (it.price * it.quantity), 0);
             const discount = 0;
-            const shipping = items.length > 0 ? SHIPPING_COST : 0;
+            const shipping = items.length > 0 ? totalShippingCost : 0;
             const total = subtotal + shipping - discount;
             
             document.getElementById('subtotal').textContent = rupiah(subtotal);
@@ -315,6 +467,10 @@
                     showNotification('Keranjang masih kosong', 'error');
                     return;
                 }
+                
+                // Simpan data ongkir ke localStorage untuk digunakan di halaman checkout
+                localStorage.setItem('shippingCosts', JSON.stringify(shippingCosts));
+                localStorage.setItem('totalShippingCost', totalShippingCost.toString());
                 
                 // Redirect to checkout page
                 window.location.href = 'cekout.html';

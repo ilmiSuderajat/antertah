@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Pesanan - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#3b82f6',
+                        'primary-dark': '#2563eb',
+                        'secondary': '#64748b',
+                        'success': '#10b981',
+                        'warning': '#f59e0b',
+                        'danger': '#ef4444',
+                        'info': '#06b6d4',
+                        'purple': '#8b5cf6',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-pending_verification {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-processing {
+            background-color: #e9d5ff;
+            color: #6d28d9;
+        }
+        
+        .status-ready {
+            background-color: #d1fae5;
+            color: #0891b2;
+        }
+        
+        .status-delivered {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+        
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0;
+            bottom: 0;
+            width: 0.125rem;
+            background-color: #e5e7eb;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -1.375rem;
+            top: 0.25rem;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+            border: 0.25rem solid white;
+            z-index: 1;
+        }
+        
+        .timeline-item.active::before {
+            background-color: #3b82f6;
+        }
+        
+        .timeline-item.completed::before {
+            background-color: #10b981;
+        }
+        
+        .notification {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .btn {
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .item-image {
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(59, 130, 246, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <button onclick="window.history.back()" class="mr-4 p-2 rounded-full hover:bg-gray-100 transition">
+                        <i class="fas fa-arrow-left text-gray-600"></i>
+                    </button>
+                    <h1 class="text-xl font-semibold text-gray-900">Detail Pesanan</h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="loadOrder()" class="p-2 rounded-full hover:bg-gray-100 transition">
+                        <i class="fas fa-sync-alt text-gray-600"></i>
+                    </button>
+                    <button onclick="window.print()" class="p-2 rounded-full hover:bg-gray-100 transition">
+                        <i class="fas fa-print text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Loading State -->
+        <div id="loading-state" class="flex justify-center items-center py-12">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Content Container -->
+        <div id="content-container" class="hidden">
+            <!-- Notification -->
+            <div id="notification" class="notification hidden mb-6 p-4 rounded-lg text-white"></div>
+
+            <!-- Order Status Timeline -->
+            <div class="bg-white rounded-xl shadow-sm p-6 mb-6 card animate-fade-in">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Status Pesanan</h2>
+                <div class="timeline">
+                    <div id="timeline-pending" class="timeline-item">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium text-gray-900">Menunggu Pembayaran</h3>
+                                <p class="text-sm text-gray-500">Pesanan dibuat, menunggu pembayaran dari pelanggan</p>
+                            </div>
+                            <div id="date-pending" class="text-sm text-gray-500"></div>
+                        </div>
+                    </div>
+                    <div id="timeline-pending_verification" class="timeline-item">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium text-gray-900">Verifikasi Pembayaran</h3>
+                                <p class="text-sm text-gray-500">Pembayaran sedang diverifikasi oleh admin</p>
+                            </div>
+                            <div id="date-pending_verification" class="text-sm text-gray-500"></div>
+                        </div>
+                    </div>
+                    <div id="timeline-processing" class="timeline-item">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium text-gray-900">Diproses</h3>
+                                <p class="text-sm text-gray-500">Pesanan sedang disiapkan</p>
+                            </div>
+                            <div id="date-processing" class="text-sm text-gray-500"></div>
+                        </div>
+                    </div>
+                    <div id="timeline-ready" class="timeline-item">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium text-gray-900">Siap Dikirim</h3>
+                                <p class="text-sm text-gray-500">Pesanan siap untuk dikirim ke pelanggan</p>
+                            </div>
+                            <div id="date-ready" class="text-sm text-gray-500"></div>
+                        </div>
+                    </div>
+                    <div id="timeline-delivered" class="timeline-item">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium text-gray-900">Terkirim</h3>
+                                <p class="text-sm text-gray-500">Pesanan telah diterima oleh pelanggan</p>
+                            </div>
+                            <div id="date-delivered" class="text-sm text-gray-500"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Order Details -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Order Information -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 card animate-fade-in">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-lg font-semibold text-gray-900">Informasi Pesanan</h2>
+                            <span id="order-status" class="status-badge"></span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">ID Pesanan</p>
+                                <p id="order-id" class="font-medium text-gray-900"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Tanggal Pesanan</p>
+                                <p id="order-date" class="font-medium text-gray-900"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Metode Pembayaran</p>
+                                <p id="payment-method" class="font-medium text-gray-900"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Tanggal Pembayaran</p>
+                                <p id="payment-date" class="font-medium text-gray-900"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Information -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 card animate-fade-in">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Informasi Pelanggan</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Nama Pelanggan</p>
+                                <p id="customer-name" class="font-medium text-gray-900"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Nomor Telepon</p>
+                                <p id="customer-phone" class="font-medium text-gray-900"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Kota</p>
+                                <p id="city" class="font-medium text-gray-900"></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Kode Pos</p>
+                                <p id="postal-code" class="font-medium text-gray-900"></p>
+                            </div>
+                            <div class="md:col-span-2">
+                                <p class="text-sm text-gray-500 mb-1">Alamat Pengiriman</p>
+                                <p id="address-detail" class="font-medium text-gray-900"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 card animate-fade-in">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Item Pesanan</h2>
+                        
+                        <div id="order-items" class="space-y-4">
+                            <!-- Items will be populated here -->
+                        </div>
+                        
+                        <div class="mt-6 pt-4 border-t border-gray-200">
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Subtotal</span>
+                                    <span id="subtotal" class="font-medium text-gray-900"></span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">Biaya Pengiriman</span>
+                                    <span id="shipping-cost" class="font-medium text-gray-900"></span>
+                                </div>
+                                <div id="discount-row" class=" justify-between items-center hidden">
+                                    <span class="text-gray-600">Diskon</span>
+                                    <span id="discount" class="font-medium text-red-600"></span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2 border-t">
+                                    <span class="text-lg font-semibold text-gray-900">Total</span>
+                                    <span id="total" class="text-lg font-bold text-primary"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Proof (if available) -->
+                   <div id="payment-proof-section" class="bg-white rounded-xl shadow-sm p-6 card animate-fade-in hidden">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Bukti Pembayaran</h2>
+    
+    <div class="flex flex-col sm:flex-row gap-4">
+        <div class="flex-shrink-0">
+            <div class="relative group cursor-pointer" onclick="openImagePreview()">
+                <img id="payment-proof-image" src="" alt="Bukti Pembayaran" class="h-48 w-48 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105">
+                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-lg flex items-center justify-center">
+                    <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="flex-1">
+            <p class="text-sm text-gray-500 mb-1">Catatan Pembayaran</p>
+            <p id="payment-note" class="text-gray-900"></p>
+        </div>
+    </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div id="image-preview-modal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4" onclick="closeImagePreview()">
+    <div class="relative max-w-4xl max-h-full">
+        <img id="preview-image" src="" alt="Preview Bukti Pembayaran" class="max-w-full max-h-full rounded-lg">
+        <button onclick="closeImagePreview()" class="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-70 transition-all">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+</div>
+
+                <!-- Actions -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl shadow-sm p-6 sticky top-24 card animate-fade-in">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-4">Aksi</h2>
+                        
+                        <div class="space-y-3">
+                            <button id="verifyBtn" data-next="pending_verification" class="btn w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                Verifikasi Pembayaran
+                            </button>
+                            <button id="processBtn" data-next="processing" class="btn w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed" disabled>
+                                <i class="fas fa-box mr-2"></i>
+                                Proses Pesanan
+                            </button>
+                            <button id="readyBtn" data-next="ready" class="btn w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed" disabled>
+                                <i class="fas fa-truck mr-2"></i>
+                                Siap Dikirim
+                            </button>
+                            <button id="deliverBtn" data-next="delivered" class="btn w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed" disabled>
+                                <i class="fas fa-check-double mr-2"></i>
+                                Selesai
+                            </button>
+                            <button id="cancelBtn" data-next="cancelled" class="btn w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg font-medium disabled:bg-gray-300 disabled:cursor-not-allowed" disabled>
+                                <i class="fas fa-times-circle mr-2"></i>
+                                Batalkan Pesanan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+<script src="config.js"></script>
+    <script>
+// Ganti bagian ini di kode JavaScript:
+const token = localStorage.getItem('authToken');
+
+// Debug URL
+console.log('Current URL:', window.location.href);
+console.log('Search params:', window.location.search);
+
+// Ambil orderId dengan beberapa kemungkinan parameter
+const urlParams = new URLSearchParams(window.location.search);
+const orderId = urlParams.get('orderId') || urlParams.get('id');
+
+// Debug orderId
+console.log('Extracted Order ID:', orderId);
+
+// Validasi orderId
+if (!orderId) {
+    console.error('Order ID is missing from URL');
+    showNotification('ID Pesanan tidak ditemukan di URL', 'error');
+    
+    // Tampilkan pesan error di halaman
+    const contentContainer = document.getElementById('content-container');
+    if (contentContainer) {
+        contentContainer.classList.remove('hidden');
+        contentContainer.innerHTML = `
+            <div class="bg-white rounded-xl shadow-sm p-6 text-center">
+                <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">ID Pesanan Tidak Ditemukan</h3>
+                <p class="text-gray-600 mb-4">ID Pesanan tidak ditemukan di URL. Pastikan Anda mengakses halaman ini dari daftar pesanan.</p>
+                <button onclick="window.history.back()" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg">
+                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                </button>
+            </div>
+        `;
+    }
+    
+    // Sembunyikan loading state
+    const loadingState = document.getElementById('loading-state');
+    if (loadingState) loadingState.classList.add('hidden');
+    
+    // Hentikan eksekusi lebih lanjut
+    throw new Error('Order ID is missing from URL');
+}
+        // Status flow
+        const statusFlow = ['pending', 'pending_verification', 'processing', 'ready', 'delivered'];
+        
+        // Helper functions
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'pending': return 'status-pending';
+                case 'pending_verification': return 'status-pending_verification';
+                case 'processing': return 'status-processing';
+                case 'ready': return 'status-ready';
+                case 'delivered': return 'status-delivered';
+                case 'cancelled': return 'status-cancelled';
+                default: return 'status-pending';
+            }
+        }
+
+        function getStatusText(status) {
+            switch(status) {
+                case 'pending': return 'Menunggu Pembayaran';
+                case 'pending_verification': return 'Verifikasi Pembayaran';
+                case 'processing': return 'Diproses';
+                case 'ready': return 'Siap Dikirim';
+                case 'delivered': return 'Terkirim';
+                case 'cancelled': return 'Dibatalkan';
+                default: return 'Tidak Diketahui';
+            }
+        }
+
+        function getPaymentMethodText(method) {
+            switch(method) {
+                case 'transfer': return 'Transfer Bank';
+                case 'ewallet': return 'E-Wallet';
+                case 'cod': return 'Cash on Delivery';
+                default: return 'Tidak Diketahui';
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.remove('hidden', 'bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500');
+            
+            switch(type) {
+                case 'success':
+                    notification.classList.add('bg-green-500');
+                    break;
+                case 'error':
+                    notification.classList.add('bg-red-500');
+                    break;
+                case 'warning':
+                    notification.classList.add('bg-yellow-500');
+                    break;
+                default:
+                    notification.classList.add('bg-blue-500');
+            }
+            
+            notification.classList.add('text-white', 'p-4', 'rounded-lg');
+            
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 5000);
+        }
+
+        function updateTimeline(status) {
+            // Reset all timeline items
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                item.classList.remove('active', 'completed');
+            });
+            
+            // Find current status index
+            const currentIndex = statusFlow.indexOf(status);
+            
+            // Update timeline items
+            statusFlow.forEach((statusItem, index) => {
+                const timelineItem = document.getElementById(`timeline-${statusItem}`);
+                if (!timelineItem) return;
+                
+                if (index < currentIndex) {
+                    timelineItem.classList.add('completed');
+                } else if (index === currentIndex) {
+                    timelineItem.classList.add('active');
+                }
+            });
+        }
+
+        function updateButtonStates(status) {
+            // Disable all buttons first
+            document.querySelectorAll('button[data-next]').forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            // Find current status index
+            const currentIndex = statusFlow.indexOf(status);
+            
+            // Enable next button if not delivered or cancelled
+            if (status !== 'delivered' && status !== 'cancelled' && currentIndex < statusFlow.length - 1) {
+                const nextStatus = statusFlow[currentIndex + 1];
+                const nextBtn = document.querySelector(`button[data-next="${nextStatus}"]`);
+                if (nextBtn) nextBtn.disabled = false;
+            }
+            
+            // Enable cancel button for pending and pending_verification
+            if (status === 'pending' || status === 'pending_verification') {
+                document.getElementById('cancelBtn').disabled = false;
+            }
+        }
+
+    // Helper function to get correct image URL
+function getImageUrl(imagePath, type = 'menu') {
+    if (!imagePath) return `https://picsum.photos/seed/${type}/100/100.jpg`;
+    
+    // Check if the path is already a full URL
+    if (imagePath.startsWith('http')) return imagePath;
+    
+    // Try different possible paths
+    const possiblePaths = [
+        `${BASE_URL}/uploads/${type}s/${imagePath}`,
+        `${BASE_URL}/uploads/menu/${imagePath}`,
+        `${BASE_URL}/${imagePath}`
+    ];
+    console.log('Possible image paths:', possiblePaths);
+    return possiblePaths[0]; // Return the first possibility, actual error handling will be done on img.onerror
+}
+
+async function loadOrder() {
+    try {
+        // Show loading state
+        document.getElementById('loading-state').classList.remove('hidden');
+        document.getElementById('content-container').classList.add('hidden');
+        
+        const res = await fetch(`${BASE_URL}/api/admin/orders/${orderId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await res.json();
+
+        if (!res.ok) throw new Error(result.error || 'Gagal memuat pesanan');
+
+        const order = result.order;
+        console.log('Order data:', order); // Debug log untuk melihat struktur data
+
+        // Jika alamat tidak lengkap, ambil dari API alamat
+        if (!order.address_detail || !order.city || !order.postal_code || !order.latitude || !order.longitude) {
+            try {
+                console.log('Fetching address from API for user:', order.user_phone);
+                const addressRes = await fetch(`${BASE_URL}/api/addresses`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (addressRes.ok) {
+                    const addresses = await addressRes.json();
+                    console.log('Addresses from API:', addresses);
+                    
+                    // Cari alamat utama (is_main = 1) atau gunakan alamat pertama
+                    const mainAddress = addresses.find(addr => addr.is_main === 1) || addresses[0];
+                    
+                    if (mainAddress) {
+                        console.log('Using address:', mainAddress);
+                        // Update order dengan data alamat dari API
+                        order.address_detail = order.address_detail || mainAddress.address_detail;
+                        order.city = order.city || mainAddress.city;
+                        order.postal_code = order.postal_code || mainAddress.postal_code;
+                        // Tambahkan data tambahan dari API alamat
+                        order.address_label = order.address_label || mainAddress.label;
+                        order.latitude = order.latitude || mainAddress.latitude;
+                        order.longitude = order.longitude || mainAddress.longitude;
+                        order.recipient_name = order.recipient_name || mainAddress.recipient_name;
+                    }
+                } else {
+                    console.error('Failed to fetch addresses:', addressRes.status);
+                }
+            } catch (error) {
+                console.error('Error fetching addresses:', error);
+            }
+        }
+
+        // Helper function untuk aman mengatur teks elemen
+        const safeSetText = (elementId, text, addClassIfEmpty = false) => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                if (text) {
+                    element.textContent = text;
+                    if (addClassIfEmpty) {
+                        element.classList.remove('text-gray-400');
+                    }
+                } else {
+                    element.textContent = 'Tidak tersedia';
+                    if (addClassIfEmpty) {
+                        element.classList.add('text-gray-400');
+                    }
+                }
+            } else {
+                console.error(`Element with ID '${elementId}' not found`);
+            }
+        };
+
+        // Helper function untuk aman mengatur HTML elemen
+        const safeSetHTML = (elementId, html) => {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = html;
+            } else {
+                console.error(`Element with ID '${elementId}' not found`);
+            }
+        };
+
+        // Update order information dengan pengecekan keberadaan elemen
+        safeSetText('order-id', `#${order.id}`);
+        safeSetText('order-date', formatDate(order.created_at));
+        console.log('Payment method:', order.payment_method);
+        
+            function getPaymentMethodText(method) {
+                const map = {
+                    'gopay': 'GoPay',
+                    'ovo': 'OVO',
+                    'qris': 'QRIS',
+                    'dana': 'Dana'
+                };
+                return map[method] || method || 'Tidak Diketahui';
+            }
+
+        // Perbaikan untuk metode pembayaran
+        const paymentMethodElement = document.getElementById('payment-method');
+        if (paymentMethodElement) {
+            if (order.payment_method) {
+                paymentMethodElement.textContent = getPaymentMethodText(order.payment_method);
+                paymentMethodElement.classList.remove('text-gray-400');
+            } else {
+                paymentMethodElement.textContent = 'Tidak Diketahui';
+                paymentMethodElement.classList.add('text-gray-400');
+            }
+        }
+        
+        // Perbaikan untuk tanggal pembayaran
+        const paymentDateElement = document.getElementById('payment-date');
+        if (paymentDateElement) {
+            if (order.payment_date) {
+                paymentDateElement.textContent = formatDate(order.payment_date);
+                paymentDateElement.classList.remove('text-gray-400');
+            } else {
+                paymentDateElement.textContent = 'Belum dibayar';
+                paymentDateElement.classList.add('text-gray-400');
+            }
+        }
+        
+        // Update status badge
+        const statusBadge = document.getElementById('order-status');
+        if (statusBadge) {
+            statusBadge.textContent = getStatusText(order.status);
+            statusBadge.className = `status-badge ${getStatusClass(order.status)}`;
+        }
+        
+        // Update customer information
+        safeSetText('customer-name', order.customer_name);
+        
+        // Perbaikan untuk nomor telepon dengan link WhatsApp
+        const phoneElement = document.getElementById('customer-phone');
+        if (phoneElement) {
+            if (order.customer_phone) {
+                // Format nomor telepon untuk WhatsApp (hapus karakter non-digit)
+                const formattedPhone = order.customer_phone.replace(/\D/g, '');
+                // Buat link WhatsApp
+                const whatsappUrl = `https://wa.me/${formattedPhone}`;
+                phoneElement.innerHTML = `<a href="${whatsappUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center">
+                    <i class="fab fa-whatsapp mr-2"></i>${order.customer_phone}
+                </a>`;
+            } else {
+                phoneElement.textContent = 'Tidak ada';
+                phoneElement.classList.add('text-gray-400');
+            }
+        }
+        
+        // Perbaikan untuk alamat dengan penanganan null
+        safeSetText('address-detail', order.address_detail, true);
+        
+        // Perbaikan untuk kota dengan penanganan null
+        safeSetText('city', order.city, true);
+        
+        // Perbaikan untuk kode pos dengan penanganan null
+        safeSetText('postal-code', order.postal_code, true);
+        
+        // Tambahkan label alamat jika ada
+        const labelElement = document.getElementById('address-label');
+        if (labelElement) {
+            if (order.address_label) {
+                labelElement.textContent = order.address_label;
+                labelElement.classList.remove('hidden');
+            } else {
+                labelElement.classList.add('hidden');
+            }
+        }
+        
+        // Debug untuk koordinat
+        console.log('Coordinates check:', {
+            latitude: order.latitude,
+            longitude: order.longitude,
+            hasLatitude: !!order.latitude,
+            hasLongitude: !!order.longitude,
+            latitudeType: typeof order.latitude,
+            longitudeType: typeof order.longitude
+        });
+        
+        // Tambahkan link Google Maps jika ada koordinat
+        const mapsLinkElement = document.getElementById('maps-link');
+        console.log('Maps link element found:', !!mapsLinkElement);
+        
+        if (mapsLinkElement) {
+            // Pastikan koordinat ada dan bukan string kosong
+            if (order.latitude && order.longitude && 
+                order.latitude !== '' && order.longitude !== '') {
+                
+                console.log('Creating Google Maps link with coordinates:', order.latitude, order.longitude);
+                
+                // Konversi koordinat ke string jika perlu
+                const lat = String(order.latitude);
+                const lng = String(order.longitude);
+                
+                // Buat URL Google Maps
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+                console.log('Google Maps URL:', mapsUrl);
+                
+                // Set HTML untuk link Google Maps
+                mapsLinkElement.innerHTML = `<a href="${mapsUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center">
+                    <i class="fas fa-map-marker-alt mr-2"></i>Lihat di Google Maps
+                </a>`;
+                mapsLinkElement.classList.remove('hidden');
+                console.log('Google Maps link added to element');
+            } else {
+                console.log('No coordinates available for Google Maps link');
+                mapsLinkElement.innerHTML = '<span class="text-gray-400">Lokasi tidak tersedia</span>';
+                mapsLinkElement.classList.remove('hidden');
+            }
+        } else {
+            console.error('Maps link element not found in DOM');
+            
+            // Cari elemen grid di dalam informasi pelanggan
+            const customerInfoGrid = document.querySelector('.bg-white.rounded-xl.shadow-sm.p-6 .grid');
+            console.log('Customer info grid found:', !!customerInfoGrid);
+            
+            if (customerInfoGrid) {
+                // Buat elemen baru untuk lokasi
+                const locationDiv = document.createElement('div');
+                locationDiv.innerHTML = `
+                    <p class="text-sm text-gray-500 mb-1">Lokasi</p>
+                    <p id="maps-link" class="font-medium text-gray-900"></p>
+                `;
+                
+                // Tambahkan ke grid
+                customerInfoGrid.appendChild(locationDiv);
+                console.log('Created maps-link element dynamically');
+                
+                // Coba lagi setelah membuat elemen
+                const newMapsLinkElement = document.getElementById('maps-link');
+                if (newMapsLinkElement && order.latitude && order.longitude) {
+                    const lat = String(order.latitude);
+                    const lng = String(order.longitude);
+                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+                    newMapsLinkElement.innerHTML = `<a href="${mapsUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2"></i>Lihat di Google Maps
+                    </a>`;
+                    newMapsLinkElement.classList.remove('hidden');
+                    console.log('Google Maps link added to dynamically created element');
+                }
+            } else {
+                console.error('Could not find customer info grid to add maps link');
+                
+                // Alternatif: Tambahkan link Google Maps di bagian alamat
+                const addressDetailElement = document.getElementById('address-detail');
+                if (addressDetailElement && order.latitude && order.longitude) {
+                    const lat = String(order.latitude);
+                    const lng = String(order.longitude);
+                    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+                    
+                    // Tambahkan link Google Maps setelah alamat
+                    const mapsLink = document.createElement('div');
+                    mapsLink.className = 'mt-2';
+                    mapsLink.innerHTML = `<a href="${mapsUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center">
+                        <i class="fas fa-map-marker-alt mr-2"></i>Lihat di Google Maps
+                    </a>`;
+                    
+                    // Sisipkan setelah elemen alamat
+                    addressDetailElement.parentNode.insertBefore(mapsLink, addressDetailElement.nextSibling);
+                    console.log('Added Google Maps link after address detail');
+                }
+            }
+        }
+        
+        // Update order items
+        const itemsContainer = document.getElementById('order-items');
+        if (itemsContainer) {
+            if (order.items && order.items.length > 0) {
+                itemsContainer.innerHTML = order.items.map(item => {
+                    // Handle image URL with multiple fallback options
+                    let imageUrl = 'https://picsum.photos/seed/menu/100/100.jpg'; // Default fallback
+                    
+                    if (item.image_url) {
+                        // If image_url is a full URL, use it directly
+                        if (item.image_url.startsWith('http')) {
+                            imageUrl = item.image_url;
+                        } else {
+                            // Try different possible paths for the image
+                            imageUrl = `${BASE_URL}/uploads/menu/${item.image_url}`;
+                        }
+                    }
+                    
+                    return `
+                        <div class="flex gap-4 p-4 border border-gray-200 rounded-lg">
+                            <img src="${imageUrl}" 
+                                 alt="${item.name}" 
+                                 class="w-20 h-20 object-cover rounded-lg item-image"
+                                 onerror="this.src='https://picsum.photos/seed/menu/100/100.jpg'">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900">${item.name}</h4>
+                                <p class="text-sm text-gray-500">${item.category || 'Tidak ada kategori'}</p>
+                                <p class="text-sm text-gray-500">${item.quantity}x @ ${formatCurrency(item.price)}</p>
+                                <p class="text-xs text-gray-400">Jarak: ${item.distance ? item.distance.toFixed(2) : '0'} km, Ongkir: ${formatCurrency(item.shipping || 0)}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-medium text-gray-900">${formatCurrency(item.price * item.quantity)}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                itemsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Tidak ada item dalam pesanan ini</p>';
+            }
+        }
+        
+        // Update pricing details
+        safeSetText('subtotal', formatCurrency(order.subtotal || 0));
+        safeSetText('shipping-cost', formatCurrency(order.shipping || 0));
+        safeSetText('total', formatCurrency(order.total || 0));
+        
+        // Show discount if applicable
+        const discountRow = document.getElementById('discount-row');
+        if (discountRow) {
+            if (order.discount && order.discount > 0) {
+                discountRow.classList.remove('hidden');
+                const discountElement = document.getElementById('discount');
+                if (discountElement) {
+                    discountElement.textContent = `-${formatCurrency(order.discount)}`;
+                }
+            } else {
+                discountRow.classList.add('hidden');
+            }
+        }
+        
+        // Update payment proof if available
+        const paymentProofSection = document.getElementById('payment-proof-section');
+        if (paymentProofSection) {
+            if (order.payment_proof) {
+                paymentProofSection.classList.remove('hidden');
+                
+                // Create payment proof image with error handling
+                const paymentProofImage = document.getElementById('payment-proof-image');
+                
+                if (paymentProofImage) {
+                    // Try different possible paths for payment proof
+                    let paymentProofUrl = `${BASE_URL}/uploads/payment_proofs/${order.payment_proof}`;
+                    
+                    // If the filename starts with "menu-", it might be in the wrong folder
+                    if (order.payment_proof.startsWith('menu-')) {
+                        paymentProofUrl = `${BASE_URL}/uploads/menu/${order.payment_proof}`;
+                    }
+                    
+                    paymentProofImage.src = paymentProofUrl;
+                    
+                    // Add error handling for payment proof image
+                    paymentProofImage.onerror = function() {
+                        console.error('Payment proof image not found:', order.payment_proof);
+                        
+                        // Try alternative path
+                        this.src = `${BASE_URL}/uploads/menu/${order.payment_proof}`;
+                        
+                        // If still fails, show placeholder
+                        this.onerror = function() {
+                            console.error('Alternative payment proof path also failed');
+                            this.src = 'https://picsum.photos/seed/payment/300/200.jpg';
+                            this.alt = 'Bukti pembayaran tidak tersedia';
+                        };
+                    };
+                }
+                
+                const paymentNoteElement = document.getElementById('payment-note');
+                if (paymentNoteElement) {
+                    paymentNoteElement.textContent = order.payment_note || 'Tidak ada catatan';
+                }
+            } else {
+                paymentProofSection.classList.add('hidden');
+            }
+        }
+        
+        // Update timeline and buttons
+        updateTimeline(order.status);
+        updateButtonStates(order.status);
+        
+        // Hide loading state and show content
+        const loadingState = document.getElementById('loading-state');
+        const contentContainer = document.getElementById('content-container');
+        
+        if (loadingState) loadingState.classList.add('hidden');
+        if (contentContainer) contentContainer.classList.remove('hidden');
+
+    } catch (err) {
+        console.error('Load order error:', err);
+        showNotification(err.message || 'Gagal memuat detail pesanan', 'error');
+        
+        // Hide loading state
+        const loadingState = document.getElementById('loading-state');
+        if (loadingState) loadingState.classList.add('hidden');
+        
+        // Show error message in content area
+        const contentContainer = document.getElementById('content-container');
+        if (contentContainer) {
+            contentContainer.classList.remove('hidden');
+            contentContainer.innerHTML = `
+                <div class="bg-white rounded-xl shadow-sm p-6 text-center">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Gagal Memuat Detail Pesanan</h3>
+                    <p class="text-gray-600 mb-4">${err.message || 'Terjadi kesalahan saat memuat data pesanan'}</p>
+                    <button onclick="loadOrder()" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg">
+                        <i class="fas fa-redo mr-2"></i>Coba Lagi
+                    </button>
+                </div>
+            `;
+        }
+    }
+}
+        async function updateStatus(nextStatus) {
+            try {
+                const res = await fetch(`${BASE_URL}/api/admin/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: nextStatus })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Gagal update status');
+
+                showNotification(`Status berhasil diubah ke ${getStatusText(nextStatus)}`, 'success');
+                await loadOrder();
+            } catch (err) {
+                console.error('Update status error:', err);
+                showNotification(err.message, 'error');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('verifyBtn').onclick = () => updateStatus('pending_verification');
+        document.getElementById('processBtn').onclick = () => updateStatus('processing');
+        document.getElementById('readyBtn').onclick = () => updateStatus('ready');
+        document.getElementById('deliverBtn').onclick = () => updateStatus('delivered');
+        document.getElementById('cancelBtn').onclick = () => {
+            if (confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {
+                updateStatus('cancelled');
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadOrder);
+        function openImagePreview() {
+    const modal = document.getElementById('image-preview-modal');
+    const previewImage = document.getElementById('preview-image');
+    const originalImage = document.getElementById('payment-proof-image');
+    
+    previewImage.src = originalImage.src;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeImagePreview() {
+    const modal = document.getElementById('image-preview-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = 'auto';
+}
+
+// Close modal with ESC key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeImagePreview();
+    }
+});
+    </script>
+</body>
+</html>

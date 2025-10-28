@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nasi & Lauk | AnterTah</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'cool-primary': '#1d4ed8',
+                        'cool-accent': '#06b6d4',
+                        'bg-light': '#f1f5f9',
+                        'bg-dark': '#0f172a',
+                        'card-light': '#ffffff',
+                        'card-dark': '#1e293b',
+                        'text-light': '#f1f5f9',
+                        'text-dark': '#1e293b',
+                        'neutral-text': '#64748b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'slide-in-right': 'slideInRight 0.4s ease-out',
+                        'bounce-in': 'bounceIn 0.6s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                        'zoom-in': 'zoomIn 0.2s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        slideInRight: {
+                            '0%': { transform: 'translateX(100%)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' },
+                        },
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.3)', opacity: '0' },
+                            '50%': { transform: 'scale(1.05)' },
+                            '70%': { transform: 'scale(0.9)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        zoomIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .menu-card {
+            transition: all 0.3s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .menu-card img {
+            transition: transform 0.3s ease;
+        }
+
+        .menu-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .category-chip {
+            transition: all 0.2s ease;
+        }
+
+        .category-chip.active {
+            background-color: #1d4ed8;
+            color: white;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+        }
+
+        .floating-cart-btn {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .dark .floating-cart-btn {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            animation: scaleIn 0.3s ease-out;
+        }
+
+        .quantity-btn {
+            transition: all 0.2s ease;
+        }
+
+        .quantity-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* Image Viewer Styles */
+        .image-viewer {
+            animation: zoomIn 0.2s ease-out;
+        }
+
+        .image-viewer img {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-bg-light dark:bg-bg-dark text-text-dark dark:text-text-light min-h-screen font-sans">
+    
+    <!-- Header -->
+    <header class="bg-card-light dark:bg-card-dark shadow-lg sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <button onclick="window.history.back()" class="text-neutral-text dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent transition">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                
+                <h1 class="text-xl font-bold text-text-dark dark:text-text-light">Nasi & Lauk</h1>
+                
+                <a href="keranjang.html" class="relative text-cool-primary dark:text-cool-accent hover:opacity-80 transition">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- Search and Filter Section -->
+        <div class="mb-6">
+            <!-- Search Bar -->
+            <div class="relative mb-4">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-neutral-text"></i>
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Cari menu favoritmu..." 
+                    class="search-input w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-cool-primary dark:bg-gray-700 dark:text-text-light transition-all"
+                >
+            </div>
+
+            <!-- Category Filters -->
+            <div id="category-filters" class="flex space-x-2 overflow-x-auto pb-2">
+                <!-- Category chips will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Menu Grid -->
+        <div id="menu-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-20">
+            <!-- Menu items will be rendered here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-16 animate-fade-in">
+            <i class="fas fa-search text-gray-300 dark:text-gray-600 text-6xl mb-4"></i>
+            <h3 class="text-xl font-bold mb-2 text-gray-600 dark:text-gray-400">Menu Tidak Ditemukan</h3>
+            <p class="text-neutral-text">Coba ubah kata kunci atau kategori pencarian</p>
+        </div>
+    </main>
+
+    <!-- Floating Cart Button (Mobile) -->
+    <a href="keranjang.html" class="lg:hidden fixed bottom-6 right-6 bg-cool-primary hover:bg-blue-700 text-white rounded-full p-4 z-30 floating-cart-btn transition-all transform hover:scale-110">
+        <i class="fas fa-shopping-cart text-xl"></i>
+        <span id="mobile-cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center">0</span>
+    </a>
+
+    <!-- Product Detail Modal -->
+    <div id="product-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-backdrop absolute inset-0 bg-black bg-opacity-60" onclick="closeProductModal()"></div>
+        <div class="relative flex items-center justify-center min-h-screen p-4">
+            <div class="modal-content bg-card-light dark:bg-card-dark rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+                <!-- Close Button -->
+                <button onclick="closeProductModal()" class="absolute top-4 right-4 text-neutral-text hover:text-red-500 z-10 bg-white dark:bg-gray-800 rounded-full p-2 shadow-md">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+
+                <!-- Modal Content -->
+                <div id="modal-body">
+                    <!-- Content will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Image Viewer -->
+    <div id="image-viewer" class="hidden fixed inset-0 z-[999] bg-black bg-opacity-90 flex items-center justify-center">
+        <div class="relative w-full h-full flex items-center justify-center">
+            <img id="viewer-img" src="" class="max-h-[90%] max-w-[90%] rounded-lg object-contain">
+            <button onclick="closeImageViewer()" class="absolute top-5 right-5 bg-white text-black p-2 rounded-full hover:bg-red-500 hover:text-white transition">
+                <i class="fas fa-times"></i>
+            </button>
+            <button onclick="prevImage()" class="absolute left-5 text-white text-3xl hover:text-cool-primary">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button onclick="nextImage()" class="absolute right-5 text-white text-3xl hover:text-cool-primary">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        
+        let allMenuItems = [];
+        let filteredMenuItems = [];
+        let cart = [];
+        let activeCategory = 'Semua';
+        let currentDetailProduct = null;
+        let detailQuantity = 1;
+        let currentImageIndex = 0;
+        let currentImageList = [];
+        const categories = new Set(['Semua']);
+
+        // ========== LOAD MENU FROM API ==========
+        async function loadMenu() {
+            try {
+                const token = localStorage.getItem('authToken');
+                const res = await fetch(`${BASE_URL}/api/menu/admin`, { 
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {} 
+                });
+                
+                if (!res.ok) throw new Error('Gagal memuat menu');
+                const data = await res.json();
+                allMenuItems = data || [];
+                
+                // Extract unique categories
+                allMenuItems.forEach(item => {
+                    if (item.category) {
+                        categories.add(item.category);
+                    }
+                });
+
+                renderCategoryFilters();
+                applyFilters();
+                loadCart();
+                
+            } catch (e) {
+                console.error('Load menu error:', e);
+                showNotification('⚠️ Gagal memuat menu', 'error');
+                document.getElementById('empty-state').classList.remove('hidden');
+                document.getElementById('menu-grid').classList.add('hidden');
+            }
+        }
+
+        // ========== RENDER CATEGORY FILTERS ==========
+        function renderCategoryFilters() {
+            const container = document.getElementById('category-filters');
+            container.innerHTML = '';
+
+            categories.forEach(category => {
+                const chip = document.createElement('button');
+                chip.className = `category-chip px-4 py-2 rounded-full border-2 border-gray-300 dark:border-gray-600 text-sm font-medium whitespace-nowrap ${category === activeCategory ? 'active' : 'bg-card-light dark:bg-card-dark'}`;
+                chip.textContent = category;
+                chip.onclick = () => filterByCategory(category);
+                container.appendChild(chip);
+            });
+        }
+
+        // ========== FILTER BY CATEGORY ==========
+        function filterByCategory(category) {
+            activeCategory = category;
+            renderCategoryFilters(); // Re-render to update active state
+            applyFilters();
+        }
+
+        // ========== APPLY FILTERS (Search + Category) ==========
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            
+            filteredMenuItems = allMenuItems.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(searchTerm);
+                const matchesCategory = activeCategory === 'Semua' || item.category === activeCategory;
+                return matchesSearch && matchesCategory;
+            });
+
+            renderMenu();
+        }
+
+        // ========== RENDER MENU ITEMS ==========
+        function renderMenu() {
+            const grid = document.getElementById('menu-grid');
+            const emptyState = document.getElementById('empty-state');
+
+            if (filteredMenuItems.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            grid.innerHTML = '';
+
+            filteredMenuItems.forEach((item, index) => {
+                // PERBAIKAN: Handle multiple images with proper URL construction
+                let imageUrl = '';
+                
+                // Coba ambil dari image_urls (array) atau image_url (string)
+                if (item.image_urls && item.image_urls.length > 0) {
+                    // Jika image_urls adalah string JSON, parse dulu
+                    const imageUrls = typeof item.image_urls === 'string' 
+                                       ? JSON.parse(item.image_urls) 
+                                       : item.image_urls;
+                    // Ambil URL pertama dari array
+                    imageUrl = imageUrls[0];
+                } else if (item.image_url) {
+                    // Jika ada image_url (single image)
+                    imageUrl = item.image_url;
+                }
+                
+                // PERBAIKAN: Konstruksi URL gambar dengan benar
+                // Jika imageUrl adalah path relatif (tidak dimulai dengan http), tambahkan BASE_URL
+                // Jika imageUrl sudah URL lengkap, gunakan apa adanya
+                let fullImageUrl = '';
+                if (imageUrl) {
+                    if (imageUrl.startsWith('http')) {
+                        // Sudah URL lengkap
+                        fullImageUrl = imageUrl;
+                    } else if (imageUrl.startsWith('/')) {
+                        // Path relatif dari root
+                        fullImageUrl = `${BASE_URL}${imageUrl}`;
+                    } else {
+                        // Path relatif dari uploads/menu
+                        fullImageUrl = `${BASE_URL}/uploads/menu/${imageUrl}`;
+                    }
+                } else {
+                    // Tidak ada gambar, gunakan placeholder
+                    fullImageUrl = 'https://placehold.co/300x200/e2e8f0/64748b?text=No+Image';
+                }
+                
+                const isAvailable = item.is_available !== 0; // Assuming 0 or false means not available
+
+                const menuCard = document.createElement('div');
+                menuCard.className = 'menu-card bg-card-light dark:bg-card-dark rounded-xl shadow-lg overflow-hidden cursor-pointer animate-slide-up';
+                menuCard.style.animationDelay = `${index * 0.05}s`;
+                menuCard.onclick = () => showProductDetail(item.id); // Open modal on card click
+
+                menuCard.innerHTML = `
+                    <div class="relative overflow-hidden h-40">
+                        <img src="${fullImageUrl}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://placehold.co/300x200/e2e8f0/64748b?text=No+Image'">
+                        ${!isAvailable ? '<div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center"><span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">Habis</span></div>' : ''}
+                    </div>
+                    
+                    <div class="p-4">
+                        <h3 class="font-bold text-base mb-1 truncate">${item.name}</h3>
+                        <p class="text-xs text-neutral-text mb-3 line-clamp-2">${item.description || 'Deskripsi tidak tersedia'}</p>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-cool-primary dark:text-cool-accent font-bold text-lg">
+                                Rp ${item.price.toLocaleString('id-ID')}
+                            </span>
+                            
+                            <button 
+                                onclick="event.stopPropagation(); addToCart(${item.id}, 1)" 
+                                class="bg-cool-primary hover:bg-blue-700 text-white p-2 rounded-lg transition-all transform hover:scale-110 ${!isAvailable ? 'opacity-50 cursor-not-allowed' : ''}"
+                                ${!isAvailable ? 'disabled' : ''}
+                            >
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(menuCard);
+            });
+        }
+
+        // ========== SHOW PRODUCT DETAIL MODAL ==========
+        function showProductDetail(productId) {
+            currentDetailProduct = allMenuItems.find(item => item.id === productId);
+            if (!currentDetailProduct) return;
+
+            detailQuantity = 1;
+            const modal = document.getElementById('product-modal');
+            const modalBody = document.getElementById('modal-body');
+
+            // Ambil semua gambar (image_urls atau image_url tunggal)
+            let imageUrls = [];
+            if (currentDetailProduct.image_urls) {
+                imageUrls = typeof currentDetailProduct.image_urls === 'string' 
+                    ? JSON.parse(currentDetailProduct.image_urls)
+                    : currentDetailProduct.image_urls;
+            } else if (currentDetailProduct.image_url) {
+                imageUrls = [currentDetailProduct.image_url];
+            }
+
+            // Pastikan semua URL benar
+            imageUrls = imageUrls.map(url => {
+                if (url.startsWith('http')) return url;
+                if (url.startsWith('/')) return `${BASE_URL}${url}`;
+                return `${BASE_URL}/uploads/menu/${url}`;
+            });
+
+            currentImageList = imageUrls;
+
+            // Buat slider
+            const imageSlides = imageUrls.map((url, i) => `
+                <div class="swiper-slide">
+                    <img src="${url}" 
+                         alt="Gambar ${i+1}" 
+                         class="w-full h-64 object-cover cursor-pointer rounded-t-2xl"
+                         onclick="openImageViewer(${i})"
+                         onerror="this.onerror=null; this.src='https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'">
+                </div>
+            `).join('');
+
+            modalBody.innerHTML = `
+                <div class="swiper mySwiper rounded-t-2xl">
+                    <div class="swiper-wrapper">${imageSlides}</div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+
+                <div class="p-6">
+                    <h2 class="text-2xl font-bold mb-2">${currentDetailProduct.name}</h2>
+                    <p class="text-neutral-text mb-4">${currentDetailProduct.description || 'Tidak ada deskripsi.'}</p>
+                    <div class="text-3xl font-bold text-cool-primary mb-4">Rp ${currentDetailProduct.price.toLocaleString('id-ID')}</div>
+
+                    <div class="flex items-center space-x-3 mb-6">
+                        <button onclick="updateDetailQuantity(-1)" class="bg-gray-200 w-10 h-10 rounded-md flex items-center justify-center"><i class="fas fa-minus"></i></button>
+                        <span id="detail-quantity" class="w-12 text-center font-bold text-lg">${detailQuantity}</span>
+                        <button onclick="updateDetailQuantity(1)" class="bg-gray-200 w-10 h-10 rounded-md flex items-center justify-center"><i class="fas fa-plus"></i></button>
+                    </div>
+
+                    <button onclick="addToCartFromModal()" class="w-full bg-gradient-to-r from-cool-primary to-blue-600 text-white py-3 rounded-xl font-bold hover:scale-105 transition">
+                        <i class="fas fa-cart-plus mr-2"></i>Tambah ke Keranjang
+                    </button>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+
+            // Inisialisasi Swiper (Shopee-style slide)
+            setTimeout(() => {
+                new Swiper(".mySwiper", {
+                    loop: true,
+                    pagination: { el: ".swiper-pagination", clickable: true },
+                    navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+                });
+            }, 100);
+        }
+
+        // ========== CLOSE PRODUCT MODAL ==========
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+            currentDetailProduct = null;
+        }
+
+        // ========== OPEN IMAGE VIEWER ==========
+        function openImageViewer(index) {
+            currentImageIndex = index;
+            document.getElementById('viewer-img').src = currentImageList[index];
+            document.getElementById('image-viewer').classList.remove('hidden');
+        }
+
+        // ========== CLOSE IMAGE VIEWER ==========
+        function closeImageViewer() {
+            document.getElementById('image-viewer').classList.add('hidden');
+        }
+
+        // ========== NAVIGATE IMAGES ==========
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + currentImageList.length) % currentImageList.length;
+            document.getElementById('viewer-img').src = currentImageList[currentImageIndex];
+        }
+
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % currentImageList.length;
+            document.getElementById('viewer-img').src = currentImageList[currentImageIndex];
+        }
+
+        // ========== UPDATE DETAIL QUANTITY ==========
+        function updateDetailQuantity(change) {
+            const newQuantity = detailQuantity + change;
+            if (newQuantity >= 1 && newQuantity <= 99) {
+                detailQuantity = newQuantity;
+                document.getElementById('detail-quantity').textContent = detailQuantity;
+            }
+        }
+
+        // ========== ADD TO CART FROM MODAL ==========
+        function addToCartFromModal() {
+            if (currentDetailProduct) {
+                addToCart(currentDetailProduct.id, detailQuantity);
+                closeProductModal();
+            }
+        }
+
+        // ========== LOAD CART ==========
+        async function loadCart() {
+            try {
+                const token = localStorage.getItem('authToken');
+                
+                if (!token) {
+                    updateCartCount(0);
+                    return;
+                }
+                
+                const res = await fetch(`${BASE_URL}/api/cart`, 
+                { headers: { 'Authorization': `Bearer ${token}` }
+            });
+                if (!res.ok) throw new Error('Gagal memuat cart');
+                const data = await res.json();
+                cart = data.items || [];
+                updateCartCount(cart.reduce((sum, item) => sum + item.quantity, 0));
+            } catch (e) {
+                console.error('Load cart error:', e);
+                updateCartCount(0);
+            }
+        }
+
+        // ========== ADD TO CART ==========
+        async function addToCart(itemId, quantity = 1) {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                showNotification('⚠️ Silakan login terlebih dahulu', 'error');
+                return;
+            }
+
+            const menuItem = allMenuItems.find(item => item.id === itemId);
+            if (!menuItem) return;
+
+            if (menuItem.is_available === 0) {
+                showNotification('⚠️ Menu sedang habis', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${BASE_URL}/api/cart`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ id: menuItem.id, name: menuItem.name, price: menuItem.price, image: menuItem.image_url })
+                });
+
+                if (!res.ok) throw new Error('Failed to add to cart');
+                
+                const result = await res.json();
+                showNotification(`✅ "${menuItem.name}" (${quantity}x) ditambahkan ke keranjang`, 'success');
+                loadCart(); // Reload cart to update count
+
+            } catch (e) {
+                console.error('Add to cart error:', e);
+                showNotification('⚠️ Gagal menambahkan ke keranjang', 'error');
+            }
+        }
+
+        // ========== UPDATE CART COUNT ==========
+        function updateCartCount(count) {
+            document.getElementById('cart-count').textContent = count;
+            document.getElementById('mobile-cart-count').textContent = count;
+        }
+
+        // ========== NOTIFICATION ==========
+        function showNotification(message, type = 'success') {
+            const existing = document.querySelector('.notification-toast');
+            if (existing) existing.remove();
+
+            const notification = document.createElement('div');
+            notification.className = 'notification-toast fixed top-20 right-4 z-[9999] animate-slide-up';
+            
+            let bgColor;
+            if (type === 'success') {
+                bgColor = 'bg-green-500';
+            } else if (type === 'warning') {
+                bgColor = 'bg-yellow-500';
+            } else {
+                bgColor = 'bg-red-500';
+            }
+            
+            notification.innerHTML = `
+                <div class="${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3">
+                    <span class="text-sm font-medium">${message}</span>
+                    <button onclick="this.closest('.notification-toast').remove()" class="ml-2 hover:opacity-80">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // ========== EVENT LISTENERS ==========
+        document.getElementById('search-input').addEventListener('input', applyFilters);
+
+        // ========== DARK MODE ==========
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+
+        // ========== INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMenu();
+        });
+    </script>
+</body>
+</html>

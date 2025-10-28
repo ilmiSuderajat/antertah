@@ -156,6 +156,40 @@
             border-color: #475569;
             background-color: rgba(30, 41, 59, 0.5);
         }
+        
+        .shipping-info {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+        .shipping-loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #1d4ed8;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .shipping-prompt {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            color: #1e40af;
+            margin-top: 4px;
+        }
+        
+        .dark .shipping-prompt {
+            background-color: rgba(6, 182, 212, 0.1);
+            border-left-color: #06b6d4;
+            color: #0e7490;
+        }
     </style>
 </head>
 <body class="bg-bg-light dark:bg-bg-dark text-text-dark dark:text-text-light min-h-screen font-sans pb-32 md:pb-8">
@@ -268,7 +302,15 @@
                             
                             <div class="flex justify-between text-sm">
                                 <span class="text-neutral-text">Ongkos Kirim</span>
-                                <span class="font-semibold text-green-600" id="shipping-cost">Rp 10.000</span>
+                                <div class="flex items-center">
+                                    <span class="font-semibold text-green-600" id="shipping-cost">Rp 0</span>
+                                    <div id="shipping-loading" class="ml-2 shipping-loading hidden"></div>
+                                </div>
+                            </div>
+                            
+                            <div id="shipping-info" class="shipping-info hidden">
+                                <i class="fas fa-map-marker-alt mr-1"></i>
+                                <span id="shipping-distance">Pilih alamat untuk menghitung ongkir</span>
                             </div>
 
                             <div id="discount-row" class="flex justify-between text-sm hidden">
@@ -330,7 +372,7 @@
                 <i class="fas fa-map-marker-alt text-gray-300 dark:text-gray-600 text-5xl mb-4"></i>
                 <p class="text-neutral-text mb-4">Belum ada alamat tersimpan</p>
                 <button onclick="window.location.href='profile.html#addresses'" class="bg-cool-primary hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-all">
-                    <i class="fas fa-plus mr-2"></i>
+                    <i class="fas fa-plus mr-1"></i>
                     Tambah Alamat
                 </button>
             </div>
@@ -347,511 +389,689 @@
     </div>
 
 <script src="config.js"></script>
-    <script>
-        
-        const SHIPPING_COST = 10000;
-        
-        let cart = [];
-        let appliedPromo = null;
-        let addresses = [];
-        let selectedAddress = null;
-        
-        // Promo codes database
-        const promoCodes = {
-            'ANT50': { type: 'percentage', value: 50, minPurchase: 0 },
-            'WELCOME20': { type: 'percentage', value: 20, minPurchase: 50000 },
-            'HEMAT25K': { type: 'fixed', value: 25000, minPurchase: 100000 },
-        };
+<script>
+    
+    const SHIPPING_COST = 10000;
+    
+    let cart = [];
+    let appliedPromo = null;
+    let addresses = [];
+    let selectedAddress = null;
+    let shippingCosts = {}; // Menyimpan ongkir per item
+    let totalShippingCost = 0; // Total ongkir semua item
+    let shippingCalculated = false; // Flag untuk menandai apakah ongkir sudah dihitung
+    
+    // Promo codes database
+    const promoCodes = {
+        'ANT50': { type: 'percentage', value: 50, minPurchase: 0 },
+        'WELCOME20': { type: 'percentage', value: 20, minPurchase: 50000 },
+        'HEMAT25K': { type: 'fixed', value: 25000, minPurchase: 100000 },
+    };
 
-        // ========== LOAD CART FROM API ==========
-        async function loadCart() {
-            try {
-                const token = localStorage.getItem('authToken');
-                if (!token) {
-                    console.warn('No auth token found');
-                    cart = [];
-                    renderCart();
-                    updateSummary();
-                    return;
-                }
-                
-                const res = await fetch(`${BASE_URL}/api/cart`, { headers: { 'Authorization': `Bearer ${token}` } });
-                if (!res.ok) throw new Error('Gagal memuat cart');
-                const data = await res.json();
-                cart = (data.items || []).map(it => ({
-                    id: it.item_id,
-                    name: it.name,
-                    price: it.price,
-                    quantity: it.quantity,
-                    image_url: it.image_url
-                }));
-                renderCart();
-                updateSummary();
-            } catch (e) {
-                console.error('Load cart error:', e);
-                showNotification('⚠️ Gagal memuat keranjang', 'error');
+    // ========== LOAD CART FROM API ==========
+    async function loadCart() {
+        try {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                console.warn('No auth token found');
                 cart = [];
                 renderCart();
                 updateSummary();
+                return;
             }
+            
+            const res = await fetch(`${BASE_URL}/api/cart`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) throw new Error('Gagal memuat cart');
+            const data = await res.json();
+            cart = (data.items || []).map(it => ({
+                id: it.item_id,
+                menu_id: it.menu_id || it.id, // Tambahkan menu_id untuk API shipping
+                name: it.name,
+                price: it.price,
+                quantity: it.quantity,
+                image_url: it.image_url
+            }));
+            renderCart();
+            updateSummary();
+            
+            // Jangan hitung ongkir di sini, tunggu sampai alamat dipilih
+            // Tampilkan pesan bahwa ongkir akan dihitung setelah alamat dipilih
+            updateShippingPrompt();
+        } catch (e) {
+            console.error('Load cart error:', e);
+            showNotification('⚠️ Gagal memuat keranjang', 'error');
+            cart = [];
+            renderCart();
+            updateSummary();
         }
+    }
 
-        // ========== LOAD ADDRESSES FROM API ==========
-        async function loadAddresses() {
-            try {
-                const token = localStorage.getItem('authToken');
-                if (!token) {
-                    console.warn('No auth token found');
-                    addresses = [];
-                    renderAddresses();
-                    return;
-                }
-                
-                const res = await fetch(`${BASE_URL}/api/addresses`, { 
-                    headers: { 'Authorization': `Bearer ${token}` } 
-                });
-                
-                if (!res.ok) throw new Error('Gagal memuat alamat');
-                const data = await res.json();
-                addresses = data || [];
-                
-                // NO AUTO-SELECTION - User must manually select
-                selectedAddress = null;
-                
-                renderAddresses();
-            } catch (e) {
-                console.error('Load addresses error:', e);
-                showNotification('⚠️ Gagal memuat alamat', 'error');
+    // ========== LOAD ADDRESSES FROM API ==========
+    async function loadAddresses() {
+        try {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                console.warn('No auth token found');
                 addresses = [];
                 renderAddresses();
-            }
-        }
-
-        // ========== RENDER ADDRESSES ==========
-        function renderAddresses() {
-            const container = document.getElementById('addresses-container');
-            const noAddresses = document.getElementById('no-addresses');
-            const addressSection = document.getElementById('address-section');
-            const modalContainer = document.getElementById('modal-addresses-container');
-            const modalNoAddresses = document.getElementById('modal-no-addresses');
-            const noAddressSelected = document.getElementById('no-address-selected');
-
-            if (addresses.length === 0) {
-                container.innerHTML = '';
-                modalContainer.innerHTML = '';
-                noAddresses.classList.remove('hidden');
-                modalNoAddresses.classList.remove('hidden');
-                noAddressSelected.classList.add('hidden');
                 return;
             }
-
-            noAddresses.classList.add('hidden');
-            modalNoAddresses.classList.add('hidden');
-            addressSection.classList.remove('hidden');
-
-            // Show/hide based on whether address is selected
-            if (selectedAddress) {
-                noAddressSelected.classList.add('hidden');
-                container.classList.remove('hidden');
-            } else {
-                noAddressSelected.classList.remove('hidden');
-                container.classList.add('hidden');
-            }
-
-            // Render selected address in main section
-            if (selectedAddress) {
-                container.innerHTML = '';
-                const addressCard = document.createElement('div');
-                addressCard.className = 'address-card border-2 border-cool-primary rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20';
-                
-                addressCard.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <div class="flex items-center mb-2">
-                                <h4 class="font-semibold mr-2">${selectedAddress.label}</h4>
-                                ${selectedAddress.is_main === 1 ? '<span class="text-xs bg-cool-primary text-white px-2 py-1 rounded">Utama</span>' : ''}
-                            </div>
-                            <p class="text-sm text-neutral-text mb-1">${selectedAddress.recipient_name}</p>
-                            <p class="text-sm text-neutral-text">${selectedAddress.address_detail}, ${selectedAddress.city}, ${selectedAddress.postal_code}</p>
-                        </div>
-                        <button onclick="openAddressModal()" class="text-cool-primary hover:text-blue-700 font-semibold text-sm">
-                            <i class="fas fa-edit mr-1"></i>
-                            Ubah
-                        </button>
-                    </div>
-                `;
-                
-                container.appendChild(addressCard);
-            }
-
-            // Render all addresses in modal
-            modalContainer.innerHTML = '';
-            addresses.forEach((address, index) => {
-                const isSelected = selectedAddress && selectedAddress.id === address.id;
-                const addressCard = document.createElement('div');
-                addressCard.className = `address-card border-2 rounded-lg p-4 cursor-pointer ${isSelected ? 'selected' : 'border-gray-200 dark:border-gray-700'}`;
-                addressCard.onclick = () => selectAddressInModal(address.id);
-                
-                addressCard.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <div class="flex items-center mb-2">
-                                <h4 class="font-semibold mr-2">${address.label}</h4>
-                                ${address.is_main === 1 ? '<span class="text-xs bg-cool-primary text-white px-2 py-1 rounded">Utama</span>' : ''}
-                            </div>
-                            <p class="text-sm text-neutral-text mb-1">${address.recipient_name}</p>
-                            <p class="text-sm text-neutral-text">${address.address_detail}, ${address.city}, ${address.postal_code}</p>
-                        </div>
-                        <div class="ml-3">
-                            <div class="w-5 h-5 rounded-full border-2 ${isSelected ? 'border-cool-primary' : 'border-gray-300 dark:border-gray-600'} flex items-center justify-center">
-                                ${isSelected ? '<div class="w-3 h-3 rounded-full bg-cool-primary"></div>' : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                modalContainer.appendChild(addressCard);
+            
+            const res = await fetch(`${BASE_URL}/api/addresses`, { 
+                headers: { 'Authorization': `Bearer ${token}` } 
             });
-        }
-
-        // ========== SELECT ADDRESS ==========
-        function selectAddress(addressId) {
-            selectedAddress = addresses.find(addr => addr.id === addressId);
+            
+            if (!res.ok) throw new Error('Gagal memuat alamat');
+            const data = await res.json();
+            addresses = data || [];
+            
+            // NO AUTO-SELECTION - User must manually select
+            selectedAddress = null;
+            
+            renderAddresses();
+        } catch (e) {
+            console.error('Load addresses error:', e);
+            showNotification('⚠️ Gagal memuat alamat', 'error');
+            addresses = [];
             renderAddresses();
         }
+    }
 
-        function selectAddressInModal(addressId) {
-            selectedAddress = addresses.find(addr => addr.id === addressId);
-            renderAddresses();
-        }
-
-        // ========== OPEN ADDRESS MODAL ==========
-        function openAddressModal() {
-            document.getElementById('address-modal').classList.remove('hidden');
-            renderAddresses();
-        }
-
-        // ========== RENDER CART ITEMS ==========
-        function renderCart() {
-            const container = document.getElementById('cart-items-container');
-            const emptyState = document.getElementById('empty-cart-state');
-            const summary = document.getElementById('cart-summary');
-
-            if (cart.length === 0) {
-                container.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-                summary.classList.add('hidden');
-                document.getElementById('address-section').classList.add('hidden');
-                return;
+    // ========== UPDATE SHIPPING PROMPT ==========
+    function updateShippingPrompt() {
+        const shippingInfoEl = document.getElementById('shipping-info');
+        const shippingDistanceEl = document.getElementById('shipping-distance');
+        
+        if (shippingInfoEl && shippingDistanceEl) {
+            shippingInfoEl.classList.remove('hidden');
+            
+            if (!selectedAddress) {
+                shippingDistanceEl.textContent = 'Pilih alamat untuk menghitung ongkir';
+            } else if (!shippingCalculated) {
+                shippingDistanceEl.textContent = 'Menghitung ongkir...';
             }
+        }
+    }
 
-            container.classList.remove('hidden');
-            emptyState.classList.add('hidden');
-            summary.classList.remove('hidden');
+    // ========== CALCULATE SHIPPING COSTS ==========
+  async function calculateAllShippingCosts() {
+  if (!selectedAddress) {
+    console.warn('Tidak dapat menghitung ongkir: alamat belum dipilih');
+    return;
+  }
+
+  const shippingLoadingEl = document.getElementById('shipping-loading');
+  const shippingInfoEl = document.getElementById('shipping-info');
+  const shippingDistanceEl = document.getElementById('shipping-distance');
+
+  if (shippingLoadingEl) shippingLoadingEl.classList.remove('hidden');
+  if (shippingInfoEl) {
+    shippingInfoEl.classList.remove('hidden');
+    if (shippingDistanceEl) shippingDistanceEl.textContent = 'Menghitung jarak...';
+  }
+
+  totalShippingCost = 0;
+  shippingCosts = {};
+  shippingCalculated = false;
+
+  const shippingPromises = cart.map(async (item) => {
+    try {
+      const menuId = item.menu_id || item.id;
+      if (!menuId) {
+        console.error('Item tidak memiliki ID:', item);
+        return null;
+      }
+
+      const response = await fetch(`${BASE_URL}/api/shipping-cost/${item.id}?address_id=${selectedAddress.id}`, {
+        headers: { 
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'ngrok-skip-browser-warning': 'true'
+        }
+      });
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const data = await response.json();
+
+      console.log(`[ONGKIR] ${item.name}: ${data.distance_km} km → Rp${data.shipping_cost}`);
+
+      const itemKey = item.id;
+      shippingCosts[itemKey] = {
+        cost: data.shipping_cost,
+        distance: parseFloat(data.distance_km)
+      };
+
+      totalShippingCost += data.shipping_cost;
+      return data;
+    } catch (error) {
+      console.error(`Error calculating shipping for ${item.name}:`, error);
+      const defaultCost = SHIPPING_COST;
+      const itemKey = item.id;
+      shippingCosts[itemKey] = {
+        cost: defaultCost,
+        distance: 0,
+        error: true
+      };
+      totalShippingCost += defaultCost;
+      return null;
+    }
+  });
+
+  await Promise.all(shippingPromises);
+
+  shippingCalculated = true;
+  if (shippingLoadingEl) shippingLoadingEl.classList.add('hidden');
+  updateSummary();
+
+  if (shippingInfoEl && shippingDistanceEl && Object.keys(shippingCosts).length > 0) {
+    const distances = Object.values(shippingCosts)
+      .filter(cost => !cost.error)
+      .map(cost => cost.distance);
+
+    if (distances.length > 0) {
+      const maxDistance = Math.max(...distances);
+      shippingDistanceEl.textContent = `Jarak terjauh: ${maxDistance.toFixed(2)} km`;
+    } else {
+      shippingDistanceEl.textContent = 'Tidak dapat menghitung jarak, menggunakan ongkir default';
+    }
+  }
+}
+
+    // ========== RENDER ADDRESSES ==========
+    function renderAddresses() {
+        const container = document.getElementById('addresses-container');
+        const noAddresses = document.getElementById('no-addresses');
+        const addressSection = document.getElementById('address-section');
+        const modalContainer = document.getElementById('modal-addresses-container');
+        const modalNoAddresses = document.getElementById('modal-no-addresses');
+        const noAddressSelected = document.getElementById('no-address-selected');
+
+        if (addresses.length === 0) {
             container.innerHTML = '';
-
-            cart.forEach((item, index) => {
-                const itemTotal = item.price * item.quantity;
-                const imageUrl = item.image_url || 'https://placehold.co/100x100/e2e8f0/64748b?text=No+Image';
-
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item bg-card-light dark:bg-card-dark rounded-xl shadow-md p-4 flex items-center space-x-4 animate-slide-up';
-                cartItem.style.animationDelay = `${index * 0.05}s`;
-
-                cartItem.innerHTML = `
-                    <div class="flex-shrink-0">
-                        <img src="${imageUrl}" alt="${item.name}" class="w-20 h-20 object-cover rounded-lg">
-                    </div>
-                    
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-bold text-base mb-1 truncate">${item.name}</h4>
-                        <p class="text-xs text-neutral-text mb-2">
-                            <i class="fas fa-tag mr-1"></i>
-                            ${item.category || 'Lainnya'}
-                        </p>
-                        <p class="text-cool-primary dark:text-cool-accent font-bold text-lg">
-                            Rp ${itemTotal.toLocaleString('id-ID')}
-                        </p>
-                    </div>
-
-                    <div class="flex flex-col items-end space-y-2">
-                        <!-- Quantity Controls -->
-                        <div class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-                            <button class="quantity-btn w-8 h-8 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all" onclick="updateQuantity(${index}, ${item.quantity - 1})">
-                                <i class="fas fa-minus text-xs"></i>
-                            </button>
-                            <span class="w-10 text-center font-semibold">${item.quantity}</span>
-                            <button class="quantity-btn w-8 h-8 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all" onclick="updateQuantity(${index}, ${item.quantity + 1})">
-                                <i class="fas fa-plus text-xs"></i>
-                            </button>
-                        </div>
-
-                        <!-- Remove Button -->
-                        <button class="text-red-500 hover:text-red-600 text-sm font-semibold transition-all hover:scale-110" onclick="removeItem(${index})">
-                            <i class="fas fa-trash-alt mr-1"></i>
-                            Hapus
-                        </button>
-                    </div>
-                `;
-
-                container.appendChild(cartItem);
-            });
+            modalContainer.innerHTML = '';
+            noAddresses.classList.remove('hidden');
+            modalNoAddresses.classList.remove('hidden');
+            noAddressSelected.classList.add('hidden');
+            return;
         }
 
-        // ========== UPDATE QUANTITY ==========
-        async function updateQuantity(index, newQty) {
-            if (newQty < 1) {
-                removeItem(index);
+        noAddresses.classList.add('hidden');
+        modalNoAddresses.classList.add('hidden');
+        addressSection.classList.remove('hidden');
+
+        // Show/hide based on whether address is selected
+        if (selectedAddress) {
+            noAddressSelected.classList.add('hidden');
+            container.classList.remove('hidden');
+        } else {
+            noAddressSelected.classList.remove('hidden');
+            container.classList.add('hidden');
+        }
+
+        // Render selected address in main section
+        if (selectedAddress) {
+            container.innerHTML = '';
+            const addressCard = document.createElement('div');
+            addressCard.className = 'address-card border-2 border-cool-primary rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20';
+            
+            addressCard.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <div class="flex items-center mb-2">
+                            <h4 class="font-semibold mr-2">${selectedAddress.label}</h4>
+                            ${selectedAddress.is_main === 1 ? '<span class="text-xs bg-cool-primary text-white px-2 py-1 rounded">Utama</span>' : ''}
+                        </div>
+                        <p class="text-sm text-neutral-text mb-1">${selectedAddress.recipient_name}</p>
+                        <p class="text-sm text-neutral-text">${selectedAddress.address_detail}, ${selectedAddress.city}, ${selectedAddress.postal_code}</p>
+                    </div>
+                    <button onclick="openAddressModal()" class="text-cool-primary hover:text-blue-700 font-semibold text-sm">
+                        <i class="fas fa-edit mr-1"></i>
+                        Ubah
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(addressCard);
+            
+            // Hitung ongkir saat alamat dipilih
+            if (cart.length > 0) {
+                calculateAllShippingCosts();
+            }
+        }
+
+        // Render all addresses in modal
+        modalContainer.innerHTML = '';
+        addresses.forEach((address, index) => {
+            const isSelected = selectedAddress && selectedAddress.id === address.id;
+            const addressCard = document.createElement('div');
+            addressCard.className = `address-card border-2 rounded-lg p-4 cursor-pointer ${isSelected ? 'selected' : 'border-gray-200 dark:border-gray-700'}`;
+            addressCard.onclick = () => selectAddressInModal(address.id);
+            
+            addressCard.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <div class="flex items-center mb-2">
+                            <h4 class="font-semibold mr-2">${address.label}</h4>
+                            ${address.is_main === 1 ? '<span class="text-xs bg-cool-primary text-white px-2 py-1 rounded">Utama</span>' : ''}
+                        </div>
+                        <p class="text-sm text-neutral-text mb-1">${address.recipient_name}</p>
+                        <p class="text-sm text-neutral-text">${address.address_detail}, ${address.city}, ${address.postal_code}</p>
+                    </div>
+                    <div class="ml-3">
+                        <div class="w-5 h-5 rounded-full border-2 ${isSelected ? 'border-cool-primary' : 'border-gray-300 dark:border-gray-600'} flex items-center justify-center">
+                            ${isSelected ? '<div class="w-3 h-3 rounded-full bg-cool-primary"></div>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modalContainer.appendChild(addressCard);
+        });
+    }
+
+    // ========== SELECT ADDRESS ==========
+    function selectAddress(addressId) {
+        selectedAddress = addresses.find(addr => addr.id === addressId);
+        renderAddresses();
+    }
+
+    function selectAddressInModal(addressId) {
+        selectedAddress = addresses.find(addr => addr.id === addressId);
+        renderAddresses();
+    }
+
+    // ========== OPEN ADDRESS MODAL ==========
+    function openAddressModal() {
+        document.getElementById('address-modal').classList.remove('hidden');
+        renderAddresses();
+    }
+
+    // ========== RENDER CART ITEMS ==========
+    function renderCart() {
+        const container = document.getElementById('cart-items-container');
+        const emptyState = document.getElementById('empty-cart-state');
+        const summary = document.getElementById('cart-summary');
+
+        if (cart.length === 0) {
+            container.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+            summary.classList.add('hidden');
+            document.getElementById('address-section').classList.add('hidden');
+            return;
+        }
+
+        container.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+        summary.classList.remove('hidden');
+        container.innerHTML = '';
+
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            let imageUrl = '';
+    
+            // Coba ambil dari image_urls (array) atau image_url (string)
+            if (item.image_urls && item.image_urls.length > 0) {
+                // Jika image_urls adalah string JSON, parse dulu
+                const imageUrls = typeof item.image_urls === 'string' 
+                                   ? JSON.parse(item.image_urls) 
+                                   : item.image_urls;
+                // Ambil URL pertama dari array
+                imageUrl = imageUrls[0];
+            } else if (item.image_url) {
+                // Jika ada image_url (single image)
+                imageUrl = item.image_url;
+            }
+                    
+            // PERBAIKAN: Konstruksi URL gambar dengan benar
+            // Jika imageUrl adalah path relatif (tidak dimulai dengan http), tambahkan BASE_URL
+            // Jika imageUrl sudah URL lengkap, gunakan apa adanya
+            let fullImageUrl = '';
+            if (imageUrl) {
+                if (imageUrl.startsWith('http')) {
+                    // Sudah URL lengkap
+                    fullImageUrl = imageUrl;
+                } else if (imageUrl.startsWith('/')) {
+                    // Path relatif dari root
+                    fullImageUrl = `${BASE_URL}${imageUrl}`;
+                } else {
+                    // Path relatif dari uploads/menu
+                    fullImageUrl = `${BASE_URL}/uploads/menu/${imageUrl}`;
+                }
+            } else {
+                // Tidak ada gambar, gunakan placeholder
+                fullImageUrl = 'https://placehold.co/300x200/e2e8f0/64748b?text=No+Image';
+            }
+            
+            // Tampilkan ongkir per item jika sudah dihitung
+            let itemShippingInfo = '';
+            if (shippingCosts[item.id]) {
+                const cost = shippingCosts[item.id].cost;
+                const distance = shippingCosts[item.id].distance;
+                itemShippingInfo = `
+                    <p class="text-xs text-neutral-text">
+                        <i class="fas fa-truck mr-1"></i>
+                        Ongkir: Rp ${cost.toLocaleString('id-ID')}
+                        ${distance ? `(${distance.toFixed(2)} km)` : ''}
+                    </p>
+                `;
+            }
+            
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item bg-card-light dark:bg-card-dark rounded-xl shadow-md p-4 flex items-center space-x-4 animate-slide-up';
+            cartItem.style.animationDelay = `${index * 0.05}s`;
+            console.log('Rendering item image URL:', fullImageUrl);
+            cartItem.innerHTML = `
+                <div class="flex-shrink-0">
+                    <img src="${fullImageUrl}" alt="${item.name}" class="w-20 h-20 object-cover rounded-lg">
+                </div>
+                
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-base mb-1 truncate">${item.name}</h4>
+                    <p class="text-xs text-neutral-text mb-2">
+                        <i class="fas fa-tag mr-1"></i>
+                        ${item.category || 'Lainnya'}
+                    </p>
+                    <p class="text-cool-primary dark:text-cool-accent font-bold text-lg">
+                        Rp ${itemTotal.toLocaleString('id-ID')}
+                    </p>
+                    ${itemShippingInfo}
+                </div>
+
+                <div class="flex flex-col items-end space-y-2">
+                    <!-- Quantity Controls -->
+                    <div class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+                        <button class="quantity-btn w-8 h-8 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all" onclick="updateQuantity(${index}, ${item.quantity - 1})">
+                            <i class="fas fa-minus text-xs"></i>
+                        </button>
+                        <span class="w-10 text-center font-semibold">${item.quantity}</span>
+                        <button class="quantity-btn w-8 h-8 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all" onclick="updateQuantity(${index}, ${item.quantity + 1})">
+                            <i class="fas fa-plus text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Remove Button -->
+                    <button class="text-red-500 hover:text-red-600 text-sm font-semibold transition-all hover:scale-110" onclick="removeItem(${index})">
+                        <i class="fas fa-trash-alt mr-1"></i>
+                        Hapus
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(cartItem);
+        });
+    }
+
+    // ========== UPDATE QUANTITY ==========
+    async function updateQuantity(index, newQty) {
+        if (newQty < 1) {
+            removeItem(index);
+            return;
+        }
+
+        if (newQty > 99) {
+            showNotification('⚠️ Maksimal 99 item per produk', 'error');
+            return;
+        }
+
+        const item = cart[index];
+        const token = localStorage.getItem('authToken');
+        
+        if (token) {
+            try {
+                const res = await fetch(`${BASE_URL}/api/cart/${item.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ quantity: newQty })
+                });
+                
+                if (!res.ok) throw new Error('Failed to update quantity');
+            } catch (e) {
+                console.error('Update quantity error:', e);
+                showNotification('⚠️ Gagal memperbarui jumlah', 'error');
                 return;
             }
+        }
+        
+        cart[index].quantity = newQty;
+        saveCart();
+        renderCart();
+        updateSummary();
+        showNotification('✅ Jumlah diperbarui', 'success');
+    }
 
-            if (newQty > 99) {
-                showNotification('⚠️ Maksimal 99 item per produk', 'error');
-                return;
-            }
-
+    // ========== REMOVE ITEM ==========
+    async function removeItem(index) {
+        const itemName = cart[index].name;
+        
+        if (confirm(`Hapus "${itemName}" dari keranjang?`)) {
             const item = cart[index];
             const token = localStorage.getItem('authToken');
             
             if (token) {
                 try {
                     const res = await fetch(`${BASE_URL}/api/cart/${item.id}`, {
-                        method: 'PUT',
+                        method: 'DELETE',
                         headers: {
-                            'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({ quantity: newQty })
+                        }
                     });
                     
-                    if (!res.ok) throw new Error('Failed to update quantity');
+                    if (!res.ok) throw new Error('Failed to remove item');
                 } catch (e) {
-                    console.error('Update quantity error:', e);
-                    showNotification('⚠️ Gagal memperbarui jumlah', 'error');
+                    console.error('Remove item error:', e);
+                    showNotification('⚠️ Gagal menghapus item', 'error');
                     return;
                 }
             }
             
-            cart[index].quantity = newQty;
+            cart.splice(index, 1);
             saveCart();
             renderCart();
             updateSummary();
-            showNotification('✅ Jumlah diperbarui', 'success');
-        }
-
-        // ========== REMOVE ITEM ==========
-        async function removeItem(index) {
-            const itemName = cart[index].name;
+            showNotification(`🗑️ "${itemName}" dihapus`, 'success');
             
-            if (confirm(`Hapus "${itemName}" dari keranjang?`)) {
-                const item = cart[index];
-                const token = localStorage.getItem('authToken');
-                
-                if (token) {
-                    try {
-                        const res = await fetch(`${BASE_URL}/api/cart/${item.id}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Authorization': `Bearer ${token}`
-                            }
-                        });
-                        
-                        if (!res.ok) throw new Error('Failed to remove item');
-                    } catch (e) {
-                        console.error('Remove item error:', e);
-                        showNotification('⚠️ Gagal menghapus item', 'error');
-                        return;
-                    }
-                }
-                
-                cart.splice(index, 1);
-                saveCart();
-                renderCart();
-                updateSummary();
-                showNotification(`🗑️ "${itemName}" dihapus`, 'success');
+            // Hitung ulang ongkir setelah item dihapus jika alamat sudah dipilih
+            if (cart.length > 0 && selectedAddress) {
+                calculateAllShippingCosts();
             }
         }
+    }
 
-        // ========== CLEAR CART ==========
-        document.getElementById('clear-cart-btn').addEventListener('click', () => {
-            if (cart.length === 0) {
-                showNotification('⚠️ Keranjang sudah kosong', 'error');
-                return;
-            }
-
-            if (confirm('Kosongkan semua item di keranjang?')) {
-                cart = [];
-                appliedPromo = null;
-                selectedAddress = null; // Reset selected address when clearing cart
-                saveCart();
-                renderCart();
-                updateSummary();
-                renderAddresses();
-                showNotification('🗑️ Keranjang dikosongkan', 'success');
-            }
-        });
-
-        // ========== UPDATE SUMMARY ==========
-        function updateSummary() {
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-            
-            let discount = 0;
-            if (appliedPromo) {
-                const promo = promoCodes[appliedPromo];
-                if (promo.type === 'percentage') {
-                    discount = Math.floor(subtotal * (promo.value / 100));
-                } else {
-                    discount = promo.value;
-                }
-            }
-
-            const shipping = cart.length > 0 ? SHIPPING_COST : 0;
-            const total = subtotal + shipping - discount;
-
-            // Update UI
-            document.getElementById('item-count').textContent = itemCount;
-            document.getElementById('subtotal').textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
-            document.getElementById('shipping-cost').textContent = shipping > 0 ? `Rp ${shipping.toLocaleString('id-ID')}` : 'GRATIS';
-            document.getElementById('total').textContent = `Rp ${total.toLocaleString('id-ID')}`;
-            document.getElementById('mobile-total').textContent = `Rp ${total.toLocaleString('id-ID')}`;
-
-            // Show/hide discount row
-            const discountRow = document.getElementById('discount-row');
-            if (discount > 0) {
-                discountRow.classList.remove('hidden');
-                document.getElementById('discount-amount').textContent = `- Rp ${discount.toLocaleString('id-ID')}`;
-            } else {
-                discountRow.classList.add('hidden');
-            }
+    // ========== CLEAR CART ==========
+    document.getElementById('clear-cart-btn').addEventListener('click', () => {
+        if (cart.length === 0) {
+            showNotification('⚠️ Keranjang sudah kosong', 'error');
+            return;
         }
 
-        // ========== PROMO CODE ==========
-        document.getElementById('apply-promo-btn').addEventListener('click', () => {
-            const promoInput = document.getElementById('promo-input');
-            const promoCode = promoInput.value.trim().toUpperCase();
-            const promoMessage = document.getElementById('promo-message');
-
-            if (!promoCode) {
-                showPromoMessage('⚠️ Masukkan kode promo', 'error');
-                return;
-            }
-
-            if (!promoCodes[promoCode]) {
-                showPromoMessage('❌ Kode promo tidak valid', 'error');
-                return;
-            }
-
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const promo = promoCodes[promoCode];
-
-            if (subtotal < promo.minPurchase) {
-                showPromoMessage(`⚠️ Minimum pembelian Rp ${promo.minPurchase.toLocaleString('id-ID')}`, 'error');
-                return;
-            }
-
-            appliedPromo = promoCode;
+        if (confirm('Kosongkan semua item di keranjang?')) {
+            cart = [];
+            appliedPromo = null;
+            selectedAddress = null; // Reset selected address when clearing cart
+            totalShippingCost = 0; // Reset total ongkir
+            shippingCosts = {}; // Reset ongkir per item
+            shippingCalculated = false; // Reset flag
+            saveCart();
+            renderCart();
             updateSummary();
-            promoInput.value = '';
-            showPromoMessage(`✅ Kode "${promoCode}" berhasil digunakan!`, 'success');
-            showNotification(`🎉 Promo "${promoCode}" diterapkan!`, 'success');
-        });
-
-        function showPromoMessage(message, type) {
-            const promoMessage = document.getElementById('promo-message');
-            promoMessage.textContent = message;
-            promoMessage.className = `mt-2 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-500'}`;
-            promoMessage.classList.remove('hidden');
-            
-            setTimeout(() => {
-                promoMessage.classList.add('hidden');
-            }, 3000);
+            renderAddresses();
+            updateShippingPrompt(); // Update pesan ongkir
+            showNotification('🗑️ Keranjang dikosongkan', 'success');
         }
+    });
 
-        // ========== CHECKOUT ==========
-        async function proceedToCheckout() {
-            if (cart.length === 0) {
-                showNotification('⚠️ Keranjang masih kosong', 'error');
-                return;
-            }
-
-            const authToken = localStorage.getItem('authToken');
-            if (!authToken) {
-                showNotification('⚠️ Silakan login terlebih dahulu', 'error');
-                return;
-            }
-
-            // Check if address is selected
-            if (!selectedAddress) {
-                // Show address modal if no address is selected
-                openAddressModal();
-                showNotification('⚠️ Silakan pilih alamat pengiriman terlebih dahulu', 'error');
-                return;
-            }
-
-            try {
-                // Get user data from localStorage
-                const userName = localStorage.getItem('userName') || 'Customer';
-                const userPhone = localStorage.getItem('userPhone') || '';
-
-                // Create order data
-                const orderData = {
-                    items: cart,
-                    subtotal: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-                    shipping: SHIPPING_COST,
-                    discount: appliedPromo ? calculateDiscount() : 0,
-                    promoCode: appliedPromo,
-                    total: calculateTotal(),
-                    customer: {
-                        name: userName,
-                        phone: userPhone
-                    },
-                    address: selectedAddress,
-                    timestamp: new Date().toISOString(),
-                    status: 'pending'
-                };
-
-                // Send order to backend
-                const response = await fetch(`${BASE_URL}/api/orders`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`
-                    },
-                    body: JSON.stringify(orderData)
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    
-                    // Store order data for payment page
-                    localStorage.setItem('currentOrderId', result.orderId);
-                    localStorage.setItem('currentOrder', JSON.stringify({
-                        ...orderData,
-                        id: result.orderId
-                    }));
-                    
-                    // Redirect to payment page
-                    window.location.href = `payment.html?orderId=${result.orderId}`;
-                } else {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.error || 'Failed to create order');
-                }
-            } catch (error) {
-                console.error('Checkout error:', error);
-                showNotification(`❌ ${error.message || 'Gagal membuat pesanan. Silakan coba lagi.'}`, 'error');
+    // ========== UPDATE SUMMARY ==========
+    function updateSummary() {
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+        
+        let discount = 0;
+        if (appliedPromo) {
+            const promo = promoCodes[appliedPromo];
+            if (promo.type === 'percentage') {
+                discount = Math.floor(subtotal * (promo.value / 100));
+            } else {
+                discount = promo.value;
             }
         }
 
-        // ========== SEND WHATSAPP NOTIFICATION ==========
-        async function sendWhatsAppNotification(orderData, orderId) {
-            try {
-                // Create WhatsApp message
-                const itemsText = orderData.items.map(item => 
-                    `• ${item.name} x${item.quantity} = Rp ${(item.price * item.quantity).toLocaleString()}`
-                ).join('\n');
+        // Gunakan totalShippingCost yang sudah dihitung jika alamat sudah dipilih
+        const shipping = (cart.length > 0 && selectedAddress && shippingCalculated) ? totalShippingCost : 0;
+        const total = subtotal + shipping - discount;
 
-                const message = `🛒 *PESANAN BARU - AnterTah*
+        // Update UI
+        document.getElementById('item-count').textContent = itemCount;
+        document.getElementById('subtotal').textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
+        document.getElementById('shipping-cost').textContent = shipping > 0 ? `Rp ${shipping.toLocaleString('id-ID')}` : 'Rp 0';
+        document.getElementById('total').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+        document.getElementById('mobile-total').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+
+        // Show/hide discount row
+        const discountRow = document.getElementById('discount-row');
+        if (discount > 0) {
+            discountRow.classList.remove('hidden');
+            document.getElementById('discount-amount').textContent = `- Rp ${discount.toLocaleString('id-ID')}`;
+        } else {
+            discountRow.classList.add('hidden');
+        }
+    }
+
+    // ========== PROMO CODE ==========
+    document.getElementById('apply-promo-btn').addEventListener('click', () => {
+        const promoInput = document.getElementById('promo-input');
+        const promoCode = promoInput.value.trim().toUpperCase();
+        const promoMessage = document.getElementById('promo-message');
+
+        if (!promoCode) {
+            showPromoMessage('⚠️ Masukkan kode promo', 'error');
+            return;
+        }
+
+        if (!promoCodes[promoCode]) {
+            showPromoMessage('❌ Kode promo tidak valid', 'error');
+            return;
+        }
+
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const promo = promoCodes[promoCode];
+
+        if (subtotal < promo.minPurchase) {
+            showPromoMessage(`⚠️ Minimum pembelian Rp ${promo.minPurchase.toLocaleString('id-ID')}`, 'error');
+            return;
+        }
+
+        appliedPromo = promoCode;
+        updateSummary();
+        promoInput.value = '';
+        showPromoMessage(`✅ Kode "${promoCode}" berhasil digunakan!`, 'success');
+        showNotification(`🎉 Promo "${promoCode}" diterapkan!`, 'success');
+    });
+
+    function showPromoMessage(message, type) {
+        const promoMessage = document.getElementById('promo-message');
+        promoMessage.textContent = message;
+        promoMessage.className = `mt-2 text-sm ${type === 'success' ? 'text-green-600' : 'text-red-500'}`;
+        promoMessage.classList.remove('hidden');
+        
+        setTimeout(() => {
+            promoMessage.classList.add('hidden');
+        }, 3000);
+    }
+
+    // ========== CHECKOUT ==========
+    async function proceedToCheckout() {
+        if (cart.length === 0) {
+            showNotification('⚠️ Keranjang masih kosong', 'error');
+            return;
+        }
+
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+            showNotification('⚠️ Silakan login terlebih dahulu', 'error');
+            return;
+        }
+
+        // Check if address is selected
+        if (!selectedAddress) {
+            // Show address modal if no address is selected
+            openAddressModal();
+            showNotification('⚠️ Silakan pilih alamat pengiriman terlebih dahulu', 'error');
+            return;
+        }
+
+        // Check if shipping cost has been calculated
+        if (!shippingCalculated) {
+            showNotification('⚠️ Sedang menghitung ongkir, harap tunggu sebentar', 'error');
+            return;
+        }
+
+        try {
+            // Get user data from localStorage
+            const userName = localStorage.getItem('userName') || 'Customer';
+            const userPhone = localStorage.getItem('userPhone') || '';
+
+            // Create order data
+            const orderData = {
+                items: cart,
+                subtotal: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                shipping: totalShippingCost, // Gunakan totalShippingCost yang sudah dihitung
+                discount: appliedPromo ? calculateDiscount() : 0,
+                promoCode: appliedPromo,
+                total: calculateTotal(),
+                customer: {
+                    name: userName,
+                    phone: userPhone
+                },
+                address: selectedAddress,
+                shipping_costs: shippingCosts, // Sertakan detail ongkir per item
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            };
+
+            // Send order to backend
+            const response = await fetch(`${BASE_URL}/api/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify(orderData)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                
+                // Store order data for payment page
+                localStorage.setItem('currentOrderId', result.orderId);
+                localStorage.setItem('currentOrder', JSON.stringify({
+                    ...orderData,
+                    id: result.orderId
+                }));
+                
+                // Redirect to payment page
+                window.location.href = `payment.html?orderId=${result.orderId}`;
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || 'Failed to create order');
+            }
+        } catch (error) {
+            console.error('Checkout error:', error);
+            showNotification(`❌ ${error.message || 'Gagal membuat pesanan. Silakan coba lagi.'}`, 'error');
+        }
+    }
+
+    // ========== SEND WHATSAPP NOTIFICATION ==========
+    async function sendWhatsAppNotification(orderData, orderId) {
+        try {
+            // Create WhatsApp message
+            const itemsText = orderData.items.map(item => 
+                `• ${item.name} x${item.quantity} = Rp ${(item.price * item.quantity).toLocaleString()}`
+            ).join('\n');
+
+            const message = `🛒 *PESANAN BARU - AnterTah*
 
 📋 *Detail Pesanan:*
 ID Pesanan: #${orderId}
@@ -877,126 +1097,126 @@ Diskon: Rp ${orderData.discount.toLocaleString()}
 
 Silakan segera proses pesanan ini! 🚀`;
 
-                // Send to WhatsApp API
-                try {
-                    const whatsappResponse = await fetch(`${BASE_URL}/api/whatsapp/send`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            message: message,
-                            orderId: orderId
-                        })
-                    });
+            // Send to WhatsApp API
+            try {
+                const whatsappResponse = await fetch(`${BASE_URL}/api/whatsapp/send`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        orderId: orderId
+                    })
+                });
 
-                    if (whatsappResponse.ok) {
-                        console.log('WhatsApp notification sent successfully');
-                    } else {
-                        const errorData = await whatsappResponse.json().catch(() => ({}));
-                        console.error('Failed to send WhatsApp notification:', errorData.error || 'Unknown error');
-                        // Continue with checkout flow even if WhatsApp fails
-                        showNotification('⚠️ Notifikasi WhatsApp gagal dikirim, tapi pesanan Anda tetap diproses', 'warning');
-                    }
-                } catch (whatsappError) {
-                    console.error('WhatsApp notification error:', whatsappError);
+                if (whatsappResponse.ok) {
+                    console.log('WhatsApp notification sent successfully');
+                } else {
+                    const errorData = await whatsappResponse.json().catch(() => ({}));
+                    console.error('Failed to send WhatsApp notification:', errorData.error || 'Unknown error');
                     // Continue with checkout flow even if WhatsApp fails
                     showNotification('⚠️ Notifikasi WhatsApp gagal dikirim, tapi pesanan Anda tetap diproses', 'warning');
                 }
-            } catch (error) {
-                console.error('WhatsApp notification error:', error);
+            } catch (whatsappError) {
+                console.error('WhatsApp notification error:', whatsappError);
+                // Continue with checkout flow even if WhatsApp fails
+                showNotification('⚠️ Notifikasi WhatsApp gagal dikirim, tapi pesanan Anda tetap diproses', 'warning');
             }
+        } catch (error) {
+            console.error('WhatsApp notification error:', error);
         }
+    }
 
-        function calculateDiscount() {
-            if (!appliedPromo) return 0;
-            
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const promo = promoCodes[appliedPromo];
-            
-            if (promo.type === 'percentage') {
-                return Math.floor(subtotal * (promo.value / 100));
-            }
-            return promo.value;
+    function calculateDiscount() {
+        if (!appliedPromo) return 0;
+        
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const promo = promoCodes[appliedPromo];
+        
+        if (promo.type === 'percentage') {
+            return Math.floor(subtotal * (promo.value / 100));
         }
+        return promo.value;
+    }
 
-        function calculateTotal() {
-            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const discount = calculateDiscount();
-            return subtotal + SHIPPING_COST - discount;
+    function calculateTotal() {
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const discount = calculateDiscount();
+        return subtotal + totalShippingCost - discount; // Gunakan totalShippingCost
+    }
+
+    document.getElementById('checkout-btn').addEventListener('click', proceedToCheckout);
+    document.getElementById('mobile-checkout-btn').addEventListener('click', proceedToCheckout);
+
+    // ========== ADDRESS MODAL CONTROLS ==========
+    document.getElementById('close-address-modal').addEventListener('click', () => {
+        document.getElementById('address-modal').classList.add('hidden');
+    });
+
+    document.getElementById('cancel-address-selection').addEventListener('click', () => {
+        document.getElementById('address-modal').classList.add('hidden');
+    });
+
+    document.getElementById('confirm-address-selection').addEventListener('click', () => {
+        if (!selectedAddress) {
+            showNotification('⚠️ Silakan pilih alamat terlebih dahulu', 'error');
+            return;
         }
+        document.getElementById('address-modal').classList.add('hidden');
+        showNotification('✅ Alamat berhasil dipilih', 'success');
+    });
 
-        document.getElementById('checkout-btn').addEventListener('click', proceedToCheckout);
-        document.getElementById('mobile-checkout-btn').addEventListener('click', proceedToCheckout);
+    document.getElementById('add-new-address-btn').addEventListener('click', () => {
+        window.location.href = 'profile.html#addresses';
+    });
 
-        // ========== ADDRESS MODAL CONTROLS ==========
-        document.getElementById('close-address-modal').addEventListener('click', () => {
-            document.getElementById('address-modal').classList.add('hidden');
-        });
+    // ========== SAVE CART ==========
+    function saveCart() {
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }
 
-        document.getElementById('cancel-address-selection').addEventListener('click', () => {
-            document.getElementById('address-modal').classList.add('hidden');
-        });
+    // ========== NOTIFICATION ==========
+    function showNotification(message, type = 'success') {
+        const existing = document.querySelector('.notification-toast');
+        if (existing) existing.remove();
 
-        document.getElementById('confirm-address-selection').addEventListener('click', () => {
-            if (!selectedAddress) {
-                showNotification('⚠️ Silakan pilih alamat terlebih dahulu', 'error');
-                return;
-            }
-            document.getElementById('address-modal').classList.add('hidden');
-            showNotification('✅ Alamat berhasil dipilih', 'success');
-        });
-
-        document.getElementById('add-new-address-btn').addEventListener('click', () => {
-            window.location.href = 'profile.html#addresses';
-        });
-
-        // ========== SAVE CART ==========
-        function saveCart() {
-            localStorage.setItem('cart', JSON.stringify(cart));
+        const notification = document.createElement('div');
+        notification.className = 'notification-toast fixed top-20 right-4 z-[9999] animate-slide-up';
+        
+        let bgColor;
+        if (type === 'success') {
+            bgColor = 'bg-green-500';
+        } else if (type === 'warning') {
+            bgColor = 'bg-yellow-500';
+        } else {
+            bgColor = 'bg-red-500';
         }
+        
+        notification.innerHTML = `
+            <div class="${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3">
+                <span class="text-sm font-medium">${message}</span>
+                <button onclick="this.closest('.notification-toast').remove()" class="ml-2 hover:opacity-80">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 3000);
+    }
 
-        // ========== NOTIFICATION ==========
-        function showNotification(message, type = 'success') {
-            const existing = document.querySelector('.notification-toast');
-            if (existing) existing.remove();
+    // ========== DARK MODE ==========
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    if (currentTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+    }
 
-            const notification = document.createElement('div');
-            notification.className = 'notification-toast fixed top-20 right-4 z-[9999] animate-slide-up';
-            
-            let bgColor;
-            if (type === 'success') {
-                bgColor = 'bg-green-500';
-            } else if (type === 'warning') {
-                bgColor = 'bg-yellow-500';
-            } else {
-                bgColor = 'bg-red-500';
-            }
-            
-            notification.innerHTML = `
-                <div class="${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center space-x-3">
-                    <span class="text-sm font-medium">${message}</span>
-                    <button onclick="this.closest('.notification-toast').remove()" class="ml-2 hover:opacity-80">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
-        }
-
-        // ========== DARK MODE ==========
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        if (currentTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-        }
-
-        // ========== INITIALIZATION ==========
-        document.addEventListener('DOMContentLoaded', () => {
-            loadCart();
-            loadAddresses();
-        });
-    </script>
+    // ========== INITIALIZATION ==========
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCart();
+        loadAddresses();
+    });
+</script>
 </body>
 </html>

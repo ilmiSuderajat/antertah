@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Verifikasi Pesanan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#3b82f6',
+                        'primary-dark': '#2563eb',
+                        'secondary': '#64748b',
+                        'success': '#10b981',
+                        'warning': '#f59e0b',
+                        'danger': '#ef4444',
+                        'info': '#06b6d4',
+                        'purple': '#8b5cf6',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'pulse-slow': 'pulse 3s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-pending_verification {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-processing {
+            background-color: #e9d5ff;
+            color: #6d28d9;
+        }
+        
+        .status-ready {
+            background-color: #d1fae5;
+            color: #0891b2;
+        }
+        
+        .status-delivered {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+        
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .btn {
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .notification {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(59, 130, 246, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .order-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+        
+        .order-card.status-pending {
+            border-left-color: #f59e0b;
+        }
+        
+        .order-card.status-pending_verification {
+            border-left-color: #3b82f6;
+        }
+        
+        .order-card.status-processing {
+            border-left-color: #8b5cf6;
+        }
+        
+        .order-card.status-ready {
+            border-left-color: #06b6d4;
+        }
+        
+        .order-card.status-delivered {
+            border-left-color: #10b981;
+        }
+        
+        .order-card.status-cancelled {
+            border-left-color: #ef4444;
+        }
+        
+        .tab-indicator {
+            position: absolute;
+            bottom: 0;
+            height: 3px;
+            background-color: #3b82f6;
+            transition: all 0.3s ease;
+        }
+        
+        @media (max-width: 640px) {
+            .mobile-scroll {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .mobile-scroll::-webkit-scrollbar {
+                height: 4px;
+            }
+            
+            .mobile-scroll::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+            
+            .mobile-scroll::-webkit-scrollbar-thumb {
+                background: #c1c1c1;
+                border-radius: 4px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="text-xl font-semibold text-gray-900 ml-2 md:ml-0">📦 Verifikasi Pesanan</h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="loadAdminOrders()" class="p-2 rounded-full hover:bg-gray-100 transition">
+                        <i class="fas fa-sync-alt text-gray-600"></i>
+                    </button>
+                    <a href="admin-dashboard.html" class="p-2 rounded-full hover:bg-gray-100 transition">
+                        <i class="fas fa-tachometer-alt text-gray-600"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden fixed inset-0 z-20 bg-gray-800 bg-opacity-50">
+        <div class="bg-white w-64 h-full shadow-lg">
+            <div class="p-4">
+                <button onclick="toggleMobileMenu()" class="mb-4 p-2 rounded-md text-gray-600 hover:bg-gray-100">
+                    <i class="fas fa-times"></i>
+                </button>
+                <nav class="space-y-2">
+                    <a href="admin-dashboard.html" class="block px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100">
+                        <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                    </a>
+                    <a href="#" class="block px-4 py-2 rounded-md bg-blue-50 text-blue-700">
+                        <i class="fas fa-shopping-cart mr-2"></i> Verifikasi Pesanan
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Notification -->
+        <div id="notification" class="notification hidden mb-6 p-4 rounded-lg text-white"></div>
+
+        <!-- Filter Tabs -->
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-6 card animate-fade-in">
+            <div class="relative">
+                <div class="mobile-scroll flex gap-2 overflow-x-auto pb-2">
+                    <button onclick="filterOrders('all')" class="status-tab active px-4 py-2 rounded-lg text-sm font-medium transition-all bg-primary text-white whitespace-nowrap" data-status="all">
+                        <i class="fas fa-list mr-1"></i> Semua
+                    </button>
+                    <button onclick="filterOrders('pending')" class="status-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-gray-200 text-gray-700 whitespace-nowrap" data-status="pending">
+                        <i class="fas fa-clock mr-1"></i> Menunggu Pembayaran
+                    </button>
+                    <button onclick="filterOrders('pending_verification')" class="status-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-gray-200 text-gray-700 whitespace-nowrap" data-status="pending_verification">
+                        <i class="fas fa-search mr-1"></i> Menunggu Verifikasi
+                    </button>
+                    <button onclick="filterOrders('processing')" class="status-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-gray-200 text-gray-700 whitespace-nowrap" data-status="processing">
+                        <i class="fas fa-cog mr-1"></i> Diproses
+                    </button>
+                    <button onclick="filterOrders('ready')" class="status-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-gray-200 text-gray-700 whitespace-nowrap" data-status="ready">
+                        <i class="fas fa-box mr-1"></i> Siap Dikirim
+                    </button>
+                    <button onclick="filterOrders('delivered')" class="status-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-gray-200 text-gray-700 whitespace-nowrap" data-status="delivered">
+                        <i class="fas fa-check-circle mr-1"></i> Terkirim
+                    </button>
+                    <button onclick="filterOrders('cancelled')" class="status-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-gray-200 text-gray-700 whitespace-nowrap" data-status="cancelled">
+                        <i class="fas fa-times-circle mr-1"></i> Dibatalkan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="flex justify-center items-center py-12">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Orders Table (Desktop) -->
+        <div id="orders-container" class="bg-white rounded-xl shadow-sm overflow-hidden card animate-fade-in hidden md:block">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metode</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- Orders will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Orders Cards (Mobile) -->
+        <div id="orders-cards-container" class="space-y-4 md:hidden">
+            <!-- Order cards will be populated here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-16 animate-fade-in">
+            <i class="fas fa-shopping-bag text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-bold mb-2 text-gray-600">Tidak Ada Pesanan</h3>
+            <p class="text-gray-500 mb-6">Tidak ada pesanan yang sesuai dengan filter yang dipilih.</p>
+        </div>
+    </main>
+
+    <!-- Verification Modal -->
+    <div id="verification-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-md shadow-lg rounded-lg bg-white">
+            <div class="mt-3">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Verifikasi Pembayaran</h3>
+                    <button onclick="closeVerificationModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="verification-content">
+                    <!-- Verification content will be populated here -->
+                </div>
+                <div class="flex justify-end mt-6 space-x-2">
+                    <button onclick="closeVerificationModal()" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">
+                        Batal
+                    </button>
+                    <button id="verify-btn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition">
+                        Verifikasi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="image-preview-modal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4" onclick="closeImagePreview()">
+        <div class="relative max-w-4xl max-h-full">
+            <img id="preview-image" src="" alt="Preview Bukti Pembayaran" class="max-w-full max-h-full rounded-lg">
+            <button onclick="closeImagePreview()" class="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-70 transition-all">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+<script src="config.js"></script>
+    <script>
+        let orders = [];
+        let currentFilter = 'all';
+        let selectedOrderId = null;
+
+        // Helper functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'pending': return 'status-pending';
+                case 'pending_verification': return 'status-pending_verification';
+                case 'processing': return 'status-processing';
+                case 'ready': return 'status-ready';
+                case 'delivered': return 'status-delivered';
+                case 'cancelled': return 'status-cancelled';
+                default: return 'status-pending';
+            }
+        }
+
+        function getStatusText(status) {
+            switch(status) {
+                case 'pending': return 'Menunggu Pembayaran';
+                case 'pending_verification': return 'Menunggu Verifikasi';
+                case 'processing': return 'Diproses';
+                case 'ready': return 'Siap Dikirim';
+                case 'delivered': return 'Terkirim';
+                case 'cancelled': return 'Dibatalkan';
+                default: return 'Tidak Diketahui';
+            }
+        }
+
+        function getPaymentMethodText(method) {
+            switch(method) {
+                case 'transfer': return 'Transfer Bank';
+                case 'ewallet': return 'E-Wallet';
+                case 'qris': return 'QRIS';
+                case 'cod': return 'Cash on Delivery';
+                default: return 'Tidak Diketahui';
+            }
+        }
+
+        function getPaymentMethodIcon(method) {
+            switch(method) {
+                case 'transfer': return 'fa-university';
+                case 'ewallet': return 'fa-wallet';
+                case 'qris': return 'fa-qrcode';
+                case 'cod': return 'fa-money-bill-wave';
+                default: return 'fa-question-circle';
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.remove('hidden', 'bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500');
+            
+            switch(type) {
+                case 'success':
+                    notification.classList.add('bg-green-500');
+                    break;
+                case 'error':
+                    notification.classList.add('bg-red-500');
+                    break;
+                case 'warning':
+                    notification.classList.add('bg-yellow-500');
+                    break;
+                default:
+                    notification.classList.add('bg-blue-500');
+            }
+            
+            notification.classList.add('text-white', 'p-4', 'rounded-lg');
+            
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 5000);
+        }
+
+        function showLoading(show) {
+            const loadingState = document.getElementById('loading-state');
+            const ordersContainer = document.getElementById('orders-container');
+            const ordersCardsContainer = document.getElementById('orders-cards-container');
+            
+            if (show) {
+                loadingState.classList.remove('hidden');
+                ordersContainer.classList.add('hidden');
+                ordersCardsContainer.classList.add('hidden');
+            } else {
+                loadingState.classList.add('hidden');
+                ordersContainer.classList.remove('hidden');
+                ordersCardsContainer.classList.remove('hidden');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        async function loadAdminOrders() {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) {
+                    showNotification('Silakan login terlebih dahulu', 'error');
+                    setTimeout(() => window.location.href = 'login.html', 2000);
+                    return;
+                }
+
+                showLoading(true);
+                
+                const res = await fetch(`${BASE_URL}/api/admin/orders`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!res.ok) {
+                    const errorData = await res.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Gagal memuat pesanan');
+                }
+                
+                orders = await res.json();
+                console.log('Orders loaded:', orders);
+                
+                renderOrders(orders);
+                showLoading(false);
+                
+            } catch (err) {
+                console.error('Load orders error:', err);
+                showNotification(err.message || 'Gagal memuat pesanan', 'error');
+                showLoading(false);
+            }
+        }
+
+        function renderOrders(ordersToRender) {
+            const tbody = document.getElementById('orderTableBody');
+            const cardsContainer = document.getElementById('orders-cards-container');
+            const emptyState = document.getElementById('empty-state');
+            const ordersContainer = document.getElementById('orders-container');
+            
+            tbody.innerHTML = '';
+            cardsContainer.innerHTML = '';
+            
+            if (!ordersToRender || ordersToRender.length === 0) {
+                ordersContainer.classList.add('hidden');
+                cardsContainer.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            ordersContainer.classList.remove('hidden');
+            cardsContainer.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            
+            ordersToRender.forEach(order => {
+                // Desktop table row
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition-colors';
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#${order.id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${order.customer_name}</div>
+                        <div class="text-sm text-gray-500">${order.customer_phone}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(order.created_at)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${formatCurrency(order.total)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="status-badge ${getStatusClass(order.status)}">${getStatusText(order.status)}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <i class="fas ${getPaymentMethodIcon(order.payment_method)} mr-1"></i>
+                        ${getPaymentMethodText(order.payment_method)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div class="flex space-x-2">
+                            <button onclick="viewDetail(${order.id})" class="btn px-3 py-1 bg-primary text-white rounded hover:bg-primary-dark transition">
+                                <i class="fas fa-eye mr-1"></i>Detail
+                            </button>
+                            ${order.status === 'pending_verification' ? `
+                                <button onclick="openVerificationModal(${order.id})" class="btn px-3 py-1 bg-success text-white rounded hover:bg-green-600 transition">
+                                    <i class="fas fa-check mr-1"></i>Verifikasi
+                                </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+                
+                // Mobile card
+                const card = document.createElement('div');
+                card.className = `order-card bg-white rounded-lg shadow-sm p-4 ${getStatusClass(order.status)}`;
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="font-semibold text-gray-900">#${order.id}</h3>
+                            <p class="text-sm text-gray-500">${formatDate(order.created_at)}</p>
+                        </div>
+                        <span class="status-badge ${getStatusClass(order.status)}">${getStatusText(order.status)}</span>
+                    </div>
+                    <div class="mb-3">
+                        <div class="flex items-center mb-1">
+                            <i class="fas fa-user text-gray-400 mr-2"></i>
+                            <p class="text-sm font-medium text-gray-900">${order.customer_name}</p>
+                        </div>
+                        <div class="flex items-center mb-1">
+                            <i class="fas fa-phone text-gray-400 mr-2"></i>
+                            <p class="text-sm text-gray-500">${order.customer_phone}</p>
+                        </div>
+                        <div class="flex items-center mb-1">
+                            <i class="fas ${getPaymentMethodIcon(order.payment_method)} text-gray-400 mr-2"></i>
+                            <p class="text-sm text-gray-500">${getPaymentMethodText(order.payment_method)}</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <p class="font-semibold text-gray-900">${formatCurrency(order.total)}</p>
+                        <div class="flex space-x-2">
+                            <button onclick="viewDetail(${order.id})" class="btn px-3 py-1 bg-primary text-white rounded hover:bg-primary-dark transition">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${order.status === 'pending_verification' ? `
+                                <button onclick="openVerificationModal(${order.id})" class="btn px-3 py-1 bg-success text-white rounded hover:bg-green-600 transition">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        function filterOrders(status) {
+            currentFilter = status;
+            console.log('Filtering orders by status:', status);
+            
+            // Update tab styles
+            document.querySelectorAll('.status-tab').forEach(tab => {
+                if (tab.dataset.status === status) {
+                    tab.classList.add('bg-primary', 'text-white');
+                    tab.classList.remove('bg-gray-200', 'text-gray-700');
+                } else {
+                    tab.classList.remove('bg-primary', 'text-white');
+                    tab.classList.add('bg-gray-200', 'text-gray-700');
+                }
+            });
+            
+            // Filter orders
+            if (status === 'all') {
+                renderOrders(orders);
+            } else {
+                const filteredOrders = orders.filter(order => order.status === status);
+                renderOrders(filteredOrders);
+            }
+        }
+
+        function viewDetail(id) {
+            window.location.href = `admin-order-detail.html?orderId=${id}`;
+        }
+
+        function openVerificationModal(orderId) {
+            selectedOrderId = orderId;
+            const modal = document.getElementById('verification-modal');
+            const content = document.getElementById('verification-content');
+            
+            // Find the order
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-sm text-gray-500">ID Pesanan</p>
+                        <p class="font-medium">#${order.id}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Pelanggan</p>
+                        <p class="font-medium">${order.customer_name}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total Pembayaran</p>
+                        <p class="font-medium">${formatCurrency(order.total)}</p>
+                    </div>
+                    ${order.payment_proof ? `
+                        <div>
+                            <p class="text-sm text-gray-500 mb-2">Bukti Pembayaran</p>
+                            <div class="relative group cursor-pointer" onclick="openImagePreview('${BASE_URL}/uploads/menu/${order.payment_proof}')">
+                                <img src="${BASE_URL}/uploads/menu/${order.payment_proof}" 
+                                     alt="Bukti Pembayaran" 
+                                     class="w-full h-40 object-cover rounded-lg"
+                                     onerror="this.src='https://picsum.photos/seed/payment/300/200.jpg'">
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-lg flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    <div>
+                        <p class="text-sm text-gray-500">Catatan</p>
+                        <textarea id="verification-note" class="w-full p-2 border border-gray-300 rounded-lg" rows="3" placeholder="Tambahkan catatan verifikasi (opsional)"></textarea>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeVerificationModal() {
+            document.getElementById('verification-modal').classList.add('hidden');
+            selectedOrderId = null;
+        }
+
+        function openImagePreview(imageSrc) {
+            const modal = document.getElementById('image-preview-modal');
+            const previewImage = document.getElementById('preview-image');
+            
+            previewImage.src = imageSrc;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImagePreview() {
+            const modal = document.getElementById('image-preview-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        async function verifyOrder() {
+            if (!selectedOrderId) return;
+            
+            try {
+                const token = localStorage.getItem('authToken');
+                const note = document.getElementById('verification-note').value;
+                
+                const res = await fetch(`${BASE_URL}/api/admin/orders/${selectedOrderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ 
+                        status: 'processing',
+                        note: note
+                    })
+                });
+                
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Gagal verifikasi pesanan');
+                
+                showNotification('Pesanan berhasil diverifikasi', 'success');
+                closeVerificationModal();
+                loadAdminOrders();
+                
+            } catch (err) {
+                console.error('Verify order error:', err);
+                showNotification(err.message || 'Gagal verifikasi pesanan', 'error');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('verify-btn').addEventListener('click', verifyOrder);
+        
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeVerificationModal();
+                closeImagePreview();
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', loadAdminOrders);
+    </script>
+</body>
+</html>

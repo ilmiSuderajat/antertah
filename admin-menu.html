@@ -4,13 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin | Kelola Menu</title>
+    
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Konfigurasi Tailwind CSS dengan Palet Warna Kustom Anda
+        // Konfigurasi Tailwind CSS dengan Palet Warna Kustom
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -28,14 +35,43 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                     },
-                },
-            },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                        'bounce-in': 'bounceIn 0.6s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(-100%)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.3)', opacity: '0' },
+                            '50%': { transform: 'scale(1.05)' },
+                            '70%': { transform: 'scale(0.9)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                    }
+                }
+            }
         }
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
         * {
             font-family: 'Inter', sans-serif;
         }
@@ -50,7 +86,7 @@
         
         /* Card hover dinamis yang lebih kuat */
         .card-hover {
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease;
         }
         
         .card-hover:hover {
@@ -111,46 +147,236 @@
             animation: slideDown 0.3s ease-out;
         }
         
-        @keyframes slideDown {
-            from {
-                transform: translateY(-100%);
-                opacity: 0;
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Image preview styles */
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .image-preview {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+
+        .image-preview:hover {
+            transform: scale(1.05);
+            border-color: #1d4ed8;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-preview .remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background-color: rgba(239, 68, 68, 0.8);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .image-preview:hover .remove-btn {
+            opacity: 1;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Image viewer modal */
+        .image-viewer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .image-viewer-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .image-viewer-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .image-viewer-modal.active img {
+            transform: scale(1);
+        }
+
+        .image-viewer-modal .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        /* Tab indicator animation */
+        .tab-indicator {
+            position: absolute;
+            bottom: 0;
+            height: 3px;
+            background-color: var(--cool-primary);
+            transition: all 0.3s ease;
+        }
+
+        /* Status badge animation */
+        .status-badge {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4);
             }
-            to {
-                transform: translateY(0);
-                opacity: 1;
+            70% {
+                box-shadow: 0 0 0 10px rgba(6, 182, 212, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(6, 182, 212, 0);
             }
         }
 
-        /* Responsivitas Mobile: Peningkatan Tampilan Card */
-        @media (max-width: 768px) {
-            .mobile-card-actions {
-                /* Untuk memastikan tombol aksi mobile selalu terlihat */
-                display: flex;
-            }
-            /* Menyesuaikan input file untuk mobile agar lebih mudah disentuh */
-            .file-input-mobile {
-                padding: 10px;
-            }
+        /* Upload area styles */
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #1d4ed8;
+            background-color: rgba(29, 78, 216, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 2rem;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .upload-area p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .upload-area p.small {
+            font-size: 0.8rem;
+            margin-top: 4px;
         }
     </style>
 </head>
 <body class="bg-bg-light min-h-screen text-text-dark">
 
+    <!-- Header -->
     <header class="header-gradient text-white py-10 shadow-2xl">
         <div class="container mx-auto px-4 max-w-7xl">
-            <h1 class="text-3xl md:text-5xl font-extrabold mb-1">🏪 Kelola Menu Produk</h1>
-            <p class="text-text-light/80 text-sm md:text-base">Dashboard administrasi yang efisien untuk mengatur daftar item Anda.</p>
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl md:text-5xl font-extrabold mb-1">🏪 Kelola Menu Produk</h1>
+                    <p class="text-text-light/80 text-sm md:text-base">Dashboard administrasi yang efisien untuk mengatur daftar item Anda.</p>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <button id="darkModeToggle" class="p-2 rounded-full hover:bg-white/20 transition">
+                        <i class="fas fa-moon text-xl"></i>
+                    </button>
+                    <div class="relative">
+                        <button id="notificationBtn" class="p-2 rounded-full hover:bg-white/20 transition">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <img src="https://picsum.photos/seed/admin/40/40.jpg" alt="Admin" class="w-10 h-10 rounded-full">
+                        <div>
+                            <p class="font-semibold">Admin</p>
+                            <p class="text-xs text-text-light/70">Online</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
     <div class="container mx-auto px-4 py-8 max-w-7xl">
         
         <!-- Tab Navigation -->
-        <div class="mb-6">
+        <div class="mb-6 relative">
             <div class="flex space-x-1 bg-gray-100 rounded-lg p-1">
-                <button id="menuTab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors bg-white text-cool-primary shadow-sm">
+                <button id="menuTab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors bg-white text-cool-primary shadow-sm relative">
                     <i class="fas fa-utensils mr-2"></i>Menu
+                    <span class="tab-indicator" style="width: 100%; left: 0;"></span>
                 </button>
                 <button id="ordersTab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors text-gray-500 hover:text-gray-700">
                     <i class="fas fa-shopping-cart mr-2"></i>Pesanan
@@ -158,6 +384,7 @@
             </div>
         </div>
         
+        <!-- Notification -->
         <div id="notification" class="hidden notification-slide fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md" role="alert">
             <div class="bg-card-light rounded-lg shadow-2xl p-4 flex items-center justify-between transition duration-300 transform scale-100 hover:scale-[1.01] border-l-4" id="notification-card">
                 <div class="flex items-center">
@@ -171,48 +398,101 @@
         <!-- Menu Tab Content -->
         <div id="menuContent">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-3 md:space-y-0">
-                <button id="addMenuBtn" class="bg-gradient-to-r from-cool-primary to-blue-500 hover:from-blue-600 hover:to-cool-primary text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition duration-300 flex items-center card-hover w-full md:w-auto" data-bs-toggle="modal" data-bs-target="#menuModal" onclick="resetForm()">
+                <button id="addMenuBtn" class="bg-gradient-to-r from-cool-primary to-blue-500 hover:from-blue-600 hover:to-cool-primary text-white font-semibold py-3 px-6 rounded-xl shadow-lg transition duration-300 flex items-center card-hover w-full md:w-auto" onclick="openMenuModal()">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     Tambah Menu Baru
                 </button>
-                <input type="text" placeholder="Cari menu..." class="form-control-custom w-full md:w-1/3 max-w-xs" onkeyup="filterMenu(this.value)">
+                <div class="relative w-full md:w-1/3 max-w-xs">
+                    <input type="text" id="searchInput" placeholder="Cari menu..." class="form-control-custom w-full pl-10" onkeyup="filterMenu(this.value)">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-text"></i>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-card-light p-4 rounded-xl shadow-md card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-neutral-text text-sm">Total Menu</p>
+                            <p class="text-2xl font-bold text-text-dark" id="totalMenuCount">0</p>
+                        </div>
+                        <div class="bg-cool-primary/10 p-3 rounded-lg">
+                            <i class="fas fa-utensils text-cool-primary text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-card-light p-4 rounded-xl shadow-md card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-neutral-text text-sm">Menu Tersedia</p>
+                            <p class="text-2xl font-bold text-green-600" id="availableMenuCount">0</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-card-light p-4 rounded-xl shadow-md card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-neutral-text text-sm">Menu Tidak Tersedia</p>
+                            <p class="text-2xl font-bold text-red-600" id="unavailableMenuCount">0</p>
+                        </div>
+                        <div class="bg-red-100 p-3 rounded-lg">
+                            <i class="fas fa-times-circle text-red-600 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-card-light p-4 rounded-xl shadow-md card-hover">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-neutral-text text-sm">Kategori</p>
+                            <p class="text-2xl font-bold text-cool-accent" id="categoryCount">0</p>
+                        </div>
+                        <div class="bg-cool-accent/10 p-3 rounded-lg">
+                            <i class="fas fa-tags text-cool-accent text-xl"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div id="menuContainer">
-
-            <div class="hidden md:block bg-card-light shadow-xl rounded-xl overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-bg-light">
-                            <tr>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider w-16">ID</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider w-1/4">Item Menu</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider">Kategori</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider w-32">Harga</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider">Deskripsi</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider w-28">Status</th>
-                                <th class="px-6 py-4 text-center text-xs font-bold text-neutral-text uppercase tracking-wider w-40">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="menuTableBody" class="bg-card-light divide-y divide-gray-100">
-                            <tr>
-                                <td colspan="7" class="px-6 py-8 text-center text-neutral-text">
-                                    <div class="flex flex-col items-center">
-                                        <svg class="w-12 h-12 text-gray-300 mb-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                        <p class="text-lg font-medium">Memuat data menu...</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Desktop Table View -->
+                <div class="hidden md:block bg-card-light shadow-xl rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-bg-light">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider w-16">ID</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider w-1/4">Item Menu</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider">Kategori</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider w-32">Harga</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider">Deskripsi</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-neutral-text uppercase tracking-wider w-28">Status</th>
+                                    <th class="px-6 py-4 text-center text-xs font-bold text-neutral-text uppercase tracking-wider w-40">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="menuTableBody" class="bg-card-light divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="7" class="px-6 py-8 text-center text-neutral-text">
+                                        <div class="flex flex-col items-center">
+                                            <div class="spinner mb-3"></div>
+                                            <p class="text-lg font-medium">Memuat data menu...</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
-            <div id="mobileMenuList" class="md:hidden space-y-4">
-                <div class="text-center py-12 text-neutral-text bg-card-light rounded-xl shadow-lg">
-                    <p>Memuat menu...</p>
+                <!-- Mobile Card View -->
+                <div id="mobileMenuList" class="md:hidden space-y-4">
+                    <div class="text-center py-12 text-neutral-text bg-card-light rounded-xl shadow-lg">
+                        <div class="spinner mx-auto mb-3"></div>
+                        <p>Memuat menu...</p>
+                    </div>
                 </div>
-            </div>
             </div>
         </div>
 
@@ -229,7 +509,7 @@
                         <option value="delivered">Selesai</option>
                         <option value="cancelled">Dibatalkan</option>
                     </select>
-                    <button id="refreshOrders" class="bg-cool-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <button id="refreshOrders" class="bg-cool-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
                         <i class="fas fa-sync-alt mr-1"></i>Refresh
                     </button>
                 </div>
@@ -254,7 +534,7 @@
                             <tr>
                                 <td colspan="7" class="px-6 py-8 text-center text-neutral-text">
                                     <div class="flex flex-col items-center">
-                                        <svg class="w-12 h-12 text-gray-300 mb-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        <div class="spinner mb-3"></div>
                                         <p class="text-lg font-medium">Memuat data pesanan...</p>
                                     </div>
                                 </td>
@@ -267,15 +547,19 @@
         
     </div>
 
-    <div class="modal fade" id="menuModal" tabindex="-1" aria-labelledby="menuModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-0 pt-5 px-6">
+    <!-- Menu Modal -->
+    <div id="menuModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-backdrop absolute inset-0 bg-black bg-opacity-60" onclick="closeMenuModal()"></div>
+        <div class="relative flex items-center justify-center min-h-screen p-4">
+            <div class="modal-content bg-card-light dark:bg-card-dark rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in">
+                <!-- Modal Header -->
+                <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
                     <h5 class="modal-title text-2xl font-extrabold text-text-dark" id="menuModalLabel">Tambah Menu Baru</h5>
-                    <button type="button" class="btn-close text-neutral-text hover:text-text-dark text-3xl leading-none" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+                    <button type="button" class="text-neutral-text hover:text-text-dark text-2xl leading-none" onclick="closeMenuModal()">&times;</button>
                 </div>
                 
-                <div class="modal-body px-6 pb-6 pt-4">
+                <!-- Modal Body -->
+                <div class="px-6 py-4">
                     <form id="menuForm">
                         <input type="hidden" id="menuId" name="id">
                         
@@ -307,6 +591,22 @@
                             <textarea class="form-control-custom w-full" id="description" name="description" rows="3" placeholder="Deskripsikan menu Anda secara detail (maks. 200 karakter)"></textarea>
                         </div>
                         
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                            <div>
+                                <label for="location_name" class="block text-sm font-semibold text-text-dark mb-2">Nama Lokasi</label>
+                                <input type="text" class="form-control-custom w-full" id="location_name" name="location_name" placeholder="Contoh: Warung Bu Yati">
+                            </div>
+                            <div>
+                                <label for="autoLocation" class="block text-sm font-semibold text-text-dark mb-2">Koordinat Lokasi</label>
+                                <div class="flex space-x-2">
+                                    <input type="text" class="form-control-custom w-full" id="latitude" name="latitude" placeholder="Latitude">
+                                    <input type="text" class="form-control-custom w-full" id="longitude" name="longitude" placeholder="Longitude">
+                                    <button type="button" onclick="getCurrentLocation()" class="bg-cool-accent text-white px-4 rounded-lg hover:bg-cool-primary transition">📍</button>
+                                </div>
+                                <small class="text-xs text-neutral-text mt-1 block">Klik tombol 📍 untuk isi otomatis dari GPS.</small>
+                            </div>
+                        </div>
+
                         <div id="imageUrlGroup" class="mb-5 hidden">
                             <label for="imageUrl" class="block text-sm font-semibold text-text-dark mb-2">URL Gambar Saat Ini</label>
                             <input type="text" class="form-control-custom w-full bg-bg-light" id="imageUrl" name="image_url" readonly>
@@ -317,8 +617,17 @@
                             <label for="imageFile" class="block text-sm font-semibold text-text-dark mb-2">
                                 Upload Gambar <span class="text-red-500" id="fileRequiredStar">*</span>
                             </label>
-                            <input class="block w-full text-sm text-text-dark border border-gray-300 rounded-lg cursor-pointer bg-bg-light p-2 file-input-mobile" type="file" id="imageFile" name="imageFile" accept="image/*">
-                            <small class="text-xs text-neutral-text mt-1 block">Maksimal ukuran file 2MB.</small>
+                            
+                            <!-- Upload Area dengan Drag and Drop -->
+                            <div id="uploadArea" class="upload-area">
+                                <input type="file" id="imageFile" name="images" accept="image/*" multiple class="hidden" onchange="handleImageSelect(event)">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Klik untuk upload atau drag and drop</p>
+                                <p class="small">Maksimal 3 gambar, ukuran per file 2MB</p>
+                            </div>
+                            
+                            <!-- PREVIEW GAMBAR -->
+                            <div id="previewContainer" class="image-preview-container"></div>
                         </div>
                         
                         <div id="isAvailableGroup" class="mb-5 hidden">
@@ -329,8 +638,11 @@
                         </div>
                         
                         <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end space-x-3">
-                            <button type="button" class="bg-gray-300 hover:bg-gray-400 text-text-dark font-semibold py-3 px-6 rounded-lg transition duration-200 btn-action" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="bg-gradient-to-r from-cool-primary to-cool-accent hover:from-cool-accent hover:to-cool-primary text-white font-semibold py-3 px-6 rounded-lg shadow-xl transition duration-200 btn-action" id="submitBtn">Simpan Menu</button>
+                            <button type="button" class="bg-gray-300 hover:bg-gray-400 text-text-dark font-semibold py-3 px-6 rounded-lg transition duration-200 btn-action" onclick="closeMenuModal()">Batal</button>
+                            <button type="submit" class="bg-gradient-to-r from-cool-primary to-cool-accent hover:from-cool-accent hover:to-cool-primary text-white font-semibold py-3 px-6 rounded-lg shadow-xl transition duration-200 btn-action flex items-center" id="submitBtn">
+                                <span id="submitBtnText">Simpan Menu</span>
+                                <div id="submitBtnSpinner" class="spinner ml-2 hidden"></div>
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -338,478 +650,1176 @@
         </div>
     </div>
 
+    <!-- Image Viewer Modal -->
+    <div id="imageViewerModal" class="image-viewer-modal">
+        <button class="close-btn" onclick="closeImageViewer()">&times;</button>
+        <img id="viewerImage" src="" alt="Product Image">
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div id="orderDetailModal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-backdrop absolute inset-0 bg-black bg-opacity-60" onclick="closeOrderDetailModal()"></div>
+        <div class="relative flex items-center justify-center min-h-screen p-4">
+            <div class="modal-content bg-card-light dark:bg-card-dark rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in">
+                <!-- Modal Header -->
+                <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+                    <h5 class="modal-title text-2xl font-extrabold text-text-dark">Detail Pesanan</h5>
+                    <button type="button" class="text-neutral-text hover:text-text-dark text-2xl leading-none" onclick="closeOrderDetailModal()">&times;</button>
+                </div>
+                
+                <!-- Modal Body -->
+                <div class="px-6 py-4" id="orderDetailContent">
+                    <!-- Order details will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="config.js"></script>
-    <script>
+<script>
+    // BASE_URL Configuration
+    // Global variables
+    
+    const token = localStorage.getItem('authToken') || '';
+    let allMenuItems = [];
+    let orders = [];
+    let customerAddresses = {}; // Store customer addresses
+    let selectedFiles = [];
+    let isEditMode = false;
+    
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchMenu();
+        switchTab('menu');
+        
+        // Set up event listeners
+        document.getElementById('menuTab').addEventListener('click', () => switchTab('menu'));
+        document.getElementById('ordersTab').addEventListener('click', () => switchTab('orders'));
+        document.getElementById('statusFilter').addEventListener('change', renderOrders);
+        document.getElementById('refreshOrders').addEventListener('click', fetchOrders);
+        document.getElementById('menuForm').addEventListener('submit', handleMenuSubmit);
+        document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+        document.getElementById('searchInput').addEventListener('input', (e) => filterMenu(e.target.value));
+        
+        // Set up drag and drop
+        setupDragAndDrop();
+    });
 
-        const token = localStorage.getItem('adminToken');
-
-        // Fungsi Show Notification (Menggunakan warna kustom untuk border)
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('notification');
-            const messageEl = document.getElementById('notification-message');
-            const iconEl = document.getElementById('notification-icon');
-            const cardEl = document.getElementById('notification-card');
-            
-            const config = {
-                success: { icon: '✅', color: 'border-wa-success' },
-                danger: { icon: '❌', color: 'border-red-500' },
-                warning: { icon: '⚠️', color: 'border-amber-500' }
-            };
-            
-            const style = config[type] || config.success;
-            
-            cardEl.className = `bg-card-light rounded-lg shadow-2xl p-4 flex items-center justify-between transition duration-300 transform scale-100 hover:scale-[1.01] border-l-4 ${style.color}`;
-            
-            iconEl.textContent = style.icon;
-            messageEl.textContent = message;
-            notification.classList.remove('hidden');
-            
-            setTimeout(() => {
-                notification.classList.add('hidden');
-            }, 5000);
+    // Setup drag and drop for image upload
+    function setupDragAndDrop() {
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('imageFile');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
         }
-
-        function closeNotification() {
-            document.getElementById('notification').classList.add('hidden');
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => {
+                uploadArea.classList.add('dragover');
+            }, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => {
+                uploadArea.classList.remove('dragover');
+            }, false);
+        });
+        
+        uploadArea.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
         }
+        
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+    }
 
-        // Fungsi Render Item Menu
-        function renderMenuItem(menu) {
-            const isAvailable = menu.is_available === 1 || menu.is_available === true;
-            const statusColor = isAvailable ? 'bg-wa-success/20 text-wa-success' : 'bg-red-500/20 text-red-700';
-            const statusText = isAvailable ? '✓ Tersedia' : '✕ Tidak Tersedia';
-            const statusBadge = `<span class="badge-custom ${statusColor}">${statusText}</span>`;
-            const imageHtml = menu.image_url 
-                ? `<img src="${menu.image_url}" alt="${menu.name}" class="menu-image mr-4">` 
-                : '<div class="w-[70px] h-[70px] bg-bg-light rounded-lg mr-4 flex items-center justify-center flex-shrink-0"><span class="text-neutral-text text-lg">🖼️</span></div>';
+    // Dark mode toggle
+    function toggleDarkMode() {
+        document.documentElement.classList.toggle('dark');
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        localStorage.setItem('darkMode', isDarkMode);
+        
+        // Update icon
+        const icon = document.querySelector('#darkModeToggle i');
+        icon.className = isDarkMode ? 'fas fa-sun text-xl' : 'fas fa-moon text-xl';
+    }
+
+    // Load dark mode preference
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+        document.querySelector('#darkModeToggle i').className = 'fas fa-sun text-xl';
+    }
+
+    // Tab switching functionality
+    function switchTab(tabName) {
+        const menuTab = document.getElementById('menuTab');
+        const ordersTab = document.getElementById('ordersTab');
+        const menuContent = document.getElementById('menuContent');
+        const ordersContent = document.getElementById('ordersContent');
+        const tabIndicator = menuTab.querySelector('.tab-indicator');
+
+        if (tabName === 'menu') {
+            menuTab.classList.add('bg-white', 'text-cool-primary', 'shadow-sm');
+            menuTab.classList.remove('text-gray-500', 'hover:text-gray-700');
+            ordersTab.classList.remove('bg-white', 'text-cool-primary', 'shadow-sm');
+            ordersTab.classList.add('text-gray-500', 'hover:text-gray-700');
             
-            const desc = menu.description ? menu.description.substring(0, 60) + (menu.description.length > 60 ? '...' : '') : 'Tidak ada deskripsi.';
-            const priceFormatted = `Rp ${menu.price.toLocaleString('id-ID')}`;
+            menuContent.classList.remove('hidden');
+            ordersContent.classList.add('hidden');
+            
+            // Move tab indicator to menu tab
+            tabIndicator.style.width = '100%';
+            tabIndicator.style.left = '0';
+        } else if (tabName === 'orders') {
+            ordersTab.classList.add('bg-white', 'text-cool-primary', 'shadow-sm');
+            ordersTab.classList.remove('text-gray-500', 'hover:text-gray-700');
+            menuTab.classList.remove('bg-white', 'text-cool-primary', 'shadow-sm');
+            menuTab.classList.add('text-gray-500', 'hover:text-gray-700');
+            
+            window.location.href = 'admin-orders.html';
+            menuContent.classList.add('hidden');
+            
+            // Move tab indicator to orders tab
+            tabIndicator.style.width = '100%';
+            tabIndicator.style.left = '100%';
+            
+            // Load orders when switching to orders tab
+            fetchOrders();
+        }
+    }
 
-            // Desktop Row
-            const rowHtml = `
-                <tr class="hover:bg-bg-light/70 transition duration-150">
-                    <td class="px-6 py-4 whitespace-nowrap"><span class="font-semibold text-neutral-text">#${menu.id}</span></td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            ${imageHtml}
-                            <span class="font-semibold text-text-dark">${menu.name}</span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap"><span class="badge-custom bg-cool-accent/20 text-cool-accent">${menu.category}</span></td>
-                    <td class="px-6 py-4 whitespace-nowrap"><span class="font-bold text-lg text-cool-primary">${priceFormatted}</span></td>
-                    <td class="px-6 py-4 max-w-xs truncate text-sm text-neutral-text">${desc}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                        <button class="btn-action bg-cool-primary hover:bg-cool-primary/80 text-white mr-1" onclick="fillFormForEdit(${menu.id})" data-bs-toggle="modal" data-bs-target="#menuModal" title="Edit Menu">
-                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        </button>
-                        <button class="btn-action bg-red-600 hover:bg-red-700 text-white" onclick="deleteMenu(${menu.id}, '${menu.name}')" title="Hapus Menu">
-                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        </button>
-                    </td>
-                </tr>
-            `;
+    // Notification system
+    function showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        const messageEl = document.getElementById('notification-message');
+        const iconEl = document.getElementById('notification-icon');
+        const cardEl = document.getElementById('notification-card');
+        
+        const config = {
+            success: { icon: '✅', color: 'border-wa-success' },
+            danger: { icon: '❌', color: 'border-red-500' },
+            warning: { icon: '⚠️', color: 'border-amber-500' }
+        };
+        
+        const style = config[type] || config.success;
+        
+        cardEl.className = `bg-card-light rounded-lg shadow-2xl p-4 flex items-center justify-between transition duration-300 transform scale-100 hover:scale-[1.01] border-l-4 ${style.color}`;
+        
+        iconEl.textContent = style.icon;
+        messageEl.textContent = message;
+        notification.classList.remove('hidden');
+        
+        setTimeout(() => {
+            notification.classList.add('hidden');
+        }, 5000);
+    }
 
-            // Mobile Card
-            const cardHtml = `
-                <div class="mobile-card card-hover bg-card-light shadow-lg rounded-xl p-4">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center flex-1 min-w-0">
-                            ${menu.image_url ? `<img src="${menu.image_url}" alt="${menu.name}" class="menu-image mr-3 flex-shrink-0">` : '<div class="w-16 h-16 bg-bg-light rounded-lg mr-3 flex items-center justify-center flex-shrink-0"><span class="text-neutral-text text-lg">🖼️</span></div>'}
-                            <div class="min-w-0">
-                                <h3 class="font-bold text-lg text-text-dark truncate">${menu.name}</h3>
-                                <div class="flex items-center mt-1 space-x-2">
-                                    <span class="badge-custom bg-cool-accent/20 text-cool-accent text-xs">${menu.category}</span>
-                                    ${statusBadge}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="border-t border-gray-100 pt-3">
-                        <p class="text-sm text-neutral-text mb-3">${desc}</p>
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-xl font-extrabold text-cool-primary">${priceFormatted}</span>
-                        </div>
-                        <div class="flex space-x-2 mobile-card-actions">
-                            <button class="btn-action bg-cool-primary hover:bg-cool-primary/80 text-white flex-1 text-sm" onclick="fillFormForEdit(${menu.id})" data-bs-toggle="modal" data-bs-target="#menuModal">
-                                ✏️ Edit
-                            </button>
-                            <button class="btn-action bg-red-600 hover:bg-red-700 text-white flex-1 text-sm" onclick="deleteMenu(${menu.id}, '${menu.name}')">
-                                🗑️ Hapus
-                            </button>
-                        </div>
-                    </div>
+    function closeNotification() {
+        document.getElementById('notification').classList.add('hidden');
+    }
+
+    // Menu management functions
+    async function fetchMenu() {
+        try {
+            const response = await fetch(`${BASE_URL}/api/menu/admin`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+
+                
+            });
+            console.log('Token dikirim:', token);
+
+            if (response.status === 401) {
+                showNotification('Sesi berakhir. Silakan login kembali.', 'danger');
+                return;
+            }
+            if (!response.ok) throw new Error('Gagal mengambil data menu.');
+            
+            const menuData = await response.json();
+            allMenuItems = menuData || [];
+            
+            // Update stats
+            updateMenuStats();
+            
+            // Render menu items
+            renderMenuItems(allMenuItems);
+        } catch (error) {
+            console.error('Error fetching menu:', error);
+            showNotification('Gagal memuat daftar menu. Periksa koneksi API server.', 'danger');
+        }
+    }
+
+    function updateMenuStats() {
+        const totalMenuCount = allMenuItems.length;
+        const availableMenuCount = allMenuItems.filter(item => item.is_available === 1 || item.is_available === true).length;
+        const unavailableMenuCount = totalMenuCount - availableMenuCount;
+        
+        // Get unique categories
+        const categories = new Set();
+        allMenuItems.forEach(item => {
+            if (item.category) categories.add(item.category);
+        });
+        const categoryCount = categories.size;
+        
+        // Update DOM
+        document.getElementById('totalMenuCount').textContent = totalMenuCount;
+        document.getElementById('availableMenuCount').textContent = availableMenuCount;
+        document.getElementById('unavailableMenuCount').textContent = unavailableMenuCount;
+        document.getElementById('categoryCount').textContent = categoryCount;
+    }
+
+    function renderMenuItems(menuData) {
+        const tableBody = document.getElementById('menuTableBody');
+        const mobileList = document.getElementById('mobileMenuList');
+        
+        if (menuData.length === 0) {
+            const emptyMessage = `
+                <div class="flex flex-col items-center py-8">
+                    <i class="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
+                    <p class="text-lg font-medium">Belum ada menu</p>
+                    <p class="text-sm text-neutral-text">Mulai tambahkan menu baru untuk restoran Anda</p>
                 </div>
             `;
             
-            return { rowHtml, cardHtml };
+            tableBody.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center text-neutral-text">${emptyMessage}</td></tr>`;
+            mobileList.innerHTML = `<div class="text-center py-12 text-neutral-text bg-card-light rounded-xl shadow-lg">${emptyMessage}</div>`;
+            return;
         }
 
-        // --- CRUD LOGIC (TETAP SAMA) ---
+        // Clear existing content
+        tableBody.innerHTML = '';
+        mobileList.innerHTML = '';
+        
+        // Render each menu item
+        menuData.forEach((menu, index) => {
+            const { rowHtml, cardHtml } = renderMenuItem(menu, index);
+            tableBody.insertAdjacentHTML('beforeend', rowHtml);
+            mobileList.insertAdjacentHTML('beforeend', cardHtml);
+        });
+    }
 
-        async function fetchMenu() {
-            try {
-                const response = await fetch(`${BASE_URL}/api/menu/admin`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+    function renderMenuItem(menu, index) {
+        const isAvailable = menu.is_available === 1 || menu.is_available === true;
+        const statusColor = isAvailable ? 'bg-wa-success/20 text-wa-success' : 'bg-red-500/20 text-red-700';
+        const statusText = isAvailable ? '✓ Tersedia' : '✕ Tidak Tersedia';
+        const statusBadge = `<span class="badge-custom ${statusColor}">${statusText}</span>`;
+        
+        // PERBAIKAN: Handle multiple images with proper URL construction
+        let imageUrl = '';
+        
+        // Coba ambil dari image_urls (array) atau image_url (string)
+        if (menu.image_urls && menu.image_urls.length > 0) {
+            // Jika image_urls adalah string JSON, parse dulu
+            const imageUrls = typeof menu.image_urls === 'string' 
+                               ? JSON.parse(menu.image_urls) 
+                               : menu.image_urls;
+            // Ambil URL pertama dari array
+            imageUrl = imageUrls[0];
+        } else if (menu.image_url) {
+            // Jika ada image_url (single image)
+            imageUrl = menu.image_url;
+        }
+        
+        // PERBAIKAN: Konstruksi URL gambar dengan benar
+        // Jika imageUrl adalah path relatif (tidak dimulai dengan http), tambahkan BASE_URL
+        // Jika imageUrl sudah URL lengkap, gunakan apa adanya
+        let fullImageUrl = '';
+        if (imageUrl) {
+            if (imageUrl.startsWith('http')) {
+                // Sudah URL lengkap
+                fullImageUrl = imageUrl;
+            } else if (imageUrl.startsWith('/')) {
+                // Path relatif dari root
+                fullImageUrl = `${BASE_URL}${imageUrl}`;
+            } else {
+                // Path relatif dari uploads/menu
+                fullImageUrl = `${BASE_URL}/uploads/menu/${imageUrl}`;
+            }
+        } else {
+            // Tidak ada gambar, gunakan placeholder
+            fullImageUrl = './img/no-image.png';
+        }
+        
+        // Gunakan fullImageUrl yang sudah diperbaiki
+        const imageHtml = fullImageUrl
+            ? `<img src="${fullImageUrl}" alt="${menu.name}" class="menu-image mr-4 cursor-pointer" onclick="openImageViewer('${fullImageUrl}')" onerror="this.onerror=null; this.src='./img/no-image.png'">`
+            : '<div class="w-[70px] h-[70px] bg-bg-light rounded-lg mr-4 flex items-center justify-center flex-shrink-0"><span class="text-neutral-text text-lg">🖼️</span></div>';
 
-                if (response.status === 401) {
-                    showNotification('Sesi berakhir. Silakan login kembali.', 'danger');
-                    // Tambahkan redirect ke login jika perlu
-                    return;
-                }
-                if (!response.ok) throw new Error('Gagal mengambil data menu.');
-                
-                const menuData = await response.json();
-                const tableBody = document.getElementById('menuTableBody');
-                const mobileList = document.getElementById('mobileMenuList');
-                
-                tableBody.innerHTML = '';
-                mobileList.innerHTML = '';
-                
-                if (menuData.length === 0) {
-                    const emptyMessage = `
-                        <div class="flex flex-col items-center">
-                            <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                            <p class="text-lg font-medium">Belum ada menu</p>
-                            <p class="text-sm">Mulai tambahkan menu baru untuk restoran Anda</p>
+        const desc = menu.description ? menu.description.substring(0, 60) + (menu.description.length > 60 ? '...' : '') : 'Tidak ada deskripsi.';
+        const priceFormatted = `Rp ${menu.price.toLocaleString('id-ID')}`;
+
+        // Desktop Row
+        const rowHtml = `
+            <tr class="hover:bg-bg-light/70 transition duration-150 animate-fade-in" style="animation-delay: ${index * 0.05}s">
+                <td class="px-6 py-4 whitespace-nowrap"><span class="font-semibold text-neutral-text">#${menu.id}</span></td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        ${imageHtml}
+                        <span class="font-semibold text-text-dark">${menu.name}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap"><span class="badge-custom bg-cool-accent/20 text-cool-accent">${menu.category}</span></td>
+                <td class="px-6 py-4 whitespace-nowrap"><span class="font-bold text-lg text-cool-primary">${priceFormatted}</span></td>
+                <td class="px-6 py-4 max-w-xs truncate text-sm text-neutral-text">${desc}</td>
+                <td class="px-6 py-4 whitespace-nowrap">${statusBadge}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <button class="btn-action bg-cool-primary hover:bg-cool-primary/80 text-white mr-1" onclick="fillFormForEdit(${menu.id})" title="Edit Menu">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-action bg-red-600 hover:bg-red-700 text-white" onclick="deleteMenu(${menu.id}, '${menu.name}')" title="Hapus Menu">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+
+        // Mobile Card
+        const cardHtml = `
+            <div class="mobile-card card-hover bg-card-light shadow-lg rounded-xl p-4 animate-fade-in" style="animation-delay: ${index * 0.05}s">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center flex-1 min-w-0">
+                        ${fullImageUrl ? `<img src="${fullImageUrl}" alt="${menu.name}" class="menu-image mr-3 flex-shrink-0 cursor-pointer" onclick="openImageViewer('${fullImageUrl}')" onerror="this.onerror=null; this.src='https://picsum.photos/seed/placeholder/70/70.jpg'">` : '<div class="w-16 h-16 bg-bg-light rounded-lg mr-3 flex items-center justify-center flex-shrink-0"><span class="text-neutral-text text-lg">🖼️</span></div>'}
+                        <div class="min-w-0">
+                            <h3 class="font-bold text-lg text-text-dark truncate">${menu.name}</h3>
+                            <div class="flex items-center mt-1 space-x-2">
+                                <span class="badge-custom bg-cool-accent/20 text-cool-accent text-xs">${menu.category}</span>
+                                ${statusBadge}
+                            </div>
                         </div>
-                    `;
-                    
-                    tableBody.innerHTML = `<tr><td colspan="7" class="px-6 py-12 text-center text-neutral-text">${emptyMessage}</td></tr>`;
-                    mobileList.innerHTML = `<div class="text-center py-12 text-neutral-text bg-card-light rounded-xl shadow-lg">${emptyMessage}</div>`;
-                    return;
+                    </div>
+                </div>
+                <div class="border-t border-gray-100 pt-3">
+                    <p class="text-sm text-neutral-text mb-3">${desc}</p>
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xl font-extrabold text-cool-primary">${priceFormatted}</span>
+                    </div>
+                    <div class="flex space-x-2 mobile-card-actions">
+                        <button class="btn-action bg-cool-primary hover:bg-cool-primary/80 text-white flex-1 text-sm" onclick="fillFormForEdit(${menu.id})">
+                            <i class="fas fa-edit mr-1"></i> Edit
+                        </button>
+                        <button class="btn-action bg-red-600 hover:bg-red-700 text-white flex-1 text-sm" onclick="deleteMenu(${menu.id}, '${menu.name}')">
+                            <i class="fas fa-trash mr-1"></i> Hapus
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        return { rowHtml, cardHtml };
+    }
+
+    function filterMenu(searchTerm) {
+        const filteredMenu = allMenuItems.filter(menu => {
+            const nameMatch = menu.name.toLowerCase().includes(searchTerm.toLowerCase());
+            const categoryMatch = menu.category.toLowerCase().includes(searchTerm.toLowerCase());
+            const descMatch = menu.description && menu.description.toLowerCase().includes(searchTerm.toLowerCase());
+            return nameMatch || categoryMatch || descMatch;
+        });
+        
+        renderMenuItems(filteredMenu);
+    }
+
+    // Modal functions
+    function openMenuModal() {
+        document.getElementById('menuModal').classList.remove('hidden');
+        resetForm();
+    }
+
+    function closeMenuModal() {
+        document.getElementById('menuModal').classList.add('hidden');
+        resetForm();
+    }
+
+    function resetForm() {
+        document.getElementById('menuForm').reset();
+        document.getElementById('menuId').value = '';
+        document.getElementById('menuModalLabel').textContent = 'Tambah Menu Baru';
+        document.getElementById('submitBtnText').textContent = 'Simpan Menu';
+        document.getElementById('imageUrlGroup').classList.add('hidden');
+        document.getElementById('isAvailableGroup').classList.add('hidden');
+        document.getElementById('imageFile').required = true;
+        document.getElementById('fileRequiredStar').classList.remove('hidden');
+        document.getElementById('previewContainer').innerHTML = '';
+        selectedFiles = [];
+        isEditMode = false;
+    }
+
+    async function fillFormForEdit(id) {
+        resetForm();
+        isEditMode = true;
+
+        try {
+            const response = await fetch(`${BASE_URL}/api/menu/admin/${id}`, {
+                headers: {'Authorization': `Bearer ${token}`}
+            });
+            
+            if (!response.ok) throw new Error('Gagal memuat detail menu.');
+            
+            const menu = await response.json();
+            
+            document.getElementById('menuId').value = menu.id;
+            document.getElementById('name').value = menu.name;
+            document.getElementById('category').value = menu.category;
+            document.getElementById('price').value = menu.price;
+            document.getElementById('description').value = menu.description || '';
+            
+            // PERBAIKAN: Cara menangani URL gambar saat edit
+            let imageUrl = '';
+            if (menu.image_urls && menu.image_urls.length > 0) {
+                try {
+                    const imageUrls = typeof menu.image_urls === 'string' ? JSON.parse(menu.image_urls) : menu.image_urls;
+                    imageUrl = imageUrls[0];
+                } catch (e) {
+                    console.error('Error parsing image_urls:', e);
                 }
-
-                menuData.forEach(menu => {
-                    const { rowHtml, cardHtml } = renderMenuItem(menu);
-                    tableBody.insertAdjacentHTML('beforeend', rowHtml);
-                    mobileList.insertAdjacentHTML('beforeend', cardHtml);
-                });
-
-            } catch (error) {
-                console.error('Error fetching menu:', error);
-                showNotification('Gagal memuat daftar menu. Periksa koneksi API server.', 'danger');
+            } else if (menu.image_url) {
+                imageUrl = menu.image_url;
             }
-        }
-
-        function resetForm() {
-            document.getElementById('menuForm').reset();
-            document.getElementById('menuId').value = '';
-            document.getElementById('menuModalLabel').textContent = 'Tambah Menu Baru';
-            document.getElementById('submitBtn').textContent = 'Simpan Menu';
-            document.getElementById('imageUrlGroup').classList.add('hidden');
-            document.getElementById('isAvailableGroup').classList.add('hidden');
-            document.getElementById('imageFile').required = true;
-            document.getElementById('fileRequiredStar').classList.remove('hidden');
-        }
-
-        async function fillFormForEdit(id) {
-            resetForm(); 
-
-            try {
-                const response = await fetch(`${BASE_URL}/api/menu/admin/${id}`, {
-                    headers: {'Authorization': `Bearer ${token}`}
-                });
-                const menu = await response.json();
-                
-                document.getElementById('menuId').value = menu.id;
-                document.getElementById('name').value = menu.name;
-                document.getElementById('category').value = menu.category;
-                document.getElementById('price').value = menu.price;
-                document.getElementById('description').value = menu.description || '';
-                document.getElementById('imageUrl').value = menu.image_url || '';
-                document.getElementById('isAvailable').checked = menu.is_available === 1;
-
-                document.getElementById('menuModalLabel').textContent = `Edit Menu: ${menu.name}`;
-                document.getElementById('submitBtn').textContent = 'Perbarui Menu';
-                document.getElementById('imageUrlGroup').classList.remove('hidden');
-                document.getElementById('isAvailableGroup').classList.remove('hidden');
-                document.getElementById('imageFile').required = false; 
-                document.getElementById('fileRequiredStar').classList.add('hidden');
-            } catch (error) {
-                console.error('Error filling form:', error);
-                showNotification('Gagal memuat detail menu.', 'danger');
+            
+            // PERBAIKAN: Konstruksi URL gambar dengan benar
+            // Jika imageUrl adalah path relatif (tidak dimulai dengan http), tambahkan BASE_URL
+            // Jika imageUrl sudah URL lengkap, gunakan apa adanya
+            let fullImageUrl = '';
+            if (imageUrl) {
+                if (imageUrl.startsWith('http')) {
+                    // Sudah URL lengkap
+                    fullImageUrl = imageUrl;
+                } else if (imageUrl.startsWith('/')) {
+                    // Path relatif dari root
+                    fullImageUrl = `${BASE_URL}${imageUrl}`;
+                } else {
+                    // Path relatif dari uploads/menu
+                    fullImageUrl = `${BASE_URL}/uploads/menu/${imageUrl}`;
+                }
+            } else {
+                // Tidak ada gambar, gunakan placeholder
+                fullImageUrl = './img/no-image.png';
             }
+            
+            document.getElementById('imageUrl').value = fullImageUrl || '';
+            document.getElementById('isAvailable').checked = menu.is_available === 1;
+
+            document.getElementById('menuModalLabel').textContent = `Edit Menu: ${menu.name}`;
+            document.getElementById('submitBtnText').textContent = 'Perbarui Menu';
+            document.getElementById('imageUrlGroup').classList.remove('hidden');
+            document.getElementById('isAvailableGroup').classList.remove('hidden');
+            document.getElementById('imageFile').required = false; 
+            document.getElementById('fileRequiredStar').classList.add('hidden');
+            
+            // Show current image if available
+            if (fullImageUrl) {
+                const previewContainer = document.getElementById('previewContainer');
+                previewContainer.innerHTML = `
+                    <div class="image-preview">
+                        <img src="${fullImageUrl}" alt="${menu.name}" onerror="this.onerror=null; this.src='https://picsum.photos/seed/placeholder/100/100.jpg'">
+                        <div class="remove-btn" onclick="removeCurrentImage()">&times;</div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('menuModal').classList.remove('hidden');
+        } catch (error) {
+            console.error('Error filling form:', error);
+            showNotification('Gagal memuat detail menu.', 'danger');
         }
+    }
 
-        document.getElementById('menuForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            document.getElementById('submitBtn').disabled = true;
-            const originalText = document.getElementById('submitBtn').textContent;
-            document.getElementById('submitBtn').textContent = 'Memproses...';
+    function removeCurrentImage() {
+        document.getElementById('imageUrl').value = '';
+        document.getElementById('previewContainer').innerHTML = '';
+    }
 
-            const id = document.getElementById('menuId').value;
-            id ? await updateMenu(id) : await createMenu();
+    // Image handling functions
+    function handleImageSelect(event) {
+        const files = Array.from(event.target.files);
+        handleFiles(files);
+    }
 
+    function handleFiles(files) {
+        // Check file count
+        if (selectedFiles.length + files.length > 3) {
+            showNotification('Maksimal 3 gambar yang diperbolehkan.', 'warning');
+            return;
+        }
+        
+        // Check file sizes
+        const oversizedFiles = files.filter(file => file.size > 2 * 1024 * 1024); // 2MB
+        if (oversizedFiles.length > 0) {
+            showNotification('Ukuran file maksimal 2MB.', 'warning');
+            return;
+        }
+        
+        // Add files to selectedFiles array
+        selectedFiles = [...selectedFiles, ...files];
+        
+        // Update preview
+        updateImagePreview();
+    }
+
+    function updateImagePreview() {
+        const previewContainer = document.getElementById('previewContainer');
+        previewContainer.innerHTML = '';
+        
+        selectedFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'image-preview';
+                previewDiv.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview">
+                    <div class="remove-btn" onclick="removeImage(${index})">&times;</div>
+                `;
+                previewContainer.appendChild(previewDiv);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function removeImage(index) {
+        selectedFiles.splice(index, 1);
+        updateImagePreview();
+    }
+
+    // Form submission
+    async function handleMenuSubmit(e) {
+        e.preventDefault();
+        
+        // Show loading state
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtnText').classList.add('hidden');
+        document.getElementById('submitBtnSpinner').classList.remove('hidden');
+        
+        const id = document.getElementById('menuId').value;
+        
+        try {
+            if (id) {
+                await updateMenu(id);
+            } else {
+                await createMenu();
+            }
+            
+            // Close modal and refresh menu list
+            closeMenuModal();
+            fetchMenu();
+        } catch (error) {
+            console.error('Error submitting menu:', error);
+            showNotification(`Gagal menyimpan menu: ${error.message}`, 'danger');
+        } finally {
+            // Reset loading state
             document.getElementById('submitBtn').disabled = false;
-            document.getElementById('submitBtn').textContent = originalText;
+            document.getElementById('submitBtnText').classList.remove('hidden');
+            document.getElementById('submitBtnSpinner').classList.add('hidden');
+        }
+    }
+
+    // === PERBAIKAN UTAMA: Fungsi Create Menu ===
+    async function createMenu() {
+        console.log('=== [DEBUG CREATE] Create Menu Started ===');
+        
+        // Validate required fields
+        const name = document.getElementById('name').value;
+        const price = document.getElementById('price').value;
+        const category = document.getElementById('category').value;
+        
+        console.log('[DEBUG CREATE] Form Data:', {
+            name,
+            price,
+            category,
+            description: document.getElementById('description').value,
+            location_name: document.getElementById('location_name').value,
+            latitude: document.getElementById('latitude').value,
+            longitude: document.getElementById('longitude').value
+        });
+        
+        if (!name || !price || !category) {
+            throw new Error('Nama, harga, dan kategori wajib diisi.');
+        }
+        
+        if (selectedFiles.length === 0) {
+            console.error('[DEBUG CREATE] ❌ No files selected!');
+            throw new Error('Harap unggah minimal 1 gambar.');
+        }
+
+        console.log('[DEBUG CREATE] ✅ Validation passed');
+        console.log('[DEBUG CREATE] Creating FormData...');
+
+        // Create FormData
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', document.getElementById('description').value);
+        formData.append('price', price);
+        formData.append('category', category);
+        formData.append('location_name', document.getElementById('location_name').value);
+        formData.append('latitude', document.getElementById('latitude').value);
+        formData.append('longitude', document.getElementById('longitude').value);
+
+        // Add all selected files with the key 'images' to match backend
+        console.log('[DEBUG CREATE] Adding files to FormData...');
+        selectedFiles.forEach((file, index) => {
+            console.log(`[DEBUG CREATE] Adding file ${index + 1}:`, {
+                name: file.name,
+                size: file.size,
+                type: file.type
+            });
+            formData.append('images', file);
         });
 
-        async function createMenu() {
-            const formData = new FormData();
-            formData.append('name', document.getElementById('name').value);
-            formData.append('description', document.getElementById('description').value);
-            formData.append('price', document.getElementById('price').value);
-            formData.append('category', document.getElementById('category').value);
-            
-            const imageFile = document.getElementById('imageFile').files[0];
-            if (imageFile) {
-                formData.append('image', imageFile); 
-            } else if (document.getElementById('imageFile').required) {
-                showNotification('Harap unggah file gambar.', 'danger');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${BASE_URL}/api/menu`, {
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    method: 'POST',
-                    body: formData
+        // Debug: Show FormData content
+        console.log('[DEBUG CREATE] FormData entries:');
+        for (let pair of formData.entries()) {
+            if (pair[1] instanceof File) {
+                console.log(`  ${pair[0]}:`, {
+                    name: pair[1].name,
+                    size: pair[1].size,
+                    type: pair[1].type
                 });
-
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || 'Gagal menambahkan menu.');
-
-                showNotification('Menu baru berhasil ditambahkan!', 'success');
-                const modal = bootstrap.Modal.getInstance(document.getElementById('menuModal'));
-                if (modal) modal.hide();
-                fetchMenu();
-            } catch (error) {
-                console.error('Error creating menu:', error);
-                showNotification(`Gagal menambah menu: ${error.message || 'Terjadi kesalahan.'}`, 'danger');
+            } else {
+                console.log(`  ${pair[0]}:`, pair[1]);
             }
         }
 
-        async function updateMenu(id) {
-            const formData = new FormData();
-            formData.append('name', document.getElementById('name').value);
-            formData.append('description', document.getElementById('description').value);
-            formData.append('price', document.getElementById('price').value);
-            formData.append('category', document.getElementById('category').value);
-            formData.append('image_url', document.getElementById('imageUrl').value || '');
-            formData.append('is_available', document.getElementById('isAvailable').checked ? '1' : '0');
-            
-            const imageFile = document.getElementById('imageFile').files[0];
-            if (imageFile) {
-                formData.append('image', imageFile);
-            }
+        console.log('[DEBUG CREATE] Sending request to:', `${BASE_URL}/api/menu`);
+        console.log('[DEBUG CREATE] Authorization token:', token ? 'Present' : 'Missing');
+        
+        // 🔧 PENTING: Jangan set Content-Type header saat upload file
+        // Browser akan otomatis set ke multipart/form-data dengan boundary yang benar
+        const response = await fetch(`${BASE_URL}/api/menu`, {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${token}`
+                // ❌ JANGAN tambahkan 'Content-Type' di sini
+            },
+            body: formData
+        });
 
+        console.log('[DEBUG CREATE] Response status:', response.status);
+        console.log('[DEBUG CREATE] Response ok:', response.ok);
+
+        const result = await response.json();
+        console.log('[DEBUG CREATE] Response data:', result);
+        
+        if (!response.ok) {
+            console.error('[DEBUG CREATE] ❌ Request failed:', result);
+            throw new Error(result.error || 'Gagal menambahkan menu.');
+        }
+
+        console.log('[DEBUG CREATE] ✅ Menu created successfully!');
+        showNotification('✅ Menu baru berhasil ditambahkan!', 'success');
+        
+        console.log('=== [DEBUG CREATE] Create Menu Ended ===');
+    }
+
+    // === PERBAIKAN: Fungsi Update Menu ===
+    async function updateMenu(id) {
+        console.log(`=== [DEBUG UPDATE] Update Menu ID ${id} Started ===`);
+
+        // 1. Validasi
+        const name = document.getElementById('name').value;
+        const price = document.getElementById('price').value;
+        const category = document.getElementById('category').value;
+        
+        // Ambil field lokasi
+        const location_name = document.getElementById('location_name').value;
+        const latitude = document.getElementById('latitude').value;
+        const longitude = document.getElementById('longitude').value;
+        
+        if (!name || !price || !category) {
+            throw new Error('Nama, harga, dan kategori wajib diisi.');
+        }
+
+        // 2. Persiapan FormData
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', document.getElementById('description').value);
+        formData.append('price', price);
+        formData.append('category', category);
+        
+        // Ambil status ketersediaan
+        const isAvailable = document.getElementById('isAvailable').checked ? '1' : '0';
+        formData.append('is_available', isAvailable);
+
+        // Ambil dan tambahkan field lokasi
+        if (location_name) formData.append('location_name', location_name);
+        if (latitude) formData.append('latitude', latitude);
+        if (longitude) formData.append('longitude', longitude);
+
+        // 3. Penanganan Gambar Lama
+        const currentImageNames = getKeptImageNamesFromDom();
+        formData.append('existing_image_urls', JSON.stringify(currentImageNames));
+        formData.append('existing_thumbnail_urls', JSON.stringify(currentImageNames));
+        console.log('[DEBUG UPDATE] currentImageNames:', currentImageNames);
+
+        // 4. Penanganan Gambar Baru (Multi-Upload)
+        if (selectedFiles.length > 0) {
+            // 🏆 Benar: Kirim setiap file baru dengan key 'images' (plural)
+            selectedFiles.forEach(file => {
+                formData.append('images', file); 
+            });
+            console.log(`[DEBUG UPDATE] Menambahkan ${selectedFiles.length} file baru dengan key 'images'.`);
+        } else {
+             console.log(`[DEBUG UPDATE] Tidak ada file baru yang ditambahkan.`);
+        }
+
+        // 5. Eksekusi Request
+        console.log(`[DEBUG UPDATE] existing_image_urls dikirim:`, currentImageNames);
+        console.log(`[DEBUG UPDATE] is_available: ${isAvailable}`);
+
+        const response = await fetch(`${BASE_URL}/api/menu/${id}`, {
+            // Jangan set Content-Type
+            headers: { 'Authorization': `Bearer ${token}` },
+            method: 'PUT',
+            body: formData
+        });
+
+        const result = await response.json();
+        console.log('[DEBUG UPDATE] Response data:', result);
+
+        if (!response.ok) {
+            console.error('[DEBUG UPDATE] ❌ Request failed:', result);
+            throw new Error(result.error || 'Gagal memperbarui menu.');
+        }
+
+        // 6. Post-Update Action
+        showNotification(`Menu "${name}" berhasil diperbarui!`, 'success');
+        fetchMenu(); // Muat ulang daftar menu
+        closeMenuModal(); // Tutup modal
+
+        console.log('=== [DEBUG UPDATE] Update Menu Ended ===');
+    }
+
+    function getKeptImageNamesFromDom() {
+        // Get current image URL from hidden input
+        const imageUrlInput = document.getElementById('imageUrl');
+        if (imageUrlInput && imageUrlInput.value) {
             try {
-                const response = await fetch(`${BASE_URL}/api/menu/${id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    method: 'PUT',
-                    body: formData
-                });
-
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || 'Gagal memperbarui menu.');
-
-                showNotification(`Menu "${document.getElementById('name').value}" berhasil diperbarui!`, 'success');
-                const modal = bootstrap.Modal.getInstance(document.getElementById('menuModal'));
-                if (modal) modal.hide();
-                fetchMenu();
-            } catch (error) {
-                console.error('Error updating menu:', error);
-                showNotification(`Gagal memperbarui menu: ${error.message || 'Terjadi kesalahan.'}`, 'danger');
-            }
-        }
-
-        async function deleteMenu(id, name) {
-            if (!confirm(`Yakin ingin menghapus menu "${name}"? Tindakan ini tidak dapat dibatalkan.`)) return;
-
-            try {
-                const response = await fetch(`${BASE_URL}/api/menu/${id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    method: 'DELETE'
-                });
-
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || 'Gagal menghapus menu.');
-
-                showNotification(`Menu "${name}" berhasil dihapus.`, 'success');
-                fetchMenu();
-            } catch (error) {
-                console.error('Error deleting menu:', error);
-                showNotification(`Gagal menghapus menu: ${error.message || 'Terjadi kesalahan.'}`, 'danger');
-            }
-        }
-
-        // ========== TAB FUNCTIONALITY ==========
-        function switchTab(tabName) {
-            const menuTab = document.getElementById('menuTab');
-            const ordersTab = document.getElementById('ordersTab');
-            const menuContent = document.getElementById('menuContent');
-            const ordersContent = document.getElementById('ordersContent');
-
-            if (tabName === 'menu') {
-                menuTab.classList.add('bg-white', 'text-cool-primary', 'shadow-sm');
-                menuTab.classList.remove('text-gray-500', 'hover:text-gray-700');
-                ordersTab.classList.remove('bg-white', 'text-cool-primary', 'shadow-sm');
-                ordersTab.classList.add('text-gray-500', 'hover:text-gray-700');
-                
-                menuContent.classList.remove('hidden');
-                ordersContent.classList.add('hidden');
-            } else if (tabName === 'orders') {
-                ordersTab.classList.add('bg-white', 'text-cool-primary', 'shadow-sm');
-                ordersTab.classList.remove('text-gray-500', 'hover:text-gray-700');
-                menuTab.classList.remove('bg-white', 'text-cool-primary', 'shadow-sm');
-                menuTab.classList.add('text-gray-500', 'hover:text-gray-700');
-                
-                ordersContent.classList.remove('hidden');
-                menuContent.classList.add('hidden');
-                
-                // Load orders when switching to orders tab
-                fetchOrders();
-            }
-        }
-
-        // ========== ORDERS MANAGEMENT ==========
-        let orders = [];
-
-        async function fetchOrders() {
-            try {
-                const token = localStorage.getItem('adminToken');
-                if (!token) {
-                    showNotification('Token admin tidak ditemukan. Silakan login ulang.', 'danger');
-                    return;
+                const fullUrl = imageUrlInput.value;
+                // Extract filename from URL
+                if (fullUrl && fullUrl !== '') {
+                    // Handle both full URLs and relative paths
+                    const filename = fullUrl.split('/').pop();
+                    if (filename && filename !== 'no-image.png' && !filename.includes('placeholder')) {
+                        return [filename];
+                    }
                 }
-
-                const response = await fetch(`${BASE_URL}/api/orders`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-
-                if (!response.ok) throw new Error('Gagal mengambil data pesanan');
-
-                const result = await response.json();
-                orders = result.orders || [];
-                renderOrders();
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-                showNotification(`Gagal mengambil data pesanan: ${error.message}`, 'danger');
+            } catch (e) {
+                console.error("Error extracting filename from imageUrl:", e);
             }
         }
+        
+        // Alternative: Extract from current image preview
+        const previewContainer = document.getElementById('previewContainer');
+        if (previewContainer) {
+            const images = previewContainer.querySelectorAll('img');
+            const imageNames = [];
+            images.forEach(img => {
+                const src = img.src;
+                // Extract filename from URL
+                const filename = src.split('/').pop();
+                if (filename && filename !== 'no-image.png' && !filename.includes('placeholder')) {
+                    imageNames.push(filename);
+                }
+            });
+            return imageNames;
+        }
+        
+        return [];
+    }
 
-        function renderOrders() {
-            const tableBody = document.getElementById('ordersTableBody');
-            const statusFilter = document.getElementById('statusFilter').value;
+    async function deleteMenu(id, name) {
+        if (!confirm(`Yakin ingin menghapus menu "${name}"? Tindakan ini tidak dapat dibatalkan.`)) return;
+
+        try {
+            const response = await fetch(`${BASE_URL}/api/menu/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Gagal menghapus menu.');
+
+            showNotification(`Menu "${name}" berhasil dihapus.`, 'success');
+            fetchMenu();
+        } catch (error) {
+            console.error('Error deleting menu:', error);
+            showNotification(`Gagal menghapus menu: ${error.message || 'Terjadi kesalahan.'}`, 'danger');
+        }
+    }
+
+    // Location functions
+    function getCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                document.getElementById('latitude').value = pos.coords.latitude;
+                document.getElementById('longitude').value = pos.coords.longitude;
+                showNotification('✅ Lokasi berhasil diambil!', 'success');
+            }, () => {
+                showNotification('⚠️ Gagal mendapatkan lokasi, aktifkan GPS.', 'warning');
+            });
+        } else {
+            showNotification('⚠️ Browser tidak mendukung GPS.', 'danger');
+        }
+    }
+
+    // Image viewer functions
+    function openImageViewer(imageUrl) {
+        const modal = document.getElementById('imageViewerModal');
+        const viewerImage = document.getElementById('viewerImage');
+        
+        viewerImage.src = imageUrl;
+        modal.classList.add('active');
+    }
+
+    function closeImageViewer() {
+        document.getElementById('imageViewerModal').classList.remove('active');
+    }
+
+    // Orders management functions
+    async function fetchOrders() {
+        try {
+            const response = await fetch(`${BASE_URL}/api/orders`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) throw new Error('Gagal mengambil data pesanan');
+
+            const result = await response.json();
+            orders = result.orders || [];
             
-            let filteredOrders = orders;
-            if (statusFilter) {
-                filteredOrders = orders.filter(order => order.status === statusFilter);
+            // Fetch customer addresses for all orders
+            await fetchCustomerAddresses();
+            
+            renderOrders();
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            showNotification(`Gagal mengambil data pesanan: ${error.message}`, 'danger');
+        }
+    }
+
+    // Fetch customer addresses
+    async function fetchCustomerAddresses() {
+        try {
+            // Get unique customer IDs from orders
+            const customerIds = [...new Set(orders.map(order => order.user_phone))];
+            
+            // Fetch addresses for each customer
+            for (const customerId of customerIds) {
+                if (!customerAddresses[customerId]) {
+                    try {
+                        const response = await fetch(`${BASE_URL}/api/addresses/${customerId}`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        
+                        if (response.ok) {
+                            const addresses = await response.json();
+                            customerAddresses[customerId] = addresses;
+                        }
+                    } catch (error) {
+                        console.error(`Error fetching addresses for customer ${customerId}:`, error);
+                        customerAddresses[customerId] = [];
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error in fetchCustomerAddresses:', error);
+        }
+    }
+
+    function renderOrders() {
+        const tableBody = document.getElementById('ordersTableBody');
+        const statusFilter = document.getElementById('statusFilter').value;
+        
+        let filteredOrders = orders;
+        if (statusFilter) {
+            filteredOrders = orders.filter(order => order.status === statusFilter);
+        }
+
+        if (filteredOrders.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="px-6 py-12 text-center text-neutral-text">
+                        <div class="flex flex-col items-center">
+                            <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-3"></i>
+                            <p class="text-lg font-medium">Tidak ada pesanan</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tableBody.innerHTML = filteredOrders.map((order, index) => {
+            const statusColors = {
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'processing': 'bg-blue-100 text-blue-800',
+                'ready': 'bg-green-100 text-green-800',
+                'delivered': 'bg-gray-100 text-gray-800',
+                'cancelled': 'bg-red-100 text-red-800'
+            };
+
+            const statusLabels = {
+                'pending': 'Pending',
+                'processing': 'Diproses',
+                'ready': 'Siap',
+                'delivered': 'Selesai',
+                'cancelled': 'Dibatalkan'
+            };
+
+            const itemsText = order.items.map(item => 
+                `${item.name} x${item.quantity}`
+            ).join(', ');
+
+            // Get customer address if available
+            let addressText = 'Alamat tidak tersedia';
+            if (customerAddresses[order.user_phone] && customerAddresses[order.user_phone].length > 0) {
+                const primaryAddress = customerAddresses[order.user_phone].find(addr => addr.is_main) || customerAddresses[order.user_phone][0];
+                addressText = `${primaryAddress.address_detail}, ${primaryAddress.city}`;
             }
 
-            if (filteredOrders.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="px-6 py-12 text-center text-neutral-text">
-                            <div class="flex flex-col items-center">
-                                <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-3"></i>
-                                <p class="text-lg font-medium">Tidak ada pesanan</p>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
+            return `
+                <tr class="hover:bg-gray-50 animate-fade-in" style="animation-delay: ${index * 0.05}s">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-dark">
+                        #${order.id}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div>
+                            <div class="text-sm font-medium text-text-dark">${order.customer.name}</div>
+                            <div class="text-sm text-neutral-text">${order.customer.phone}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-neutral-text max-w-xs truncate" title="${addressText}">
+                        ${addressText}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-neutral-text">
+                        <div class="max-w-xs truncate" title="${itemsText}">
+                            ${itemsText}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-dark">
+                        Rp ${order.total.toLocaleString('id-ID')}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[order.status]} ${order.status === 'pending' ? 'status-badge' : ''}">
+                            ${statusLabels[order.status]}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-text">
+                        ${new Date(order.timestamp).toLocaleString('id-ID')}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                        <div class="flex justify-center space-x-2">
+                            <button onclick="viewOrder(${order.id})" class="text-cool-primary hover:text-blue-700" title="Lihat Detail">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="updateOrderStatus(${order.id})" class="text-green-600 hover:text-green-700" title="Update Status">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteOrder(${order.id}, '${order.customer.name}')" class="text-red-600 hover:text-red-700" title="Hapus Pesanan">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
 
-            tableBody.innerHTML = filteredOrders.map(order => {
-                const statusColors = {
-                    'pending': 'bg-yellow-100 text-yellow-800',
-                    'processing': 'bg-blue-100 text-blue-800',
-                    'ready': 'bg-green-100 text-green-800',
-                    'delivered': 'bg-gray-100 text-gray-800',
-                    'cancelled': 'bg-red-100 text-red-800'
-                };
+    function viewOrder(orderId) {
+        const order = orders.find(o => o.id === orderId);
+        if (!order) return;
 
-                const statusLabels = {
-                    'pending': 'Pending',
-                    'processing': 'Diproses',
-                    'ready': 'Siap',
-                    'delivered': 'Selesai',
-                    'cancelled': 'Dibatalkan'
-                };
+        const itemsHtml = order.items.map(item => `
+            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                <div class="flex items-center">
+                    <img src="${item.image || 'https://picsum.photos/seed/food/50/50.jpg'}" alt="${item.name}" class="w-12 h-12 rounded-lg object-cover mr-3">
+                    <div>
+                        <p class="font-medium">${item.name}</p>
+                        <p class="text-sm text-neutral-text">Rp ${item.price.toLocaleString('id-ID')} x ${item.quantity}</p>
+                    </div>
+                </div>
+                <p class="font-medium">Rp ${(item.price * item.quantity).toLocaleString('id-ID')}</p>
+            </div>
+        `).join('');
 
-                const itemsText = order.items.map(item => 
-                    `${item.name} x${item.quantity}`
-                ).join(', ');
+        const statusColors = {
+            'pending': 'bg-yellow-100 text-yellow-800',
+            'processing': 'bg-blue-100 text-blue-800',
+            'ready': 'bg-green-100 text-green-800',
+            'delivered': 'bg-gray-100 text-gray-800',
+            'cancelled': 'bg-red-100 text-red-800'
+        };
 
+        const statusLabels = {
+            'pending': 'Pending',
+            'processing': 'Diproses',
+            'ready': 'Siap',
+            'delivered': 'Selesai',
+            'cancelled': 'Dibatalkan'
+        };
+
+        // Get customer address if available
+        let addressHtml = '<p class="text-sm text-neutral-text">Alamat tidak tersedia</p>';
+        if (customerAddresses[order.user_phone] && customerAddresses[order.user_phone].length > 0) {
+            const addresses = customerAddresses[order.user_phone];
+            addressHtml = addresses.map(addr => {
+                const isPrimary = addr.is_main ? '<span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Utama</span>' : '';
                 return `
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-dark">
-                            #${order.id}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div>
-                                <div class="text-sm font-medium text-text-dark">${order.customer.name}</div>
-                                <div class="text-sm text-neutral-text">${order.customer.phone}</div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-neutral-text">
-                            <div class="max-w-xs truncate" title="${itemsText}">
-                                ${itemsText}
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-text-dark">
-                            Rp ${order.total.toLocaleString()}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[order.status]}">
-                                ${statusLabels[order.status]}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-text">
-                            ${new Date(order.timestamp).toLocaleString('id-ID')}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                            <div class="flex justify-center space-x-2">
-                                <button onclick="viewOrder(${order.id})" class="text-cool-primary hover:text-blue-700">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button onclick="updateOrderStatus(${order.id})" class="text-green-600 hover:text-green-700">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                    <div class="mb-2 p-2 border rounded ${addr.is_main ? 'border-green-300 bg-green-50' : 'border-gray-200'}">
+                        <p class="font-medium">${addr.label || 'Alamat'}${isPrimary}</p>
+                        <p class="text-sm text-neutral-text">${addr.address_detail}, ${addr.city}</p>
+                        <p class="text-sm text-neutral-text">Phone: ${order.customer.phone}</p>
+                    </div>
                 `;
             }).join('');
         }
 
-        function viewOrder(orderId) {
-            const order = orders.find(o => o.id === orderId);
-            if (!order) return;
+        const content = `
+            <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-lg mb-2">Informasi Pesanan</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-neutral-text">ID Pesanan</p>
+                            <p class="font-medium">#${order.id}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-neutral-text">Status</p>
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColors[order.status]}">
+                                ${statusLabels[order.status]}
+                            </span>
+                        </div>
+                        <div>
+                            <p class="text-sm text-neutral-text">Waktu Pemesanan</p>
+                            <p class="font-medium">${new Date(order.timestamp).toLocaleString('id-ID')}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-neutral-text">Metode Pembayaran</p>
+                            <p class="font-medium">${order.payment_method || 'Tidak diketahui'}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-lg mb-2">Informasi Pelanggan</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-neutral-text">Nama</p>
+                            <p class="font-medium">${order.customer.name}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-neutral-text">No. HP</p>
+                            <p class="font-medium">${order.customer.phone}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-lg mb-2">Alamat Pengiriman</h3>
+                    ${addressHtml}
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-lg mb-2">Detail Pesanan</h3>
+                    <div class="space-y-2">
+                        ${itemsHtml}
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-neutral-text">Subtotal</p>
+                            <p>Rp ${order.subtotal.toLocaleString('id-ID')}</p>
+                        </div>
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-neutral-text">Ongkos Kirim</p>
+                            <p>Rp ${order.shipping.toLocaleString('id-ID')}</p>
+                        </div>
+                        ${order.discount > 0 ? `
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-neutral-text">Diskon</p>
+                            <p class="text-red-600">-Rp ${order.discount.toLocaleString('id-ID')}</p>
+                        </div>
+                        ` : ''}
+                        <div class="flex justify-between items-center font-bold text-lg">
+                            <p>Total</p>
+                            <p class="text-cool-primary">Rp ${order.total.toLocaleString('id-ID')}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button onclick="closeOrderDetailModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
+                        Tutup
+                    </button>
+                    <button onclick="updateOrderStatus(${order.id})" class="px-4 py-2 bg-cool-primary text-white rounded-lg hover:bg-blue-700 transition">
+                        Update Status
+                    </button>
+                    <button onclick="deleteOrder(${order.id}, '${order.customer.name}')" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                        Hapus Pesanan
+                    </button>
+                </div>
+            </div>
+        `;
 
-            const itemsText = order.items.map(item => 
-                `• ${item.name} x${item.quantity} = Rp ${(item.price * item.quantity).toLocaleString()}`
-            ).join('\n');
+        document.getElementById('orderDetailContent').innerHTML = content;
+        document.getElementById('orderDetailModal').classList.remove('hidden');
+    }
 
-            const message = `📋 *Detail Pesanan #${order.id}*
+    function closeOrderDetailModal() {
+        document.getElementById('orderDetailModal').classList.add('hidden');
+    }
 
-👤 *Customer:*
-Nama: ${order.customer.name}
-No. HP: ${order.customer.phone}
+    async function updateOrderStatus(orderId) {
+        const order = orders.find(o => o.id === orderId);
+        if (!order) return;
 
-🛍️ *Items:*
-${itemsText}
+        const statusOptions = {
+            'pending': 'Pending',
+            'processing': 'Diproses', 
+            'ready': 'Siap',
+            'delivered': 'Selesai',
+            'cancelled': 'Dibatalkan'
+        };
 
-💰 *Ringkasan:*
-Subtotal: Rp ${order.subtotal.toLocaleString()}
-Ongkir: Rp ${order.shipping.toLocaleString()}
-Diskon: Rp ${order.discount.toLocaleString()}
-*TOTAL: Rp ${order.total.toLocaleString()}*
-
-📱 *Status:* ${order.status}
-⏰ *Waktu:* ${new Date(order.timestamp).toLocaleString('id-ID')}`;
-
-            alert(message);
+        const currentStatus = order.status;
+        const availableStatuses = Object.keys(statusOptions).filter(status => status !== currentStatus);
+        
+        if (availableStatuses.length === 0) {
+            showNotification('Status pesanan sudah final', 'warning');
+            return;
         }
 
-        async function updateOrderStatus(orderId) {
-            const order = orders.find(o => o.id === orderId);
-            if (!order) return;
+        // Create a simple modal for status selection
+        const statusModal = document.createElement('div');
+        statusModal.className = 'fixed inset-0 z-50 flex items-center justify-center';
+        statusModal.innerHTML = `
+            <div class="absolute inset-0 bg-black bg-opacity-50" onclick="this.parentElement.remove()"></div>
+            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 z-10 animate-scale-in">
+                <h3 class="text-lg font-bold mb-4">Update Status Pesanan #${orderId}</h3>
+                <p class="text-sm text-gray-600 mb-4">Status saat ini: ${statusOptions[currentStatus]}</p>
+                <div class="space-y-2">
+                    ${availableStatuses.map(status => `
+                        <button onclick="setOrderStatus(${orderId}, '${status}')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-100 transition">
+                            ${statusOptions[status]}
+                        </button>
+                    `).join('')}
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="mt-4 w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
+                    Batal
+                </button>
+            </div>
+        `;
+        document.body.appendChild(statusModal);
+    }
 
+    async function setOrderStatus(orderId, newStatus) {
+        try {
             const statusOptions = {
                 'pending': 'Pending',
                 'processing': 'Diproses', 
@@ -818,67 +1828,60 @@ Diskon: Rp ${order.discount.toLocaleString()}
                 'cancelled': 'Dibatalkan'
             };
 
-            const currentStatus = order.status;
-            const availableStatuses = Object.keys(statusOptions).filter(status => status !== currentStatus);
+            const response = await fetch(`${BASE_URL}/api/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (!response.ok) throw new Error('Gagal mengupdate status pesanan');
+
+            showNotification(`Status pesanan #${orderId} berhasil diubah ke ${statusOptions[newStatus]}`, 'success');
             
-            if (availableStatuses.length === 0) {
-                showNotification('Status pesanan sudah final', 'warning');
-                return;
-            }
-
-            const newStatus = prompt(
-                `Ubah status pesanan #${orderId}:\n\n` +
-                `Status saat ini: ${statusOptions[currentStatus]}\n\n` +
-                `Pilih status baru:\n` +
-                availableStatuses.map((status, index) => `${index + 1}. ${statusOptions[status]}`).join('\n') +
-                `\n\nMasukkan nomor (1-${availableStatuses.length}):`
-            );
-
-            if (!newStatus || isNaN(newStatus)) return;
-
-            const statusIndex = parseInt(newStatus) - 1;
-            if (statusIndex < 0 || statusIndex >= availableStatuses.length) {
-                showNotification('Pilihan status tidak valid', 'danger');
-                return;
-            }
-
-            const selectedStatus = availableStatuses[statusIndex];
-
-            try {
-                const token = localStorage.getItem('adminToken');
-                const response = await fetch(`${BASE_URL}/api/orders/${orderId}/status`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ status: selectedStatus })
-                });
-
-                if (!response.ok) throw new Error('Gagal mengupdate status pesanan');
-
-                showNotification(`Status pesanan #${orderId} berhasil diubah ke ${statusOptions[selectedStatus]}`, 'success');
-                fetchOrders();
-            } catch (error) {
-                console.error('Error updating order status:', error);
-                showNotification(`Gagal mengupdate status: ${error.message}`, 'danger');
-            }
+            // Close the modal
+            document.querySelector('.fixed.inset-0').remove();
+            
+            // Close the detail modal if open
+            closeOrderDetailModal();
+            
+            // Refresh orders
+            fetchOrders();
+        } catch (error) {
+            console.error('Error updating order status:', error);
+            showNotification(`Gagal mengupdate status: ${error.message}`, 'danger');
         }
+    }
 
-        // ========== EVENT LISTENERS ==========
-        document.getElementById('menuTab').addEventListener('click', () => switchTab('menu'));
-        document.getElementById('ordersTab').addEventListener('click', () => switchTab('orders'));
-        document.getElementById('statusFilter').addEventListener('change', renderOrders);
-        document.getElementById('refreshOrders').addEventListener('click', fetchOrders);
+    // Delete order function
+    async function deleteOrder(orderId, customerName) {
+        if (!confirm(`Yakin ingin menghapus pesanan #${orderId} dari ${customerName}? Tindakan ini tidak dapat dibatalkan.`)) return;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchMenu();
-            // Initialize with menu tab
-            switchTab('menu');
-        });
-    </script>
+        try {
+            const response = await fetch(`${BASE_URL}/api/orders/${orderId}`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+                method: 'DELETE'
+            });
 
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Gagal menghapus pesanan');
+            }
+
+            showNotification(`Pesanan #${orderId} berhasil dihapus.`, 'success');
+            
+            // Close the detail modal if open
+            closeOrderDetailModal();
+            
+            // Refresh orders
+            fetchOrders();
+        } catch (error) {
+            console.error('Error deleting order:', error);
+            showNotification(`Gagal menghapus pesanan: ${error.message}`, 'danger');
+        }
+    }
+</script>
 </body>
-
 </html>
-
