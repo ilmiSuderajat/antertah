@@ -224,7 +224,7 @@
             <span id="imageCounter">1 / 1</span>
         </div>
     </div>
-     <footer class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
+     <footer id="footer" class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
         <div class="flex justify-around items-center h-16">
             <a href="home.html" class="bottom-nav-item text-neutral-text  dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
                 <i class="fas fa-home text-xl mb-1"></i>
@@ -735,13 +735,28 @@
             }
         }
 
-        function toggleCart() {
-            const sidebar = document.getElementById('cartSidebar');
-            const overlay = document.getElementById('cartOverlay');
-            
-            sidebar.classList.toggle('translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
+let cartSidebarOpen = false;
+
+function toggleCart() {
+    const sidebar = document.getElementById('cartSidebar');
+    const overlay = document.getElementById('cartOverlay');
+    const footer = document.getElementById('footer');
+
+    if (!cartSidebarOpen) {
+        // Buka sidebar
+        sidebar.classList.remove('translate-x-full'); // tampilkan sidebar
+        overlay.classList.remove('hidden');          // tampilkan overlay
+        footer.style.display = "none";               // sembunyikan footer
+    } else {
+        // Tutup sidebar
+        sidebar.classList.add('translate-x-full');   // sembunyikan sidebar
+        overlay.classList.add('hidden');             // sembunyikan overlay
+        footer.style.display = "block";               // tampilkan footer
+    }
+
+    cartSidebarOpen = !cartSidebarOpen; // update state
+}
+
 
         // Fungsi notifikasi
         function showNotification(message, type = 'info') {

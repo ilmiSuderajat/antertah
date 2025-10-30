@@ -770,7 +770,6 @@ function renderCart() {
         const cartItem = document.createElement('div');
         cartItem.className = 'cart-item bg-card-light dark:bg-card-dark rounded-xl shadow-md p-4 flex items-center space-x-4 animate-slide-up';
         cartItem.style.animationDelay = `${index * 0.05}s`;
-        
         cartItem.innerHTML = `
             <div class="flex-shrink-0">
                 <img src="${fullImageUrl}" alt="${item.name}" class="w-20 h-20 object-cover rounded-lg">
@@ -791,17 +790,17 @@ function renderCart() {
             <div class="flex flex-col items-end space-y-2">
                 <!-- Quantity Controls -->
                 <div class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-                    <button class="quantity-btn w-8 h-8 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all" onclick="updateQuantity(${index}, ${item.quantity - 1})">
+                    <button class="quantity-btn w-8 h-8 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all" data-index="${index}" data-action="decrease">
                         <i class="fas fa-minus text-xs"></i>
                     </button>
                     <span class="w-10 text-center font-semibold">${item.quantity}</span>
-                    <button class="quantity-btn w-8 h-8 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all" onclick="updateQuantity(${index}, ${item.quantity + 1})">
+                    <button class="quantity-btn w-8 h-8 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all" data-index="${index}" data-action="increase">
                         <i class="fas fa-plus text-xs"></i>
                     </button>
                 </div>
 
                 <!-- Remove Button -->
-                <button class="text-red-500 hover:text-red-600 text-sm font-semibold transition-all hover:scale-110" onclick="removeItem(${index})">
+                <button class="text-red-500 hover:text-red-600 text-sm font-semibold transition-all hover:scale-110" data-index="${index}" data-action="remove">
                     <i class="fas fa-trash-alt mr-1"></i>
                     Hapus
                 </button>
@@ -810,49 +809,98 @@ function renderCart() {
 
         container.appendChild(cartItem);
     });
+    
+    // Tambahkan event listener untuk semua tombol
+    document.querySelectorAll('.quantity-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            const action = this.getAttribute('data-action');
+            
+            if (action === 'decrease') {
+                updateQuantity(index, cart[index].quantity - 1);
+            } else if (action === 'increase') {
+                updateQuantity(index, cart[index].quantity + 1);
+            }
+        });
+    });
+    
+    document.querySelectorAll('[data-action="remove"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            removeItem(index);
+        });
+    });
 }
 
-    // ========== UPDATE QUANTITY ==========
-    async function updateQuantity(index, newQty) {
-        if (newQty < 1) {
-            removeItem(index);
-            return;
-        }
-
-        if (newQty > 99) {
-            showNotification('⚠️ Maksimal 99 item per produk', 'error');
-            return;
-        }
-
-        const item = cart[index];
-        const token = localStorage.getItem('authToken');
-        
-        if (token) {
-            try {
-                const res = await fetch(`${BASE_URL}/api/cart/${item.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ quantity: newQty })
-                });
-                
-                if (!res.ok) throw new Error('Failed to update quantity');
-            } catch (e) {
-                console.error('Update quantity error:', e);
-                showNotification('⚠️ Gagal memperbarui jumlah', 'error');
-                return;
-            }
-        }
-        
-        cart[index].quantity = newQty;
-        saveCart();
-        renderCart();
-        updateSummary();
-        showNotification('✅ Jumlah diperbarui', 'success');
+// ========== UPDATE QUANTITY ==========
+async function updateQuantity(index, newQuantity) {
+    // --- Langkah 1: Validasi Input ---
+    if (newQuantity < 1) {
+        console.error("Quantity must be at least 1.");
+        showNotification("Jumlah minimal adalah 1.", "error");
+        return;
+    }
+    
+    // Pastikan index valid
+    if (index < 0 || index >= cart.length) {
+        console.error("Invalid cart item index.");
+        showNotification("Item keranjang tidak valid.", "error");
+        return;
     }
 
+    // Cari tombol yang diklik untuk menampilkan loading
+    const button = event.target.closest('button');
+    const originalContent = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; // Tampilkan animasi loading
+
+    try {
+        // --- Langkah 2: Siapkan Permintaan API ---
+        // ✅ PERBAIKAN: Endpoint disesuaikan dengan backend Anda.
+        const endpoint = `${BASE_URL}/api/cart/${cart[index].id}`;
+        
+        // Ambil token autentikasi dari localStorage
+        const token = localStorage.getItem('authToken'); 
+
+        const response = await fetch(endpoint, {
+            method: 'PUT', // Metode PUT sudah sesuai dengan backend
+            headers: {
+                'Content-Type': 'application/json',
+                // Header ini WAJIB karena backend menggunakan middleware 'authenticateToken'
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                quantity: newQuantity
+            })
+        });
+
+        if (!response.ok) {
+            // Jika server memberikan error, ambil pesan errornya untuk ditampilkan
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Gagal memperbarui jumlah. Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('Quantity updated successfully:', result);
+        
+        // --- Langkah 3: Perbarui UI jika sukses ---
+        // Update data lokal terlebih dahulu
+        cart[index].quantity = newQuantity;
+        
+        // Panggil fungsi untuk render ulang seluruh tampilan keranjang
+        // agar harga total dan data lainnya ikut diperbarui.
+        renderCart(); 
+        showNotification("Jumlah berhasil diperbarui.", "success");
+
+    } catch (error) {
+        console.error('Update quantity error:', error);
+        showNotification(error.message || "Terjadi kesalahan saat memperbarui jumlah.", "error");
+    } finally {
+        // --- Langkah 4: Kembalikan Tombol ke Keadaan Semula ---
+        button.disabled = false;
+        button.innerHTML = originalContent;
+    }
+}
     // ========== REMOVE ITEM ==========
     async function removeItem(index) {
         const itemName = cart[index].name;
