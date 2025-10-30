@@ -679,7 +679,7 @@
     // BASE_URL Configuration
     // Global variables
     
-    const token = localStorage.getItem('authToken') || '';
+    const token = localStorage.getItem('adminToken') || '';
     let allMenuItems = [];
     let orders = [];
     let customerAddresses = {}; // Store customer addresses
@@ -906,50 +906,147 @@
             mobileList.insertAdjacentHTML('beforeend', cardHtml);
         });
     }
-
+function getImageUrl(item) {
+    if (!item) {
+        console.log('[DEBUG] No item provided, using placeholder');
+        return 'https://placehold.co/300x200/e2e8f0/64748b?text=No+Image';
+    }
+    
+    // Debug log untuk melihat struktur item
+    console.log('[DEBUG] Item structure:', item);
+    
+    // Prioritas 1: Cek single image properties
+    const singleImageProps = ['image', 'image_url', 'imageUrl', 'img', 'picture'];
+    let imageUrl = null;
+    
+    for (const prop of singleImageProps) {
+        if (item[prop]) {
+            imageUrl = item[prop];
+            console.log(`[DEBUG] Found single image in property ${prop}:`, imageUrl);
+            break;
+        }
+    }
+    
+    // Prioritas 2: Cek multiple images array
+    if (!imageUrl) {
+        const multipleImageProps = ['images', 'image_urls', 'imageArray', 'gallery'];
+        
+        for (const prop of multipleImageProps) {
+            if (item[prop] && Array.isArray(item[prop]) && item[prop].length > 0) {
+                // Ambil gambar pertama dari array
+                imageUrl = item[prop][0];
+                console.log(`[DEBUG] Found multiple images in property ${prop}, using first:`, imageUrl);
+                break;
+            }
+        }
+    }
+    
+    // Prioritas 3: Cek jika image_urls adalah string JSON
+    if (!imageUrl && item.image_urls && typeof item.image_urls === 'string') {
+        try {
+            const parsedImages = JSON.parse(item.image_urls);
+            if (Array.isArray(parsedImages) && parsedImages.length > 0) {
+                imageUrl = parsedImages[0];
+                console.log('[DEBUG] Parsed image_urls string, using first image:', imageUrl);
+            }
+        } catch (e) {
+            console.log('[DEBUG] Failed to parse image_urls string:', e);
+        }
+    }
+    
+    // Prioritas 4: Coba ambil gambar default berdasarkan menu_id
+    if (!imageUrl && item.menu_id) {
+        console.log('[DEBUG] No image URL found, trying to get default image for menu_id:', item.menu_id);
+        
+        // Coba beberapa nama file default yang mungkin
+        const defaultImageNames = [
+            `menu-${item.menu_id}.jpg`,
+            `menu-${item.menu_id}.webp`,
+            `menu-${item.menu_id}.png`,
+            `default-${item.menu_id}.jpg`,
+            `default-${item.menu_id}.webp`,
+            `default-${item.menu_id}.png`
+        ];
+        
+        // Gunakan nama file default pertama
+        imageUrl = defaultImageNames[0];
+        console.log('[DEBUG] Using default image name:', imageUrl);
+    }
+    
+    // Prioritas 5: Coba ambil gambar berdasarkan ID item
+    if (!imageUrl && item.id) {
+        console.log('[DEBUG] No image URL found, trying to get default image for item_id:', item.id);
+        
+        // Coba beberapa nama file default yang mungkin
+        const defaultImageNames = [
+            `menu-${item.id}.jpg`,
+            `menu-${item.id}.webp`,
+            `menu-${item.id}.png`,
+            `default-${item.id}.jpg`,
+            `default-${item.id}.webp`,
+            `default-${item.id}.png`
+        ];
+        
+        // Gunakan nama file default pertama
+        imageUrl = defaultImageNames[0];
+        console.log('[DEBUG] Using default image name based on item ID:', imageUrl);
+    }
+    
+    // Prioritas 6: Coba ambil gambar berdasarkan nama produk
+    if (!imageUrl && item.name) {
+        console.log('[DEBUG] No image URL found, trying to get default image based on product name:', item.name);
+        
+        // Buat nama file dari nama produk (hapus karakter khusus dan spasi)
+        const sanitizedName = item.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+        
+        if (sanitizedName) {
+            imageUrl = `${sanitizedName}.jpg`;
+            console.log('[DEBUG] Using default image name based on product name:', imageUrl);
+        }
+    }
+    
+    if (!imageUrl) {
+        console.log('[DEBUG] No image URL found, using placeholder');
+        return 'https://placehold.co/300x200/e2e8f0/64748b?text=No+Image';
+    }
+    
+    // Jika URL sudah lengkap (dimulai dengan http), gunakan apa adanya
+    if (imageUrl.startsWith('http')) {
+        console.log('[DEBUG] Using full URL:', imageUrl);
+        return imageUrl;
+    }
+    
+    // Jika URL dimulai dengan /uploads/menu/, tambahkan BASE_URL tanpa menambah path lagi
+    if (imageUrl.startsWith('/uploads/menu/')) {
+        const fullUrl = `${BASE_URL}${imageUrl}`;
+        console.log('[DEBUG] Using uploads/menu path:', fullUrl);
+        return fullUrl;
+    }
+    
+    // Jika URL dimulai dengan / (path relatif dari root), tambahkan BASE_URL
+    if (imageUrl.startsWith('/')) {
+        const fullUrl = `${BASE_URL}${imageUrl}`;
+        console.log('[DEBUG] Using root path:', fullUrl);
+        return fullUrl;
+    }
+    
+    // Jika hanya nama file, tambahkan path uploads/menu
+    const fullUrl = `${BASE_URL}/uploads/menu/${imageUrl}`;
+    console.log('[DEBUG] Using filename with path:', fullUrl);
+    return fullUrl;
+}
     function renderMenuItem(menu, index) {
         const isAvailable = menu.is_available === 1 || menu.is_available === true;
         const statusColor = isAvailable ? 'bg-wa-success/20 text-wa-success' : 'bg-red-500/20 text-red-700';
         const statusText = isAvailable ? '✓ Tersedia' : '✕ Tidak Tersedia';
         const statusBadge = `<span class="badge-custom ${statusColor}">${statusText}</span>`;
-        
-        // PERBAIKAN: Handle multiple images with proper URL construction
-        let imageUrl = '';
-        
-        // Coba ambil dari image_urls (array) atau image_url (string)
-        if (menu.image_urls && menu.image_urls.length > 0) {
-            // Jika image_urls adalah string JSON, parse dulu
-            const imageUrls = typeof menu.image_urls === 'string' 
-                               ? JSON.parse(menu.image_urls) 
-                               : menu.image_urls;
-            // Ambil URL pertama dari array
-            imageUrl = imageUrls[0];
-        } else if (menu.image_url) {
-            // Jika ada image_url (single image)
-            imageUrl = menu.image_url;
-        }
-        
-        // PERBAIKAN: Konstruksi URL gambar dengan benar
-        // Jika imageUrl adalah path relatif (tidak dimulai dengan http), tambahkan BASE_URL
-        // Jika imageUrl sudah URL lengkap, gunakan apa adanya
-        let fullImageUrl = '';
-        if (imageUrl) {
-            if (imageUrl.startsWith('http')) {
-                // Sudah URL lengkap
-                fullImageUrl = imageUrl;
-            } else if (imageUrl.startsWith('/')) {
-                // Path relatif dari root
-                fullImageUrl = `${BASE_URL}${imageUrl}`;
-            } else {
-                // Path relatif dari uploads/menu
-                fullImageUrl = `${BASE_URL}/uploads/menu/${imageUrl}`;
-            }
-        } else {
-            // Tidak ada gambar, gunakan placeholder
-            fullImageUrl = './img/no-image.png';
-        }
-        
+
         // Gunakan fullImageUrl yang sudah diperbaiki
+        const fullImageUrl = getImageUrl(menu);
         const imageHtml = fullImageUrl
             ? `<img src="${fullImageUrl}" alt="${menu.name}" class="menu-image mr-4 cursor-pointer" onclick="openImageViewer('${fullImageUrl}')" onerror="this.onerror=null; this.src='./img/no-image.png'">`
             : '<div class="w-[70px] h-[70px] bg-bg-light rounded-lg mr-4 flex items-center justify-center flex-shrink-0"><span class="text-neutral-text text-lg">🖼️</span></div>';
@@ -1319,66 +1416,136 @@
     }
 
     // === PERBAIKAN: Fungsi Update Menu ===
-    async function updateMenu(id) {
-        console.log(`=== [DEBUG UPDATE] Update Menu ID ${id} Started ===`);
+async function updateMenu(id) {
+    console.log(`=== [DEBUG UPDATE] Update Menu ID ${id} Started ===`);
 
-        // 1. Validasi
-        const name = document.getElementById('name').value;
-        const price = document.getElementById('price').value;
-        const category = document.getElementById('category').value;
-        
-        // Ambil field lokasi
-        const location_name = document.getElementById('location_name').value;
-        const latitude = document.getElementById('latitude').value;
-        const longitude = document.getElementById('longitude').value;
-        
+    try {
+        // 1️⃣ Validasi field wajib
+        const name = document.getElementById('name').value.trim();
+        const price = document.getElementById('price').value.trim();
+        const category = document.getElementById('category').value.trim();
+
         if (!name || !price || !category) {
-            throw new Error('Nama, harga, dan kategori wajib diisi.');
+            showNotification('Nama, harga, dan kategori wajib diisi.', 'warning');
+            return;
         }
 
-        // 2. Persiapan FormData
+        const priceNumber = parseFloat(price);
+        if (isNaN(priceNumber) || priceNumber < 0) {
+            showNotification('Harga harus berupa angka valid.', 'warning');
+            return;
+        }
+
+        // 2️⃣ Ambil data menu lama dari database untuk mendapatkan daftar gambar existing
+        const menuResponse = await fetch(`${BASE_URL}/api/menu/admin/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!menuResponse.ok) {
+            throw new Error('Gagal mengambil data menu existing.');
+        }
+
+        const existingMenu = await menuResponse.json();
+        console.log('[DEBUG UPDATE] Existing menu data:', existingMenu);
+
+        // 3️⃣ Parse gambar lama dari database
+        let oldImageUrls = [];
+        try {
+            if (existingMenu.image_urls) {
+                oldImageUrls = typeof existingMenu.image_urls === 'string' 
+                    ? JSON.parse(existingMenu.image_urls) 
+                    : existingMenu.image_urls;
+            } else if (existingMenu.image_url) {
+                // Fallback ke single image
+                oldImageUrls = [existingMenu.image_url];
+            }
+        } catch (e) {
+            console.error('[DEBUG UPDATE] Error parsing old images:', e);
+        }
+        
+        console.log('[DEBUG UPDATE] Old images from DB:', oldImageUrls);
+
+        // 4️⃣ Ambil gambar lama yang dipertahankan dari preview DOM
+        const keptImageUrls = getKeptImageNamesFromDom();
+        console.log('[DEBUG UPDATE] Kept images from DOM:', keptImageUrls);
+
+        // 5️⃣ Tentukan gambar yang akan dihapus (ada di DB tapi tidak di kept)
+        const imagesToDelete = oldImageUrls.filter(img => !keptImageUrls.includes(img));
+        console.log('[DEBUG UPDATE] Images to delete:', imagesToDelete);
+
+        // 6️⃣ Persiapan FormData
         const formData = new FormData();
         formData.append('name', name);
-        formData.append('description', document.getElementById('description').value);
-        formData.append('price', price);
+        formData.append('description', document.getElementById('description').value.trim());
+        formData.append('price', priceNumber);
         formData.append('category', category);
-        
-        // Ambil status ketersediaan
-        const isAvailable = document.getElementById('isAvailable').checked ? '1' : '0';
+
+        // Status ketersediaan
+        const isAvailable = document.getElementById('isAvailable').checked ? 1 : 0;
         formData.append('is_available', isAvailable);
 
-        // Ambil dan tambahkan field lokasi
+        // Field lokasi (opsional)
+        const location_name = document.getElementById('location_name')?.value.trim();
+        const latitude = document.getElementById('latitude')?.value.trim();
+        const longitude = document.getElementById('longitude')?.value.trim();
+
         if (location_name) formData.append('location_name', location_name);
         if (latitude) formData.append('latitude', latitude);
         if (longitude) formData.append('longitude', longitude);
 
-        // 3. Penanganan Gambar Lama
-        const currentImageNames = getKeptImageNamesFromDom();
-        formData.append('existing_image_urls', JSON.stringify(currentImageNames));
-        formData.append('existing_thumbnail_urls', JSON.stringify(currentImageNames));
-        console.log('[DEBUG UPDATE] currentImageNames:', currentImageNames);
+        // 7️⃣ Kirim daftar gambar lama yang DIPERTAHANKAN (bukan yang dihapus!)
+        formData.append('existing_image_urls', JSON.stringify(keptImageUrls));
+        formData.append('existing_thumbnail_urls', JSON.stringify(keptImageUrls)); // Asumsi thumbnail sama
 
-        // 4. Penanganan Gambar Baru (Multi-Upload)
+        console.log('[DEBUG UPDATE] Existing images sent to backend:', keptImageUrls);
+
+        // 8️⃣ Tambahkan file baru (jika ada)
         if (selectedFiles.length > 0) {
-            // 🏆 Benar: Kirim setiap file baru dengan key 'images' (plural)
-            selectedFiles.forEach(file => {
-                formData.append('images', file); 
+            console.log(`[DEBUG UPDATE] Adding ${selectedFiles.length} new files`);
+            selectedFiles.forEach((file, index) => {
+                formData.append('images', file); // ✅ Key harus 'images' (plural)
+                console.log(`[DEBUG UPDATE] File ${index + 1}:`, {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type
+                });
             });
-            console.log(`[DEBUG UPDATE] Menambahkan ${selectedFiles.length} file baru dengan key 'images'.`);
         } else {
-             console.log(`[DEBUG UPDATE] Tidak ada file baru yang ditambahkan.`);
+            console.log('[DEBUG UPDATE] No new files to upload');
         }
 
-        // 5. Eksekusi Request
-        console.log(`[DEBUG UPDATE] existing_image_urls dikirim:`, currentImageNames);
-        console.log(`[DEBUG UPDATE] is_available: ${isAvailable}`);
+        // 9️⃣ Validasi total gambar (lama + baru) tidak boleh > 5
+        const totalImages = keptImageUrls.length + selectedFiles.length;
+        if (totalImages > 5) {
+            showNotification(`Total gambar tidak boleh lebih dari 5. Saat ini: ${totalImages}`, 'warning');
+            return;
+        }
 
+        console.log(`[DEBUG UPDATE] Total images after update: ${totalImages}`);
+
+        // Debug FormData
+        console.log('[DEBUG UPDATE] FormData entries:');
+        for (let pair of formData.entries()) {
+            if (pair[1] instanceof File) {
+                console.log(`  ${pair[0]}:`, { name: pair[1].name, size: pair[1].size });
+            } else {
+                console.log(`  ${pair[0]}:`, pair[1]);
+            }
+        }
+
+        // 🔟 Kirim request ke backend
+        console.log(`[DEBUG UPDATE] Sending PUT request to: ${BASE_URL}/api/menu/${id}`);
+        
         const response = await fetch(`${BASE_URL}/api/menu/${id}`, {
-            // Jangan set Content-Type
-            headers: { 'Authorization': `Bearer ${token}` },
             method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`
+                // ❌ JANGAN tambahkan 'Content-Type' untuk multipart/form-data
+            },
             body: formData
         });
+
+        console.log('[DEBUG UPDATE] Response status:', response.status);
 
         const result = await response.json();
         console.log('[DEBUG UPDATE] Response data:', result);
@@ -1388,13 +1555,24 @@
             throw new Error(result.error || 'Gagal memperbarui menu.');
         }
 
-        // 6. Post-Update Action
-        showNotification(`Menu "${name}" berhasil diperbarui!`, 'success');
-        fetchMenu(); // Muat ulang daftar menu
-        closeMenuModal(); // Tutup modal
+        // 1️⃣1️⃣ Sukses!
+        console.log('[DEBUG UPDATE] ✅ Menu updated successfully!');
+        showNotification(`✅ Menu "${name}" berhasil diperbarui!`, 'success');
+        
+        // Refresh daftar menu
+        await fetchMenu();
+        
+        // Tutup modal
+        closeMenuModal();
 
         console.log('=== [DEBUG UPDATE] Update Menu Ended ===');
+
+    } catch (err) {
+        console.error('[DEBUG UPDATE] ❌ Error:', err);
+        showNotification(err.message || 'Terjadi kesalahan saat memperbarui menu.', 'danger');
     }
+}
+
 
     function getKeptImageNamesFromDom() {
         // Get current image URL from hidden input

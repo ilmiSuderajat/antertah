@@ -104,7 +104,109 @@
         .service-icon:hover {
             transform: scale(1.1) rotate(5deg);
         }
+        
 
+        /* Search Input Styles */
+.mobile-search-input, #search-input {
+    transition: all 0.3s ease;
+}
+
+.mobile-search-input:focus, #search-input:focus {
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+}
+
+/* Search Suggestions Styles */
+.search-suggestion {
+    transition: all 0.2s ease;
+}
+
+.search-suggestion:hover {
+    padding-left: 1rem;
+}
+
+/* Search Loading Animation */
+.search-loading::after {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 8px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #1d4ed8;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Search Highlight */
+.search-highlight {
+    background-color: #fef3c7;
+    padding: 1px 2px;
+    border-radius: 2px;
+}
+
+.dark .search-highlight {
+    background-color: #451a03;
+    color: #fbbf24;
+}
+
+/* Search Mode Styles */
+#search-indicator {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Search Results Animation */
+.search-result-item {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+/* No Results State */
+.no-results-icon {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Search Suggestions Buttons */
+.search-suggestion-btn {
+    transition: all 0.2s ease;
+}
+
+.search-suggestion-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading State */
+.search-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+/* Smooth transitions for hidden elements */
+.hidden-element {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.hidden-element.hiding {
+    opacity: 0;
+    transform: translateY(-10px);
+}
         /* Dark Mode Toggle Button Styles */
         #dark-mode-toggle {
             position: relative;
@@ -269,9 +371,57 @@
         .pull-indicator.show {
             opacity: 1;
         }
+
+        /* Mobile Header Styles */
+        .mobile-header {
+            height: 56px;
+        }
+
+        /* Mobile Search Styles */
+        .mobile-search-container {
+            position: relative;
+            flex: 1;
+            max-width: calc(100% - 120px); /* Space for cart and notification icons */
+        }
+
+        .mobile-search-input {
+            width: 100%;
+            padding-left: 2.5rem;
+            padding-right: 1rem;
+            height: 40px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+        }
+
+        .mobile-search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+        }
+
+        /* Mobile Icon Styles */
+        .mobile-icon-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .mobile-icon {
+            font-size: 1.25rem;
+            position: relative;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767px) {
+            .mobile-logo {
+                display: none; /* Hide logo on mobile */
+            }
+        }
     </style>
 </head>
-<body class="bg-bg-light dark:bg-bg-dark text-text-dark dark:text-text-light min-h-screen font-sans pb-16 md:pb-0">
+<body class="bg-bg-light dark:bg-bg-dark text-text-dark dark:text-text-light min-h-screen font-sans">
     
     <!-- Pull to Refresh Indicator -->
     <div id="pull-to-refresh" class="bg-cool-primary text-white px-6 py-3 rounded-full shadow-2xl flex items-center space-x-3">
@@ -280,25 +430,32 @@
     </div>
 
     <!-- Header -->
-    <header class="bg-card-light dark:bg-card-dark shadow-lg sticky top-0 z-50 backdrop-blur-md bg-opacity-95">
+    <header class="bg-card-light dark:bg-card-dark shadow-lg sticky top-0 z-50 backdrop-blur-md bg-opacity-95 m-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                
+            <!-- Desktop Header -->
+            <div class="hidden md:flex justify-between items-center h-16">
                 <a href="#" class="inline-flex items-center text-2xl font-extrabold text-cool-primary dark:text-cool-accent transition-all hover:scale-105">
                     <i class="fas fa-motorcycle mr-2 float-animation"></i> AnterTah
                 </a>
                 
-                <div class="hidden md:block flex-grow max-w-xl mx-8">
-                    <div class="relative">
-                        <input type="text" id="search-input" placeholder="Cari kuliner, toko, atau layanan..." 
-                                class="w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 dark:border-gray-600 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-cool-primary focus:border-transparent dark:bg-gray-700 dark:text-text-light">
-                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-text"></i>
-                    </div>
-                </div>
+<div class="w-full px-4 sm:px-6 md:px-8 flex justify-center">
+  <div class="relative group flex-1 max-w-2xl ml-30">
+    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-cool-primary transition-colors"></i>
+
+    <input
+      type="text"
+      id="search-input"
+      placeholder="Cari kuliner, toko, atau layanan..."
+      class="w-full pl-12 pr-5 py-3 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-100 shadow-sm focus:shadow-md focus:outline-none focus:ring-2 focus:ring-cool-primary focus:border-transparent transition-all duration-200 placeholder-gray-400"
+    />
+  </div>
+</div>
+
+
 
                 <div class="flex items-center space-x-4">
                     <!-- Dark Mode Toggle Button -->
-                    <div id="dark-mode-toggle" class="hidden md:block">
+                    <div id="dark-mode-toggle">
                         <div class="toggle-circle">
                             <i class="toggle-icon fas fa-sun text-yellow-500"></i>
                         </div>
@@ -313,6 +470,32 @@
                     </button>
                 </div>
             </div>
+            
+            <!-- Mobile Header - Simplified with only search, cart, and notification -->
+            <div class="md:hidden flex items-center justify-between mobile-header">
+                <!-- Mobile Search Bar (Large) -->
+                <div class="mobile-search-container">
+                    <div class="relative">
+                        <input type="text" id="search-input-mobile" placeholder="Cari kuliner, toko, atau layanan..." 
+                                class="mobile-search-input w-full border-2 border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cool-primary focus:border-transparent dark:bg-gray-700 dark:text-text-light">
+                        <i class="fas fa-search mobile-search-icon"></i>
+                    </div>
+                </div>
+                
+                <!-- Mobile Icons -->
+                <div class="mobile-icon-container">
+                    <!-- Mobile Cart -->
+                    <button class="text-neutral-text dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent transition relative group">
+                        <a href="keranjang.html"><i class="fas fa-shopping-basket mobile-icon group-hover:scale-110 transition-transform"></i></a>
+                        <span id="cart-item-count-mobile" class="cart-badge absolute -top-1.5 -right-1.5 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">0</span>
+                    </button>
+                    
+                    <!-- Mobile Notification -->
+                    <button class="text-neutral-text dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent transition">
+                        <i class="fas fa-bell mobile-icon hover:scale-110 transition-transform"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -324,17 +507,6 @@
                 <h2 class="text-3xl font-bold">
                     Hi, <span id="user-greeting-name" class="font-extrabold">Pengguna!</span> 👋
                 </h2>
-                <div class="flex items-center space-x-3">
-                    <!-- Mobile Dark Mode Toggle -->
-                    <div id="dark-mode-toggle-mobile" class="md:hidden w-14 h-7 rounded-full bg-white/20 cursor-pointer flex items-center px-1">
-                        <div class="toggle-circle-mobile w-5 h-5 bg-white rounded-full transition-transform duration-300 flex items-center justify-center">
-                            <i class="toggle-icon-mobile fas fa-sun text-yellow-500 text-xs"></i>
-                        </div>
-                    </div>
-                    <a href="profile.html" id="profile-link" class="md:hidden text-lg hover:opacity-80 transition-all hover:scale-110">
-                        <i class="fas fa-user-circle text-2xl"></i>
-                    </a>
-                </div>
             </div>
             
             <div class="flex items-center glass-effect p-4 rounded-xl cursor-pointer hover:bg-white/40 transition-all group" id="address-section">
@@ -344,15 +516,6 @@
                     <p class="font-medium text-sm line-clamp-1" id="delivery-address">Memuat Alamat Anda...</p>
                 </div>
                 <i class="fas fa-chevron-right opacity-70 group-hover:translate-x-1 transition-transform"></i>
-            </div>
-        </div>
-
-        <!-- Mobile Search -->
-        <div class="md:hidden mb-6 animate-slide-up">
-            <div class="relative">
-                <input type="text" id="search-input-mobile" placeholder="Cari kuliner favorit..." 
-                        class="w-full pl-10 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cool-primary focus:border-transparent dark:bg-gray-700 dark:text-text-light">
-                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-text"></i>
             </div>
         </div>
         
@@ -481,23 +644,21 @@
             </div>
         </div>
     </main>
-
-    <!-- Bottom Navigation -->
-    <footer class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
+        <footer class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
         <div class="flex justify-around items-center h-16">
-            <a href="#" class="bottom-nav-item active text-cool-primary flex flex-col items-center text-xs font-semibold">
+            <a href="home.html" class="bottom-nav-item text-cool-primary  dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
                 <i class="fas fa-home text-xl mb-1"></i>
                 <span>Beranda</span>
             </a>
-            <a href="kuliner.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium">
+            <a href="kuliner.html" class="bottom-nav-item  text-neutral-text  flex flex-col items-center text-xs font-bold transition">
                 <i class="fas fa-search text-xl mb-1"></i>
                 <span>Cari</span>
             </a>
-            <a href="pesanan.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium">
+            <a href="pesanan.html" class="bottom-nav-item text-neutral-text  dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
                 <i class="fas fa-list-alt text-xl mb-1"></i>
                 <span>Pesanan</span>
             </a>
-            <a href="profile.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium">
+            <a href="profile.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
                 <i class="fas fa-user text-xl mb-1"></i>
                 <span>Akun</span>
             </a>
@@ -506,8 +667,6 @@
 
     <script src="config.js"></script>
     <script>
-        
-        
         // ========== DARK MODE FUNCTIONALITY ==========
         const darkModeToggle = document.getElementById('dark-mode-toggle');
         const darkModeToggleMobile = document.getElementById('dark-mode-toggle-mobile');
@@ -594,13 +753,12 @@
         }
 
         async function refreshData() {
-            const authToken = localStorage.getItem('authToken');
             showNotification('🔄 Memperbarui data...', 'success');
             
             // Reload user data and menu
             await Promise.all([
-                fetchUserData(authToken),
-                loadRecommendations(authToken)
+                fetchUserData(),
+                loadRecommendations()
             ]);
             
             updateCartCount();
@@ -681,67 +839,153 @@
         const userGreetingName = document.getElementById('user-greeting-name');
         const deliveryAddress = document.getElementById('delivery-address');
         const cartItemCount = document.getElementById('cart-item-count');
+        const cartItemCountMobile = document.getElementById('cart-item-count-mobile');
         
         let allMenuItems = [];
         let currentCategory = 'all';
+        let isLoggedIn = false; // Tambahkan flag untuk melihat status login
 
-        function handleLogout() {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('userPhone');
-            localStorage.removeItem('userName');
-            window.location.href = 'login.html';
+        // Fungsi untuk memeriksa status login
+        function checkLoginStatus() {
+            const token = localStorage.getItem('authToken');
+            isLoggedIn = !!token;
+            return isLoggedIn;
         }
-        
-        async function fetchUserData(token) {
-            try {
-                const defaultName = localStorage.getItem('userName') || 'Pelanggan';
-                userGreetingName.textContent = defaultName.split(' ')[0];
-                deliveryAddress.textContent = 'Memuat Alamat...';
 
+        // Fungsi untuk mengambil data pengguna
+        async function fetchUserData() {
+            try {
+                const token = localStorage.getItem('authToken');
+                
+                if (!token) {
+                    // Jika tidak ada token, tampilkan data default
+                    userGreetingName.textContent = 'Pengguna';
+                    deliveryAddress.textContent = 'Silakan login untuk mengatur alamat pengiriman';
+                    return;
+                }
+
+                // Ambil data pengguna dari API
                 const response = await fetch(`${BASE_URL}/api/profile`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
                 if (response.status === 401 || response.status === 403) {
-                    handleLogout();
+                    // Token tidak valid, logout otomatis
+                    localStorage.removeItem('authToken');
+                    userGreetingName.textContent = 'Pengguna';
+                    deliveryAddress.textContent = 'Silakan login untuk mengatur alamat pengiriman';
                     return;
                 }
 
                 if (!response.ok) throw new Error('Gagal memuat data');
 
                 const data = await response.json();
-
+                
+                // Tampilkan nama pengguna
                 if (data.name) {
-                    localStorage.setItem('userName', data.name);
                     userGreetingName.textContent = data.name.split(' ')[0];
                 }
                 
-                const mainAddress = data.address_main;
-                let addressText = 'Alamat belum diatur';
-                if (mainAddress && mainAddress.full_address_text) {
-                    addressText = mainAddress.full_address_text;
+                // Tampilkan alamat pengguna
+                if (data.address_main && data.address_main.full_address_text) {
+                    deliveryAddress.textContent = data.address_main.full_address_text;
+                } else {
+                    deliveryAddress.textContent = 'Alamat belum diatur';
                 }
-                deliveryAddress.textContent = addressText;
                 
             } catch (error) {
                 console.error('Error fetching user data:', error);
-                userGreetingName.textContent = 'Pelanggan';
+                userGreetingName.textContent = 'Pengguna';
                 deliveryAddress.textContent = 'Gagal memuat alamat';
             }
         }
 
+        // Fungsi untuk menangani klik pada bagian alamat
+        function setupAddressSectionClickHandler() {
+            const addressSection = document.getElementById('address-section');
+            
+            if (addressSection) {
+                addressSection.addEventListener('click', () => {
+                    if (checkLoginStatus()) {
+                        // Jika sudah login, arahkan ke halaman profil dengan tab alamat
+                        window.location.href = 'profile.html?tab=address';
+                    } else {
+                        // Jika belum login, tampilkan notifikasi dan arahkan ke halaman login
+                        showNotification('⚠️ Silakan login terlebih dahulu', 'error');
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 2000);
+                    }
+                });
+            }
+        }
+
+        // Fungsi untuk memperbarui tampilan berdasarkan status login
+        function updateUIBasedOnLoginStatus() {
+            if (checkLoginStatus()) {
+                // Jika sudah login, ambil data pengguna
+                fetchUserData();
+            } else {
+                // Jika belum login, tampilkan data default
+                userGreetingName.textContent = 'Pengguna';
+                deliveryAddress.textContent = 'Silakan login untuk mengatur alamat pengiriman';
+            }
+            
+            // Setup event listener untuk bagian alamat
+            setupAddressSectionClickHandler();
+        }
+
+        // Fungsi untuk logout
+        function handleLogout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userPhone');
+            localStorage.removeItem('userName');
+            isLoggedIn = false;
+            updateUIBasedOnLoginStatus();
+            window.location.href = 'login.html';
+        }
+
+        // Fungsi untuk login (setelah berhasil login dari halaman login)
+        function handleLoginSuccess(token, userData) {
+            localStorage.setItem('authToken', token);
+            if (userData.name) {
+                localStorage.setItem('userName', userData.name);
+            }
+            if (userData.phone) {
+                localStorage.setItem('userPhone', userData.phone);
+            }
+            isLoggedIn = true;
+            updateUIBasedOnLoginStatus();
+        }
+
         // ========== MENU LOADING ==========
-        async function loadRecommendations(token) {
+        async function loadRecommendations() {
             const container = document.getElementById('recommendation-list-container');
             
             try {
-                const res = await fetch(`${BASE_URL}/api/menu/admin`, {
-                    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                // Menggunakan endpoint publik yang tidak memerlukan token
+                const res = await fetch(`${BASE_URL}/api/menu/public`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // Tidak ada header Authorization
+                    }
                 });
 
-                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
-                allMenuItems = await res.json();
+                if (!res.ok) {
+                    // Jika masih gagal, coba endpoint admin tanpa token
+                    if (res.status === 401) {
+                        console.log('Endpoint publik masih memerlukan autentikasi, mencoba endpoint admin...');
+                        const adminRes = await fetch(`${BASE_URL}/api/menu/admin`);
+                        if (!adminRes.ok) throw new Error(`HTTP error! status: ${adminRes.status}`);
+                        allMenuItems = await adminRes.json();
+                    } else {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                } else {
+                    allMenuItems = await res.json();
+                }
+                
                 renderRecommendations(allMenuItems);
 
             } catch (err) {
@@ -757,112 +1001,117 @@
                 `;
             }
         }
-function renderRecommendations(menuItems) {
-    const container = document.getElementById('recommendation-list-container');
-    container.innerHTML = '';
 
-    if (menuItems.length === 0) {
-        container.innerHTML = `
-            <div class="col-span-full text-center py-12">
-                <i class="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
-                <p class="text-neutral-text">Belum ada menu tersedia</p>
-            </div>
-        `;
-        return;
-    }
+        function renderRecommendations(menuItems) {
+            const container = document.getElementById('recommendation-list-container');
+            container.innerHTML = '';
 
-    menuItems.forEach((item, index) => {
-        const card = document.createElement('div');
-        card.className = "product-card bg-card-light dark:bg-card-dark rounded-2xl shadow-lg overflow-hidden cursor-pointer animate-scale-in";
-        card.style.animationDelay = `${index * 0.05}s`;
-
-        // ✅ Ambil semua gambar dari image_urls (bisa string JSON atau array)
-        const imageUrls = item.image_urls 
-            ? (typeof item.image_urls === 'string' ? JSON.parse(item.image_urls) : item.image_urls)
-            : (item.image_url ? [item.image_url] : []);
-
-        // ✅ Generate HTML untuk setiap gambar dalam slider
-        const imagesHtml = imageUrls.length > 0 
-            ? imageUrls.map(url => {
-                const fullUrl = url.startsWith('http') 
-                    ? url 
-                    : `${BASE_URL}/uploads/menu/${url}`;
-                return `
-                    <div class="swiper-slide">
-                        <img src="${fullUrl}" alt="${item.name}" class="w-full h-36 object-cover" 
-                            onerror="this.src='https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'">
-                    </div>`;
-            }).join('')
-            : `
-                <div class="swiper-slide">
-                    <img src="https://placehold.co/400x300/e2e8f0/64748b?text=No+Image" 
-                         class="w-full h-36 object-cover">
-                </div>`;
-
-        // ✅ Bangun isi kartu produk
-        const priceText = item.price ? `Rp ${parseInt(item.price).toLocaleString('id-ID')}` : 'Hubungi';
-        card.innerHTML = `
-            <div class="relative bg-gray-200 dark:bg-gray-700 rounded-t-2xl overflow-hidden">
-                <!-- Swiper Container -->
-                <div class="swiper mySwiper-${index}">
-                    <div class="swiper-wrapper">
-                        ${imagesHtml}
+            if (menuItems.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <i class="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-neutral-text">Belum ada menu tersedia</p>
                     </div>
-                    <div class="swiper-pagination"></div>
-                </div>
-
-                ${item.promo 
-                    ? `<span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">${item.promo}</span>` 
-                    : ''}
-                ${!item.is_available 
-                    ? `<div class="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span class="text-white font-bold">Tidak Tersedia</span>
-                       </div>` 
-                    : ''}
-            </div>
-
-            <div class="p-4">
-                <h4 class="font-bold text-base line-clamp-2 mb-2 min-h-[2.5rem]">${item.name}</h4>
-                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2 flex items-center">
-                    <i class="fas fa-tag mr-1"></i>
-                    ${item.category || 'Lainnya'}
-                </p>
-                <div class="flex items-center justify-between mt-3">
-                    <div class="flex items-center text-sm">
-                        <span class="text-yellow-500 mr-1"><i class="fas fa-star"></i></span>
-                        <span class="font-semibold">${item.rating || '4.5'}</span>
-                    </div>
-                </div>
-                <div class="mt-3 flex items-center justify-between">
-                    <span class="text-cool-primary dark:text-cool-accent font-bold text-lg">${priceText}</span>
-                    <button class="bg-cool-primary hover:bg-blue-700 text-white p-2 rounded-lg transition-all transform hover:scale-110 shadow-md" onclick="addToCart(${item.id}, event)">
-                        <i class="fas fa-plus text-sm"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-
-        // Event klik kartu → buka detail produk
-        card.addEventListener('click', (e) => {
-            if (!e.target.closest('button')) {
-                showProductDetail(item);
+                `;
+                return;
             }
-        });
 
-        container.appendChild(card);
-    });
+            menuItems.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = "product-card bg-card-light dark:bg-card-dark rounded-2xl shadow-lg overflow-hidden cursor-pointer animate-scale-in";
+                card.style.animationDelay = `${index * 0.05}s`;
 
-    // ✅ Setelah semua kartu dirender, aktifkan semua slider Swiper
-    setTimeout(() => {
-        document.querySelectorAll('.swiper').forEach((el) => {
-            new Swiper(el, {
-                loop: true,
-                autoplay: { delay: 2500, disableOnInteraction: false },
-                pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
+                // Ambil semua gambar dari image_urls (bisa string JSON atau array)
+                const imageUrls = item.image_urls 
+                    ? (typeof item.image_urls === 'string' ? JSON.parse(item.image_urls) : item.image_urls)
+                    : (item.image_url ? [item.image_url] : []);
+
+                // Generate HTML untuk setiap gambar dalam slider
+                const imagesHtml = imageUrls.length > 0 
+                    ? imageUrls.map(url => {
+                        const fullUrl = url.startsWith('http') 
+                            ? url 
+                            : `${BASE_URL}/uploads/menu/${url}`;
+                        return `
+                            <div class="swiper-slide">
+                                <img src="${fullUrl}" alt="${item.name}" class="w-full h-36 object-cover" 
+                                    onerror="this.src='https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'">
+                            </div>`;
+                    }).join('')
+                    : `
+                        <div class="swiper-slide">
+                            <img src="https://placehold.co/400x300/e2e8f0/64748b?text=No+Image" 
+                                 class="w-full h-36 object-cover">
+                        </div>`;
+
+                // Bangun isi kartu produk
+                const priceText = item.price ? `Rp ${parseInt(item.price).toLocaleString('id-ID')}` : 'Hubungi';
+                card.innerHTML = `
+                        <div 
+                class="menu-card bg-white dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group border border-gray-100 dark:border-gray-800 cursor-pointer"
+                onclick="openProductDetail(${item.id}, '${item.category}')"
+                >
+                    <div class="relative bg-gray-200 dark:bg-gray-700 rounded-t-2xl overflow-hidden">
+                        <!-- Swiper Container -->
+                        <div class="swiper mySwiper-${index}">
+                            <div class="swiper-wrapper">
+                                ${imagesHtml}
+                            </div>
+                            <div class="swiper-pagination"></div>
+                        </div>
+
+                        ${item.promo 
+                            ? `<span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">${item.promo}</span>` 
+                            : ''}
+                        ${!item.is_available 
+                            ? `<div class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <span class="text-white font-bold">Tidak Tersedia</span>
+                               </div>` 
+                            : ''}
+                    </div>
+
+                    <div class="p-4">
+                        <h4 class="font-bold text-base line-clamp-2 mb-2 min-h-[2.5rem]">${item.name}</h4>
+                        <p class="text-xs text-neutral-text dark:text-gray-400 mb-2 flex items-center">
+                            <i class="fas fa-tag mr-1"></i>
+                            ${item.category || 'Lainnya'}
+                        </p>
+                        <div class="flex items-center justify-between mt-3">
+                            <div class="flex items-center text-sm">
+                                <span class="text-yellow-500 mr-1"><i class="fas fa-star"></i></span>
+                                <span class="font-semibold">${item.rating || '4.5'}</span>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex items-center justify-between">
+                            <span class="text-cool-primary dark:text-cool-accent font-bold text-lg">${priceText}</span>
+                            <button class="bg-cool-primary hover:bg-blue-700 text-white p-2 rounded-lg transition-all transform hover:scale-110 shadow-md" onclick="${checkLoginStatus() ? `addToCart(${item.id}, event)` : `showLoginPrompt(event)`}">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                // Event klik kartu → buka detail produk
+                card.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        showProductDetail(item);
+                    }
+                });
+
+                container.appendChild(card);
             });
-        });
-    }, 100);
-}
+
+            // Setelah semua kartu dirender, aktifkan semua slider Swiper
+            setTimeout(() => {
+                document.querySelectorAll('.swiper').forEach((el) => {
+                    new Swiper(el, {
+                        loop: true,
+                        autoplay: { delay: 2500, disableOnInteraction: false },
+                        pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
+                    });
+                });
+            }, 100);
+        }
 
         // ========== CATEGORY FILTER ==========
         document.querySelectorAll('.category-tab').forEach(tab => {
@@ -888,115 +1137,6 @@ function renderRecommendations(menuItems) {
         });
 
         // ========== PRODUCT DETAIL MODAL ==========
-function showProductDetail(item) {
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in';
-    modal.onclick = (e) => {
-        if (e.target === modal) modal.remove();
-    };
-
-    // ✅ Ambil semua gambar dari image_urls atau image_url
-    const imageUrls = item.image_urls 
-        ? (typeof item.image_urls === 'string' ? JSON.parse(item.image_urls) : item.image_urls)
-        : (item.image_url ? [item.image_url] : []);
-
-    const imagesHtml = imageUrls.length > 0
-        ? imageUrls.map(url => {
-            const fullUrl = url.startsWith('http') ? url : `${BASE_URL}/uploads/menu/${url}`;
-            return `
-                <div class="swiper-slide">
-                    <img src="${fullUrl}" alt="${item.name}" 
-                         class="w-full h-72 object-cover select-none"
-                         onerror="this.src='https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'">
-                </div>`;
-        }).join('')
-        : `
-            <div class="swiper-slide">
-                <img src="https://placehold.co/400x300/e2e8f0/64748b?text=No+Image" 
-                     class="w-full h-72 object-cover">
-            </div>
-        `;
-
-    const priceText = item.price 
-        ? `Rp ${parseInt(item.price).toLocaleString('id-ID')}` 
-        : 'Hubungi';
-
-    modal.innerHTML = `
-        <div class="bg-card-light dark:bg-card-dark rounded-2xl max-w-md w-full max-h-[95vh] overflow-y-auto animate-scale-in relative">
-
-            <!-- Tombol close -->
-            <button class="absolute top-3 right-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-white w-10 h-10 rounded-full shadow-md hover:scale-110 transition-transform z-20" onclick="this.closest('.fixed').remove()">
-                <i class="fas fa-times"></i>
-            </button>
-
-            <!-- ✅ Swiper Slider -->
-            <div class="swiper productSwiper">
-                <div class="swiper-wrapper">
-                    ${imagesHtml}
-                </div>
-                <div class="swiper-pagination"></div>
-            </div>
-
-            <div class="p-6">
-                <h3 class="text-2xl font-bold mb-2">${item.name}</h3>
-                
-                <div class="flex items-center space-x-4 mb-4">
-                    <div class="flex items-center text-yellow-500">
-                        <i class="fas fa-star mr-1"></i>
-                        <span class="font-semibold">${item.rating || '4.5'}</span>
-                    </div>
-                    <span class="text-neutral-text text-sm">
-                        <i class="fas fa-tag mr-1"></i>
-                        ${item.category || 'Lainnya'}
-                    </span>
-                </div>
-
-                <p class="text-neutral-text dark:text-gray-400 mb-4 text-sm leading-relaxed">
-                    ${item.description || 'Produk berkualitas tinggi dengan rasa dan tampilan menarik. Wajib dicoba!'}
-                </p>
-
-                <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-2xl font-bold text-cool-primary dark:text-cool-accent">${priceText}</span>
-                        ${!item.is_available 
-                            ? '<span class="text-red-500 font-semibold">Tidak Tersedia</span>' 
-                            : ''}
-                    </div>
-
-                    <div class="flex items-center space-x-2 mb-4">
-                        <button class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" onclick="decreaseQty()">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                        <input type="number" id="qty-input" value="1" min="1" 
-                            class="w-16 text-center border-2 border-gray-200 dark:border-gray-600 rounded-lg py-2 dark:bg-gray-700" readonly>
-                        <button class="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors" onclick="increaseQty()">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <button class="w-full bg-gradient-to-r from-cool-primary to-blue-600 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-105 shadow-lg ${!item.is_available ? 'opacity-50 cursor-not-allowed' : ''}" 
-                    onclick="${item.is_available ? `addToCartWithQty(${item.id})` : ''}" 
-                    ${!item.is_available ? 'disabled' : ''}>
-                    <i class="fas fa-shopping-cart mr-2"></i>
-                    ${item.is_available ? 'Tambah ke Keranjang' : 'Stok Habis'}
-                </button>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    // ✅ Inisialisasi Swiper (setelah modal muncul)
-    setTimeout(() => {
-        new Swiper('.productSwiper', {
-            loop: true,
-            pagination: { el: '.swiper-pagination', clickable: true },
-            autoplay: { delay: 2500, disableOnInteraction: false },
-        });
-    }, 100);
-}
-
         // ========== CART FUNCTIONS ==========
         async function addToCart(itemId, event) {
             if (event) event.stopPropagation();
@@ -1079,20 +1219,39 @@ function showProductDetail(item) {
             }
         }
 
+        function showLoginPrompt(event) {
+            if (event) event.stopPropagation();
+            
+            showNotification('⚠️ Silakan login terlebih dahulu untuk menambahkan ke keranjang', 'error');
+            
+            // Opsi: Alihkan ke halaman login
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        }
+
         function updateCartCount() {
-            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            cartItemCount.textContent = totalItems;
+            if (checkLoginStatus()) {
+                // Jika sudah login, ambil data keranjang dari API
+                refreshCartCountFromAPI();
+            } else {
+                // Jika belum login, tampilkan 0
+                cartItemCount.textContent = '0';
+                cartItemCountMobile.textContent = '0';
+            }
         }
 
         async function refreshCartCountFromAPI(){
             try {
                 const token = localStorage.getItem('authToken');
+                if (!token) return;
+                
                 const res = await fetch(`${BASE_URL}/api/cart`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (!res.ok) return;
                 const data = await res.json();
                 const total = (data.items||[]).reduce((s,it)=> s + (it.quantity||0), 0);
                 cartItemCount.textContent = total;
+                cartItemCountMobile.textContent = total;
             } catch {}
         }
 
@@ -1132,53 +1291,364 @@ function showProductDetail(item) {
         }
 
         // ========== SEARCH FUNCTIONALITY ==========
-        const searchInputs = [document.getElementById('search-input'), document.getElementById('search-input-mobile')];
-        
-        searchInputs.forEach(searchInput => {
-            if (searchInput) {
-                searchInput.addEventListener('input', (e) => {
-                    const query = e.target.value.toLowerCase();
-                    if (query === '') {
-                        renderRecommendations(allMenuItems);
-                        return;
-                    }
-                    
-                    const filtered = allMenuItems.filter(item => 
-                        item.name.toLowerCase().includes(query) ||
-                        (item.category && item.category.toLowerCase().includes(query)) ||
-                        (item.description && item.description.toLowerCase().includes(query))
-                    );
-                    
-                    renderRecommendations(filtered);
-                });
-            }
-        });
+// ========== SEARCH FUNCTIONALITY ==========
+// ========== SEARCH FUNCTIONALITY ==========
+// ========================
+// Variables
+// ========================
+const searchInputs = [
+    document.getElementById('search-input'),
+    document.getElementById('search-input-mobile')
+];
 
-        // ========== INITIALIZATION ==========
-        document.addEventListener('DOMContentLoaded', () => {
-            const authToken = localStorage.getItem('authToken');
-            
-            if (!authToken) {
-                handleLogout();
-                return;
-            }
-            
-            fetchUserData(authToken);
-            loadRecommendations(authToken);
-            // Sinkron badge cart dari API
-            refreshCartCountFromAPI();
-            
-            showSlide(currentSlideIndex);
-            startAutoSlide();
-        });
+let hiddenElements = [];
+let isSearchMode = false;
 
-        // Address click handler
-        const addressSection = document.getElementById('address-section');
-        if (addressSection) {
-            addressSection.addEventListener('click', () => {
-                window.location.href = 'profile.html?tab=address';
+// ========================
+// Utility Functions
+// ========================
+
+// Cek null-safe
+function safeLower(str) {
+    return (str || '').toLowerCase();
+}
+
+// ========================
+// Search Indicator
+// ========================
+function createSearchIndicator() {
+    const indicator = document.createElement('div');
+    indicator.id = 'search-indicator';
+    indicator.className = 'mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg';
+    indicator.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <i class="fas fa-search text-blue-600 dark:text-blue-400 mr-3"></i>
+                <span class="text-blue-800 dark:text-blue-200 font-medium">Mode Pencarian Aktif</span>
+            </div>
+            <button class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    indicator.querySelector('button').addEventListener('click', exitSearchMode);
+    return indicator;
+}
+
+function addSearchIndicator() {
+    const mainContent = document.getElementById('main-content');
+    if (!mainContent || document.getElementById('search-indicator')) return;
+
+    const indicator = createSearchIndicator();
+    mainContent.insertBefore(indicator, mainContent.firstChild);
+}
+
+function removeSearchIndicator() {
+    const indicator = document.getElementById('search-indicator');
+    if (indicator) indicator.remove();
+}
+
+// ========================
+// Search Mode
+// ========================
+function enterSearchMode() {
+    const mainContent = document.getElementById('main-content');
+    if (!mainContent) return;
+
+    hiddenElements = []; // reset
+    const selectorsToHide = [
+        '.mb-8.p-6', // Welcome Section
+        '.mb-6', // Services Grid heading
+        '.grid.grid-cols-4', // Services Grid
+        '.relative.mb-6', // Promo Slider
+        '#slider-dots', // Slider Dots
+        '.flex.space-x-2.mb-6', // Category Tabs
+        '.flex.justify-between.items-center.mb-6' // Products Section heading
+    ];
+
+    selectorsToHide.forEach(sel => {
+        mainContent.querySelectorAll(sel).forEach(el => {
+            el.style.display = 'none';
+            hiddenElements.push(el);
+        });
+    });
+
+    isSearchMode = true;
+    addSearchIndicator();
+}
+
+function exitSearchMode() {
+    // Kembalikan semua elemen yang disembunyikan
+    hiddenElements.forEach(el => {
+        el.style.display = '';
+    });
+    hiddenElements = [];
+    isSearchMode = false;
+
+    // Hapus indikator mode pencarian
+    removeSearchIndicator();
+
+    // Reset rekomendasi produk ke awal
+    renderRecommendations(allMenuItems);
+
+    // Hapus text search hasil
+    const resultText = document.getElementById('search-result-text');
+    if (resultText) resultText.textContent = '';
+}
+
+
+// ========================
+// Loading Skeleton
+// ========================
+function showSearchLoading() {
+    const container = document.getElementById('recommendation-list-container');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="col-span-full text-center py-8">
+            <div class="inline-flex items-center px-4 py-2 bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 rounded-full mb-4">
+                <i class="fas fa-spinner fa-spin mr-2"></i>
+                <span class="font-medium">Mencari...</span>
+            </div>
+        </div>
+        ${Array(4).fill('').map(() => `
+            <div class="skeleton-card">
+                <div class="skeleton h-32 rounded-t-xl"></div>
+                <div class="p-3">
+                    <div class="skeleton h-4 w-3/4 rounded mb-2"></div>
+                    <div class="skeleton h-3 w-1/2 rounded mb-2"></div>
+                    <div class="skeleton h-4 w-1/3 rounded"></div>
+                </div>
+            </div>
+        `).join('')}
+    `;
+}
+
+// ========================
+// Search Function
+// ========================
+function addSearchSuggestions() {
+    const container = document.getElementById('search-suggestions-container');
+    if (!container) return;
+
+    // Ambil kategori unik + item populer (maks 5)
+    const categories = [...new Set(allMenuItems.map(item => item.category).filter(Boolean))];
+    const popularItems = allMenuItems.slice(0, 5).map(item => item.name);
+
+    const suggestions = [...categories.slice(0, 3), ...popularItems.slice(0, 2)];
+
+    container.innerHTML = suggestions.map(s => `
+        <button 
+            class="search-suggestion-btn px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            onclick="searchFromSuggestion('${s}')"
+        >
+            ${s}
+        </button>
+    `).join('');
+}
+
+function addSearchHistory() {
+    const container = document.getElementById('search-history-container');
+    if (!container) return;
+
+    // Ambil history dari localStorage
+    let history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+
+    container.innerHTML = history.slice(-5).reverse().map(term => `
+        <button 
+            class="search-suggestion-btn px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            onclick="searchFromSuggestion('${term}')"
+        >
+            ${term}
+        </button>
+    `).join('');
+}
+
+// Simpan pencarian ke history
+function saveSearchToHistory(query) {
+    if (!query || query.trim() === '') return;
+
+    let history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+    // Hapus jika sudah ada, agar unik
+    history = history.filter(h => h.toLowerCase() !== query.toLowerCase());
+    history.push(query);
+    localStorage.setItem('searchHistory', JSON.stringify(history));
+    addSearchHistory(); // update UI
+}
+
+// Update performSearch untuk simpan ke history
+function performSearch(query) {
+    if (!query || query.trim() === '') {
+        exitSearchMode();
+        return;
+    }
+
+    saveSearchToHistory(query); // simpan ke localStorage
+    if (!isSearchMode) enterSearchMode();
+
+    const filtered = allMenuItems.filter(item => {
+        const searchTerm = query.toLowerCase().trim();
+        return (
+            item.name.toLowerCase().includes(searchTerm) ||
+            (item.category && item.category.toLowerCase().includes(searchTerm)) ||
+            (item.description && item.description.toLowerCase().includes(searchTerm)) ||
+            (item.location_name && item.location_name.toLowerCase().includes(searchTerm))
+        );
+    });
+
+    // Bersihkan container sebelum render
+    const container = document.getElementById('recommendation-list-container');
+    if (container) container.innerHTML = '';
+
+    renderRecommendations(filtered);
+
+    filtered.length > 0 ? showSearchResults(query, filtered) : showNoResults(query);
+}
+
+
+// ========================
+// Search Results / No Results
+// ========================
+function showSearchResults(query, results) {
+    let resultText = document.getElementById('search-result-text');
+
+    // Kalau belum ada, buat satu
+    if (!resultText) {
+        resultText = document.createElement('span');
+        resultText.id = 'search-result-text';
+        const container = document.getElementById('recommendation-list-container');
+        container.parentNode.insertBefore(resultText, container);
+    }
+
+    // Update text
+    resultText.textContent = `Ditemukan ${results.length} hasil untuk "${query}"`;
+
+    showNotification(`🔍 Ditemukan ${results.length} hasil untuk "${query}"`, 'success');
+}
+
+function showNoResults(query) {
+    const container = document.getElementById('recommendation-list-container');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="col-span-full text-center py-12">
+            <div class="max-w-md mx-auto">
+                <i class="fas fa-search text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">Tidak ada hasil ditemukan</h3>
+                <p class="text-gray-500 dark:text-gray-500 mb-6">Coba kata kunci lain atau periksa ejaan Anda</p>
+            </div>
+        </div>
+    `;
+
+    let resultText = document.getElementById('search-result-text');
+    if (resultText) resultText.textContent = `Tidak ada hasil untuk "${query}"`;
+
+    showNotification(`❌ Tidak ada hasil untuk "${query}"`, 'error');
+}
+
+// ========================
+// Search Suggestions
+// ========================
+function getSearchSuggestions() {
+    const categories = [...new Set(allMenuItems.map(item => item.category).filter(Boolean))];
+    const popularItems = allMenuItems.slice(0, 5).map(item => item.name);
+    return [...categories.slice(0,3), ...popularItems.slice(0,2)];
+}
+
+function searchFromSuggestion(query) {
+    searchInputs.forEach(input => {
+        if (input) {
+            input.value = query;
+            performSearch(query);
+        }
+    });
+}
+
+// ========================
+// Clear Search Button
+// ========================
+function addClearSearchFeature() {
+    searchInputs.forEach(input => {
+        if (!input) return;
+        if (!input.parentNode.classList.contains('relative')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'relative';
+            input.parentNode.insertBefore(wrapper, input);
+            wrapper.appendChild(input);
+
+            const clearBtn = document.createElement('button');
+            clearBtn.type = 'button';
+            clearBtn.className = 'absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors hidden';
+            clearBtn.innerHTML = '<i class="fas fa-times-circle"></i>';
+            clearBtn.setAttribute('aria-label', 'Clear search');
+
+            wrapper.appendChild(clearBtn);
+
+            clearBtn.addEventListener('click', () => {
+                input.value = '';
+                performSearch('');
+                input.focus();
+                clearBtn.classList.add('hidden');
+            });
+
+            input.addEventListener('input', e => {
+                if (e.target.value) clearBtn.classList.remove('hidden');
+                else clearBtn.classList.add('hidden');
             });
         }
+    });
+}
+
+// ========================
+// Event Listeners
+// ========================
+function initSearch() {
+    searchInputs.forEach(input => {
+        if (!input) return;
+
+        let timeout;
+        input.addEventListener('input', e => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => performSearch(e.target.value), 300);
+        });
+
+        input.addEventListener('keypress', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch(e.target.value);
+            }
+        });
+
+        input.addEventListener('search', e => performSearch(''));
+    });
+}
+
+function openProductDetail(id, category) {
+  // Simpan info produk di localStorage
+  localStorage.setItem('selectedProductId', id);
+  localStorage.setItem('selectedCategory', category);
+  
+  // Arahkan ke halaman detail
+  window.location.href = 'produk.html';
+}
+
+// ========================
+// Initialization
+// ========================
+document.addEventListener('DOMContentLoaded', () => {
+    updateUIBasedOnLoginStatus();
+    loadRecommendations().then(() => {
+        addClearSearchFeature();
+        addSearchSuggestions(); // optional
+        addSearchHistory(); // optional
+    });
+
+    initSearch();
+
+    showSlide(currentSlideIndex);
+    startAutoSlide();
+});
+
     </script>
 </body>
 </html>

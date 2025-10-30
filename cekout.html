@@ -391,6 +391,10 @@
 <script src="config.js"></script>
 <script>
     
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    console.log('Produk yang dipilih:', productId);
+
     const SHIPPING_COST = 10000;
     
     let cart = [];
@@ -408,15 +412,34 @@
         'HEMAT25K': { type: 'fixed', value: 25000, minPurchase: 100000 },
     };
 
-    // ========== LOAD CART FROM API ==========
+    // ========== LOAD CART FROM API OR LOCALSTORAGE ==========
     async function loadCart() {
         try {
+            // Cek apakah ada data keranjang dari localStorage (dari halaman detail produk)
+            const localCart = localStorage.getItem('cart');
+            
+            if (localCart) {
+                // Jika ada, gunakan data dari localStorage
+                cart = JSON.parse(localCart);
+                console.log('Using cart from localStorage:', cart);
+                
+                // Hapus data dari localStorage agar tidak digunakan lagi
+                localStorage.removeItem('cart');
+                
+                renderCart();
+                updateSummary();
+                loadAddresses();
+                return;
+            }
+            
+            // Jika tidak ada, coba muat dari API
             const token = localStorage.getItem('authToken');
             if (!token) {
                 console.warn('No auth token found');
                 cart = [];
                 renderCart();
                 updateSummary();
+                loadAddresses();
                 return;
             }
             
@@ -433,16 +456,15 @@
             }));
             renderCart();
             updateSummary();
+            loadAddresses();
             
-            // Jangan hitung ongkir di sini, tunggu sampai alamat dipilih
-            // Tampilkan pesan bahwa ongkir akan dihitung setelah alamat dipilih
-            updateShippingPrompt();
         } catch (e) {
             console.error('Load cart error:', e);
             showNotification('⚠️ Gagal memuat keranjang', 'error');
             cart = [];
             renderCart();
             updateSummary();
+            loadAddresses();
         }
     }
 
@@ -687,119 +709,108 @@
     }
 
     // ========== RENDER CART ITEMS ==========
-    function renderCart() {
-        const container = document.getElementById('cart-items-container');
-        const emptyState = document.getElementById('empty-cart-state');
-        const summary = document.getElementById('cart-summary');
+// ========== RENDER CART ITEMS ==========
+function renderCart() {
+    const container = document.getElementById('cart-items-container');
+    const emptyState = document.getElementById('empty-cart-state');
+    const summary = document.getElementById('cart-summary');
 
-        if (cart.length === 0) {
-            container.classList.add('hidden');
-            emptyState.classList.remove('hidden');
-            summary.classList.add('hidden');
-            document.getElementById('address-section').classList.add('hidden');
-            return;
-        }
+    if (cart.length === 0) {
+        container.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        summary.classList.add('hidden');
+        document.getElementById('address-section').classList.add('hidden');
+        return;
+    }
 
-        container.classList.remove('hidden');
-        emptyState.classList.add('hidden');
-        summary.classList.remove('hidden');
-        container.innerHTML = '';
+    container.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+    summary.classList.remove('hidden');
+    container.innerHTML = '';
 
-        cart.forEach((item, index) => {
-            const itemTotal = item.price * item.quantity;
-            let imageUrl = '';
-    
-            // Coba ambil dari image_urls (array) atau image_url (string)
-            if (item.image_urls && item.image_urls.length > 0) {
-                // Jika image_urls adalah string JSON, parse dulu
-                const imageUrls = typeof item.image_urls === 'string' 
-                                   ? JSON.parse(item.image_urls) 
-                                   : item.image_urls;
-                // Ambil URL pertama dari array
-                imageUrl = imageUrls[0];
-            } else if (item.image_url) {
-                // Jika ada image_url (single image)
-                imageUrl = item.image_url;
-            }
-                    
-            // PERBAIKAN: Konstruksi URL gambar dengan benar
-            // Jika imageUrl adalah path relatif (tidak dimulai dengan http), tambahkan BASE_URL
-            // Jika imageUrl sudah URL lengkap, gunakan apa adanya
-            let fullImageUrl = '';
-            if (imageUrl) {
-                if (imageUrl.startsWith('http')) {
-                    // Sudah URL lengkap
-                    fullImageUrl = imageUrl;
-                } else if (imageUrl.startsWith('/')) {
-                    // Path relatif dari root
-                    fullImageUrl = `${BASE_URL}${imageUrl}`;
-                } else {
-                    // Path relatif dari uploads/menu
-                    fullImageUrl = `${BASE_URL}/uploads/menu/${imageUrl}`;
-                }
+    cart.forEach((item, index) => {
+        const itemTotal = item.price * item.quantity;
+        
+        // PERBAIKAN: Ambil URL gambar dengan benar
+        let fullImageUrl = '';
+        
+        // Cek apakah item memiliki properti 'image' atau 'image_url'
+        const imageUrl = item.image || item.image_url;
+        
+        if (imageUrl) {
+            if (imageUrl.startsWith('http')) {
+                // Jika sudah URL lengkap, gunakan apa adanya
+                fullImageUrl = imageUrl;
+            } else if (imageUrl.startsWith('/')) {
+                // Jika path relatif dari root
+                fullImageUrl = `${BASE_URL}${imageUrl}`;
             } else {
-                // Tidak ada gambar, gunakan placeholder
-                fullImageUrl = 'https://placehold.co/300x200/e2e8f0/64748b?text=No+Image';
+                // Jika hanya nama file, tambahkan path uploads/menu
+                fullImageUrl = `${BASE_URL}/uploads/menu/${imageUrl}`;
             }
+        } else {
+            // Jika tidak ada gambar, gunakan placeholder
+            fullImageUrl = 'https://placehold.co/300x200/e2e8f0/64748b?text=No+Image';
+        }
+        
+        // Tampilkan ongkir per item jika sudah dihitung
+        let itemShippingInfo = '';
+        if (shippingCosts[item.id]) {
+            const cost = shippingCosts[item.id].cost;
+            const distance = shippingCosts[item.id].distance;
+            itemShippingInfo = `
+                <p class="text-xs text-neutral-text">
+                    <i class="fas fa-truck mr-1"></i>
+                    Ongkir: Rp ${cost.toLocaleString('id-ID')}
+                    ${distance ? `(${distance.toFixed(2)} km)` : ''}
+                </p>
+            `;
+        }
+        
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item bg-card-light dark:bg-card-dark rounded-xl shadow-md p-4 flex items-center space-x-4 animate-slide-up';
+        cartItem.style.animationDelay = `${index * 0.05}s`;
+        
+        cartItem.innerHTML = `
+            <div class="flex-shrink-0">
+                <img src="${fullImageUrl}" alt="${item.name}" class="w-20 h-20 object-cover rounded-lg">
+            </div>
             
-            // Tampilkan ongkir per item jika sudah dihitung
-            let itemShippingInfo = '';
-            if (shippingCosts[item.id]) {
-                const cost = shippingCosts[item.id].cost;
-                const distance = shippingCosts[item.id].distance;
-                itemShippingInfo = `
-                    <p class="text-xs text-neutral-text">
-                        <i class="fas fa-truck mr-1"></i>
-                        Ongkir: Rp ${cost.toLocaleString('id-ID')}
-                        ${distance ? `(${distance.toFixed(2)} km)` : ''}
-                    </p>
-                `;
-            }
-            
-            const cartItem = document.createElement('div');
-            cartItem.className = 'cart-item bg-card-light dark:bg-card-dark rounded-xl shadow-md p-4 flex items-center space-x-4 animate-slide-up';
-            cartItem.style.animationDelay = `${index * 0.05}s`;
-            console.log('Rendering item image URL:', fullImageUrl);
-            cartItem.innerHTML = `
-                <div class="flex-shrink-0">
-                    <img src="${fullImageUrl}" alt="${item.name}" class="w-20 h-20 object-cover rounded-lg">
-                </div>
-                
-                <div class="flex-1 min-w-0">
-                    <h4 class="font-bold text-base mb-1 truncate">${item.name}</h4>
-                    <p class="text-xs text-neutral-text mb-2">
-                        <i class="fas fa-tag mr-1"></i>
-                        ${item.category || 'Lainnya'}
-                    </p>
-                    <p class="text-cool-primary dark:text-cool-accent font-bold text-lg">
-                        Rp ${itemTotal.toLocaleString('id-ID')}
-                    </p>
-                    ${itemShippingInfo}
-                </div>
+            <div class="flex-1 min-w-0">
+                <h4 class="font-bold text-base mb-1 truncate">${item.name}</h4>
+                <p class="text-xs text-neutral-text mb-2">
+                    <i class="fas fa-tag mr-1"></i>
+                    ${item.category || 'Lainnya'}
+                </p>
+                <p class="text-cool-primary dark:text-cool-accent font-bold text-lg">
+                    Rp ${itemTotal.toLocaleString('id-ID')}
+                </p>
+                ${itemShippingInfo}
+            </div>
 
-                <div class="flex flex-col items-end space-y-2">
-                    <!-- Quantity Controls -->
-                    <div class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-                        <button class="quantity-btn w-8 h-8 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all" onclick="updateQuantity(${index}, ${item.quantity - 1})">
-                            <i class="fas fa-minus text-xs"></i>
-                        </button>
-                        <span class="w-10 text-center font-semibold">${item.quantity}</span>
-                        <button class="quantity-btn w-8 h-8 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all" onclick="updateQuantity(${index}, ${item.quantity + 1})">
-                            <i class="fas fa-plus text-xs"></i>
-                        </button>
-                    </div>
-
-                    <!-- Remove Button -->
-                    <button class="text-red-500 hover:text-red-600 text-sm font-semibold transition-all hover:scale-110" onclick="removeItem(${index})">
-                        <i class="fas fa-trash-alt mr-1"></i>
-                        Hapus
+            <div class="flex flex-col items-end space-y-2">
+                <!-- Quantity Controls -->
+                <div class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+                    <button class="quantity-btn w-8 h-8 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all" onclick="updateQuantity(${index}, ${item.quantity - 1})">
+                        <i class="fas fa-minus text-xs"></i>
+                    </button>
+                    <span class="w-10 text-center font-semibold">${item.quantity}</span>
+                    <button class="quantity-btn w-8 h-8 rounded-md bg-white dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center transition-all" onclick="updateQuantity(${index}, ${item.quantity + 1})">
+                        <i class="fas fa-plus text-xs"></i>
                     </button>
                 </div>
-            `;
 
-            container.appendChild(cartItem);
-        });
-    }
+                <!-- Remove Button -->
+                <button class="text-red-500 hover:text-red-600 text-sm font-semibold transition-all hover:scale-110" onclick="removeItem(${index})">
+                    <i class="fas fa-trash-alt mr-1"></i>
+                    Hapus
+                </button>
+            </div>
+        `;
+
+        container.appendChild(cartItem);
+    });
+}
 
     // ========== UPDATE QUANTITY ==========
     async function updateQuantity(index, newQty) {
@@ -1215,7 +1226,6 @@ Silakan segera proses pesanan ini! 🚀`;
     // ========== INITIALIZATION ==========
     document.addEventListener('DOMContentLoaded', () => {
         loadCart();
-        loadAddresses();
     });
 </script>
 </body>

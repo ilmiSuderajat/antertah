@@ -272,8 +272,7 @@
         async function loadMenu() {
             try {
                 const token = localStorage.getItem('authToken');
-                const res = await fetch(`${BASE_URL}/api/menu/admin`, { 
-                    headers: token ? { 'Authorization': `Bearer ${token}` } : {} 
+                const res = await fetch(`${BASE_URL}/api/menu/public`, {  
                 });
                 
                 if (!res.ok) throw new Error('Gagal memuat menu');

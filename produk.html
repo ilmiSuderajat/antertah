@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Produk - Nama Toko</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Konfigurasi Tailwind Kustom -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'zoom-in': 'zoomIn 0.3s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        zoomIn: {
+                            '0%': { transform: 'scale(0.95)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Untuk memotong teks */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* Custom scrollbar untuk gallery */
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Zoom cursor */
+        .zoom-cursor {
+            cursor: zoom-in;
+        }
+        
+        /* Animasi untuk lightbox */
+        .lightbox-image {
+            transition: transform 0.3s ease;
+            transform-origin: center center;
+        }
+        
+        /* Prevent body scroll when lightbox is open */
+        body.no-scroll {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
+            <button onclick="history.back()" class="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="Kembali">
+                <i class="fas fa-arrow-left text-lg"></i>
+            </button>
+            <h1 class="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-100">Detail Produk</h1>
+            <div class="flex items-center space-x-2">
+                <button class="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="Bagikan">
+                    <i class="fas fa-share-alt text-lg"></i>
+                </button>
+                <button onclick="toggleCart()" class="relative p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="Keranjang">
+                    <i class="fas fa-shopping-cart text-lg"></i>
+                    <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="productDetailContainer" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="flex items-center justify-center min-h-[60vh]">
+            <div class="text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 mb-4 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                    <i class="fas fa-spinner fa-spin text-2xl text-blue-600 dark:text-blue-400"></i>
+                </div>
+                <p class="text-gray-500 dark:text-gray-400">Memuat detail produk...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Recommendations Section -->
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Rekomendasi Serupa</h2>
+            <button class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                Lihat Semua <i class="fas fa-arrow-right ml-1"></i>
+            </button>
+        </div>
+        <div id="recommendationContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <!-- Konten akan diisi oleh JavaScript -->
+        </div>
+    </section>
+
+    <!-- Floating Action Buttons -->
+    <div class="fixed bottom-6 right-6 z-30 flex flex-col space-y-3">
+        <button onclick="scrollToTop()" class="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110" aria-label="Kembali ke atas">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <button class="bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110" aria-label="Chat">
+            <i class="fas fa-comment-dots text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed top-20 right-4 z-50 space-y-2"></div>
+
+    <!-- Cart Sidebar -->
+    <div id="cartSidebar" class="fixed right-0 top-0 h-full w-80 bg-white dark:bg-gray-800 shadow-2xl transform translate-x-full transition-transform duration-300 z-50">
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-semibold">Keranjang Belanja</h3>
+            <button onclick="toggleCart()" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="cartItems" class="p-4 overflow-y-auto" style="height: calc(100% - 200px);">
+            <p class="text-center text-gray-500 dark:text-gray-400">Keranjang Anda kosong</p>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between mb-3">
+                <span class="font-semibold">Total:</span>
+                <span id="cartTotal" class="font-bold text-lg">Rp 0</span>
+            </div>
+            <button onclick="goToCheckout()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition-colors">
+                Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- Overlay untuk Cart Sidebar -->
+    <div id="cartOverlay" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="toggleCart()"></div>
+
+    <!-- Image Lightbox -->
+    <div id="imageLightbox" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/90" onclick="closeLightbox()"></div>
+        
+        <!-- Close Button -->
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 z-10 p-2 bg-white/10 backdrop-blur-sm rounded-full text-white hover:bg-white/20 transition-colors">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+        
+        <!-- Navigation Buttons -->
+        <button id="prevBtn" onclick="navigateImage(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-3 bg-white/10 backdrop-blur-sm rounded-full text-white hover:bg-white/20 transition-colors">
+            <i class="fas fa-chevron-left text-xl"></i>
+        </button>
+        <button id="nextBtn" onclick="navigateImage(1)" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-3 bg-white/10 backdrop-blur-sm rounded-full text-white hover:bg-white/20 transition-colors">
+            <i class="fas fa-chevron-right text-xl"></i>
+        </button>
+        
+        <!-- Image Container -->
+        <div class="relative h-full flex items-center justify-center p-4">
+            <img id="lightboxImage" src="" alt="" class="lightbox-image max-w-full max-h-full object-contain">
+        </div>
+        
+        <!-- Image Counter -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 px-3 py-1 bg-white/10 backdrop-blur-sm rounded-full text-white text-sm">
+            <span id="imageCounter">1 / 1</span>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="config.js"></script>
+    <script>
+        // State global
+        let cart = [];
+        let currentProduct = null;
+        let productImages = [];
+        let currentImageIndex = 0;
+        let isZoomed = false;
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        // Inisialisasi saat DOM dimuat
+        document.addEventListener('DOMContentLoaded', async () => {
+            const id = localStorage.getItem('selectedProductId');
+            const category = localStorage.getItem('selectedCategory');
+
+            if (!id) {
+                document.getElementById('productDetailContainer').innerHTML = `
+                    <div class="flex items-center justify-center min-h-[60vh]">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-16 h-16 mb-4 bg-red-100 dark:bg-red-900/30 rounded-full">
+                                <i class="fas fa-exclamation-triangle text-2xl text-red-600 dark:text-red-400"></i>
+                            </div>
+                            <p class="text-center text-gray-500 dark:text-gray-400">ID Produk tidak ditemukan.</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            await fetchProductDetail(id);
+        });
+
+        // Fungsi untuk mengambil detail produk
+        async function fetchProductDetail(id) {
+            try {
+                const productResponse = await fetch(`${BASE_URL}/api/menu/${id}`);
+                
+                if (productResponse.status !== 200) {
+                    throw new Error(`Gagal mengambil data. Status: ${productResponse.status}`);
+                }
+                
+                const productData = await productResponse.json();
+                
+                if (!productData || !productData.product || !productData.product.id) {
+                    throw new Error('Produk tidak ditemukan atau format data salah');
+                }
+
+                currentProduct = productData.product;
+                renderProductDetail(productData);
+
+                const currentProductId = productData.product.id;
+                const filteredRecommendations = productData.related.filter(p => p.id !== currentProductId);
+                renderRecommendations(filteredRecommendations);
+                
+            } catch (error) {
+                console.error("Kesalahan saat fetching produk:", error);
+                document.getElementById('productDetailContainer').innerHTML = `
+                    <div class="flex items-center justify-center min-h-[60vh]">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-16 h-16 mb-4 bg-red-100 dark:bg-red-900/30 rounded-full">
+                                <i class="fas fa-wifi text-2xl text-red-600 dark:text-red-400"></i>
+                            </div>
+                            <p class="text-center text-red-500 dark:text-red-400">Terjadi kesalahan koneksi atau server.</p>
+                            <button onclick="window.location.reload()" class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                                Coba Lagi
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Fungsi untuk merender detail produk
+        function renderProductDetail(item) {
+            const container = document.getElementById('productDetailContainer');
+            const product = item.product;
+
+            // Siapkan array gambar
+            productImages = [];
+            
+            // Tambahkan gambar utama
+            if (product.image_url) {
+                productImages.push(product.image_url);
+            }
+            
+            // Tambahkan gambar tambahan jika ada
+            if (Array.isArray(product.image_urls) && product.image_urls.length > 0) {
+                product.image_urls.forEach(img => {
+                    if (!productImages.includes(img)) {
+                        productImages.push(img);
+                    }
+                });
+            }
+            
+            // Jika tidak ada gambar, gunakan placeholder
+            if (productImages.length === 0) {
+                productImages.push("https://placehold.co/600x400/3b82f6/FFFFFF?text=📸+No+Image");
+            }
+            
+            // Format URL gambar
+            const formattedImages = productImages.map(img => {
+                return img.startsWith('http') ? img : `${BASE_URL}/uploads/menu/${img}`;
+            });
+            
+            const rawPrice = product.price;
+            const safePrice = parseInt(rawPrice) || 0; 
+            const formattedPrice = safePrice.toLocaleString('id-ID');
+
+            container.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden animate-slide-up">
+                    <!-- Image Gallery -->
+                    <div class="p-4 sm:p-6">
+                        <!-- Main Image -->
+                        <div class="relative mb-4">
+                            <div class="aspect-w-16 aspect-h-12 sm:aspect-h-9 lg:aspect-h-8 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
+                                <img id="mainImage" 
+                                     src="${formattedImages[0]}" 
+                                     alt="${product.name}" 
+                                     class="w-full h-64 sm:h-80 lg:h-96 object-cover zoom-cursor transition-transform duration-300"
+                                     onclick="openLightbox(0)">
+                            </div>
+                            <button onclick="toggleFavorite(this)" class="absolute top-4 right-4 p-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full shadow-md hover:shadow-lg transition-all">
+                                <i class="far fa-heart text-gray-700 dark:text-gray-300 hover:text-red-500 transition-colors"></i>
+                            </button>
+                            <!-- Zoom Indicator -->
+                            <div class="absolute bottom-4 right-4 p-2 bg-black/50 backdrop-blur-sm rounded-full">
+                                <i class="fas fa-search-plus text-white text-sm"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Thumbnail Gallery -->
+                        ${formattedImages.length > 1 ? `
+                            <div class="flex gap-2 overflow-x-auto custom-scrollbar pb-2">
+                                ${formattedImages.map((img, index) => `
+                                    <button onclick="changeMainImage(${index})" 
+                                            class="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden border-2 ${index === 0 ? 'border-blue-500' : 'border-transparent'} hover:border-blue-500 transition-colors">
+                                        <img src="${img}" alt="Thumbnail ${index + 1}" class="w-full h-full object-cover">
+                                    </button>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- Product Info -->
+                    <div class="p-4 sm:p-6 lg:p-8 pt-0">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-0">${product.name}</h2>
+                            <div class="flex items-center space-x-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <i class="fas fa-star-half-alt text-yellow-400"></i>
+                                </div>
+                                <span class="text-sm text-gray-500 dark:text-gray-400">(4.5)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-baseline mb-6">
+                            <p class="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">Rp ${formattedPrice}</p>
+                            <span class="ml-3 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded-full">Tersedia</span>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">Deskripsi Produk</h3>
+                            <p class="text-gray-600 dark:text-gray-400 leading-relaxed">${product.description || 'Tidak ada deskripsi.'}</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-truck text-blue-600 dark:text-blue-400 mr-2"></i>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Pengiriman</span>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Gratis ongkir untuk pembelian di atas Rp 100.000</p>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-shield-alt text-blue-600 dark:text-blue-400 mr-2"></i>
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Garansi</span>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Garansi uang kembali 30 hari</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button 
+                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                                onclick="addToCart(${product.id}, '${product.name}', ${safePrice}, '${formattedImages[0]}')">
+                                <i class="fas fa-shopping-bag mr-2"></i>Tambah ke Keranjang
+                            </button>
+                            <button 
+                                class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                                onclick="buyNow(${product.id}, '${product.name}', ${safePrice}, '${formattedImages[0]}')">
+                                <i class="fas fa-bolt mr-2"></i>Beli Sekarang
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Fungsi untuk merender rekomendasi
+        function renderRecommendations(items) {
+            const container = document.getElementById('recommendationContainer');
+            const placeholderUrl = "https://placehold.co/300x200/3b82f6/FFFFFF?text=🍛";
+            
+            if (!Array.isArray(items) || items.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-12">
+                        <i class="fas fa-box-open text-4xl text-gray-300 dark:text-gray-600 mb-3"></i>
+                        <p class="text-gray-500 dark:text-gray-400">Tidak ada rekomendasi serupa.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = items.map(item => {
+                let imageUrl;
+
+                if (item.image_url) {
+                    imageUrl = item.image_url.startsWith('http')
+                        ? item.image_url
+                        : `${BASE_URL}/uploads/menu/${item.image_url}`;
+                } else {
+                    imageUrl = placeholderUrl;
+                }
+                
+                const safePrice = parseInt(item.price) || 0;
+                
+                return `
+                    <div class="group bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-1"
+                        onclick="openProductDetail(${item.id}, '${item.category}')">
+                        <div class="relative overflow-hidden">
+                            <img src="${imageUrl}" alt="${item.name}" class="w-full h-36 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button class="p-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full shadow-md">
+                                    <i class="far fa-heart text-gray-700 dark:text-gray-300 hover:text-red-500 transition-colors"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-3 sm:p-4">
+                            <h3 class="font-semibold text-sm text-gray-800 dark:text-gray-100 line-clamp-2 mb-2">${item.name}</h3>
+                            <div class="flex items-center justify-between">
+                                <p class="text-sm font-bold text-blue-600 dark:text-blue-400">Rp ${safePrice.toLocaleString('id-ID')}</p>
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-yellow-400 text-xs"></i>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 ml-1">4.5</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Fungsi pembantu untuk navigasi detail produk dari rekomendasi
+        function openProductDetail(id, category) {
+            localStorage.setItem('selectedProductId', id);
+            localStorage.setItem('selectedCategory', category);
+            window.location.reload(); 
+        }
+
+        // Fungsi untuk galeri gambar
+        function changeMainImage(index) {
+            currentImageIndex = index;
+            const mainImage = document.getElementById('mainImage');
+            const thumbnails = document.querySelectorAll('.flex-shrink-0');
+            
+            // Update main image
+            mainImage.src = productImages[index].startsWith('http') 
+                ? productImages[index] 
+                : `${BASE_URL}/uploads/menu/${productImages[index]}`;
+            
+            // Update thumbnail borders
+            thumbnails.forEach((thumb, i) => {
+                if (i === index) {
+                    thumb.classList.add('border-blue-500');
+                    thumb.classList.remove('border-transparent');
+                } else {
+                    thumb.classList.remove('border-blue-500');
+                    thumb.classList.add('border-transparent');
+                }
+            });
+        }
+
+        // Lightbox functions
+        function openLightbox(index) {
+            currentImageIndex = index;
+            const lightbox = document.getElementById('imageLightbox');
+            const lightboxImage = document.getElementById('lightboxImage');
+            const imageCounter = document.getElementById('imageCounter');
+            
+            // Set image source
+            lightboxImage.src = productImages[index].startsWith('http') 
+                ? productImages[index] 
+                : `${BASE_URL}/uploads/menu/${productImages[index]}`;
+            
+            // Update counter
+            imageCounter.textContent = `${index + 1} / ${productImages.length}`;
+            
+            // Show/hide navigation buttons
+            document.getElementById('prevBtn').style.display = productImages.length > 1 ? 'block' : 'none';
+            document.getElementById('nextBtn').style.display = productImages.length > 1 ? 'block' : 'none';
+            
+            // Show lightbox
+            lightbox.classList.remove('hidden');
+            document.body.classList.add('no-scroll');
+            
+            // Add touch event listeners
+            lightboxImage.addEventListener('touchstart', handleTouchStart, { passive: true });
+            lightboxImage.addEventListener('touchend', handleTouchEnd, { passive: true });
+            
+            // Add zoom functionality
+            lightboxImage.addEventListener('click', toggleZoom);
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('imageLightbox');
+            const lightboxImage = document.getElementById('lightboxImage');
+            
+            lightbox.classList.add('hidden');
+            document.body.classList.remove('no-scroll');
+            
+            // Reset zoom
+            isZoomed = false;
+            lightboxImage.style.transform = 'scale(1)';
+            lightboxImage.style.cursor = 'zoom-in';
+            
+            // Remove event listeners
+            lightboxImage.removeEventListener('touchstart', handleTouchStart);
+            lightboxImage.removeEventListener('touchend', handleTouchEnd);
+            lightboxImage.removeEventListener('click', toggleZoom);
+        }
+
+        function navigateImage(direction) {
+            currentImageIndex += direction;
+            
+            // Loop around if at the ends
+            if (currentImageIndex < 0) {
+                currentImageIndex = productImages.length - 1;
+            } else if (currentImageIndex >= productImages.length) {
+                currentImageIndex = 0;
+            }
+            
+            const lightboxImage = document.getElementById('lightboxImage');
+            const imageCounter = document.getElementById('imageCounter');
+            
+            // Add fade effect
+            lightboxImage.style.opacity = '0';
+            
+            setTimeout(() => {
+                lightboxImage.src = productImages[currentImageIndex].startsWith('http') 
+                    ? productImages[currentImageIndex] 
+                    : `${BASE_URL}/uploads/menu/${productImages[currentImageIndex]}`;
+                imageCounter.textContent = `${currentImageIndex + 1} / ${productImages.length}`;
+                lightboxImage.style.opacity = '1';
+            }, 150);
+            
+            // Reset zoom when changing image
+            isZoomed = false;
+            lightboxImage.style.transform = 'scale(1)';
+            lightboxImage.style.cursor = 'zoom-in';
+        }
+
+        function toggleZoom(e) {
+            const lightboxImage = document.getElementById('lightboxImage');
+            
+            if (!isZoomed) {
+                // Zoom in
+                const rect = lightboxImage.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width;
+                const y = (e.clientY - rect.top) / rect.height;
+                
+                lightboxImage.style.transformOrigin = `${x * 100}% ${y * 100}%`;
+                lightboxImage.style.transform = 'scale(2)';
+                lightboxImage.style.cursor = 'zoom-out';
+                isZoomed = true;
+            } else {
+                // Zoom out
+                lightboxImage.style.transform = 'scale(1)';
+                lightboxImage.style.cursor = 'zoom-in';
+                isZoomed = false;
+            }
+        }
+
+        // Touch event handlers for mobile swipe
+        function handleTouchStart(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }
+
+        function handleTouchEnd(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe left - next image
+                    navigateImage(1);
+                } else {
+                    // Swipe right - previous image
+                    navigateImage(-1);
+                }
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const lightbox = document.getElementById('imageLightbox');
+            if (!lightbox.classList.contains('hidden')) {
+                if (e.key === 'Escape') {
+                    closeLightbox();
+                } else if (e.key === 'ArrowLeft') {
+                    navigateImage(-1);
+                } else if (e.key === 'ArrowRight') {
+                    navigateImage(1);
+                }
+            }
+        });
+
+        // Fungsi keranjang belanja
+        function addToCart(id, name, price, image) {
+            const existingItem = cart.find(item => item.id === id);
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ id, name, price, image, quantity: 1 });
+            }
+            
+            updateCartUI();
+            showNotification(`${name} ditambahkan ke keranjang`, 'success');
+        }
+
+        function updateCartUI() {
+            const cartCount = document.getElementById('cartCount');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            cartCount.classList.toggle('hidden', totalItems === 0);
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400">Keranjang Anda kosong</p>';
+                cartTotal.textContent = 'Rp 0';
+                return;
+            }
+            
+            cartItems.innerHTML = cart.map(item => `
+                <div class="flex items-center space-x-3 mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                    <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-medium text-sm">${item.name}</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Rp ${item.price.toLocaleString('id-ID')}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="updateQuantity(${item.id}, -1)" class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-minus text-xs"></i>
+                        </button>
+                        <span class="w-8 text-center">${item.quantity}</span>
+                        <button onclick="updateQuantity(${item.id}, 1)" class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotal.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        function updateQuantity(id, change) {
+            const item = cart.find(item => item.id === id);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(item => item.id !== id);
+                }
+                updateCartUI();
+            }
+        }
+
+        function toggleCart() {
+            const sidebar = document.getElementById('cartSidebar');
+            const overlay = document.getElementById('cartOverlay');
+            
+            sidebar.classList.toggle('translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        // Fungsi notifikasi
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            
+            notification.className = `p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' : 
+                type === 'error' ? 'bg-red-500 text-white' : 
+                'bg-blue-500 text-white'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${
+                        type === 'success' ? 'fa-check-circle' : 
+                        type === 'error' ? 'fa-exclamation-circle' : 
+                        'fa-info-circle'
+                    } mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    container.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Fungsi utilitas
+        function toggleFavorite(button) {
+            const icon = button.querySelector('i');
+            icon.classList.toggle('far');
+            icon.classList.toggle('fas');
+            icon.classList.toggle('text-red-500');
+            
+            const isFavorited = icon.classList.contains('fas');
+            showNotification(isFavorited ? 'Ditambahkan ke favorit' : 'Dihapus dari favorit', 'success');
+        }
+
+        // Fungsi Beli Sekarang - menambahkan produk ke keranjang dan redirect ke checkout
+// Di halaman detail produk
+function buyNow(id, name, price, image) {
+    // Kosongkan keranjang terlebih dahulu
+    cart = [];
+    
+    // Tambahkan produk ini ke keranjang dengan properti yang konsisten
+    cart.push({ 
+        id, 
+        name, 
+        price, 
+        image: image, // Gunakan 'image' bukan 'image_url' untuk konsistensi
+        quantity: 1 
+    });
+    
+    // Update UI keranjang
+    updateCartUI();
+    
+    // Simpan keranjang ke localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Redirect ke halaman checkout
+    window.location.href = 'cekout.html';
+}
+
+        // Fungsi untuk ke halaman checkout dari sidebar
+        function goToCheckout() {
+            if (cart.length === 0) {
+                showNotification('Keranjang masih kosong', 'error');
+                return;
+            }
+            
+            // Simpan keranjang ke localStorage
+            localStorage.setItem('cart', JSON.stringify(cart));
+            
+            // Redirect ke halaman checkout
+            window.location.href = 'checkout.html';
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

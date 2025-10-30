@@ -355,15 +355,33 @@
             </div>
         </div>
     </div>
-
+    <footer class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
+        <div class="flex justify-around items-center h-16">
+            <a href="home.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span>Beranda</span>
+            </a>
+            <a href="kuliner.html" class="bottom-nav-item  text-neutral-text  flex flex-col items-center text-xs font-bold transition">
+                <i class="fas fa-search text-xl mb-1"></i>
+                <span>Cari</span>
+            </a>
+            <a href="pesanan.html" class="bottom-nav-item text-cool-primary  dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
+                <i class="fas fa-list-alt text-xl mb-1"></i>
+                <span>Pesanan</span>
+            </a>
+            <a href="profile.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span>Akun</span>
+            </a>
+        </div>
+    </footer>
     <!-- Notification Toast -->
     <div id="notification-toast" class="fixed top-20 right-4 z-50 hidden"></div>
 
+    <script src="config.js"></script>
     <script>
         // Periksa apakah config.js ada, jika tidak gunakan nilai default
-        if (typeof BASE_URL === 'undefined') {
-            var BASE_URL = 'https://df3f41a695c9.ngrok-free.app';
-        }
+
         
         let orders = [];
         let currentFilter = 'all';
@@ -415,43 +433,139 @@
                 minimumFractionDigits: 0
             }).format(amount);
         }
-
-        function getImageUrl(item) {
-            if (!item) return `${BASE_URL}/uploads/menu/placeholder.jpg`;
-            
-            let imageUrl = '';
-            
-            // Coba ambil dari image_urls (array) atau image_url (string)
-            if (item.image_urls && item.image_urls.length > 0) {
-                // Jika image_urls adalah string JSON, parse dulu
-                const imageUrls = typeof item.image_urls === 'string' 
-                                   ? JSON.parse(item.image_urls) 
-                                   : item.image_urls;
-                // Ambil URL pertama dari array
-                imageUrl = imageUrls[0];
-            } else if (item.image_url) {
-                // Jika ada image_url (single image)
-                imageUrl = item.image_url;
-            }
-            
-            // PERBAIKAN: Semua gambar menggunakan format BASE_URL/uploads/menu/filename
-            if (imageUrl) {
-                // Jika sudah full URL, gunakan langsung
-                if (imageUrl.startsWith('http')) {
-                    return imageUrl;
-                }
-                // Jika path dimulai dengan /uploads/menu/, gunakan BASE_URL + path
-                if (imageUrl.startsWith('/uploads/menu/')) {
-                    return `${BASE_URL}${imageUrl}`;
-                }
-                // Jika hanya filename, tambahkan BASE_URL/uploads/menu/
-                return `${BASE_URL}/uploads/menu/${imageUrl}`;
-            } else {
-                // Tidak ada gambar, gunakan placeholder
-                return `${BASE_URL}/uploads/menu/placeholder.jpg`;
+function getImageUrl(item) {
+    if (!item) {
+        console.log('[DEBUG] No item provided, using placeholder');
+        return 'https://placehold.co/300x200/e2e8f0/64748b?text=No+Image';
+    }
+    
+    // Debug log untuk melihat struktur item
+    console.log('[DEBUG] Item structure:', item);
+    
+    // Prioritas 1: Cek single image properties
+    const singleImageProps = ['image', 'image_url', 'imageUrl', 'img', 'picture'];
+    let imageUrl = null;
+    
+    for (const prop of singleImageProps) {
+        if (item[prop]) {
+            imageUrl = item[prop];
+            console.log(`[DEBUG] Found single image in property ${prop}:`, imageUrl);
+            break;
+        }
+    }
+    
+    // Prioritas 2: Cek multiple images array
+    if (!imageUrl) {
+        const multipleImageProps = ['images', 'image_urls', 'imageArray', 'gallery'];
+        
+        for (const prop of multipleImageProps) {
+            if (item[prop] && Array.isArray(item[prop]) && item[prop].length > 0) {
+                // Ambil gambar pertama dari array
+                imageUrl = item[prop][0];
+                console.log(`[DEBUG] Found multiple images in property ${prop}, using first:`, imageUrl);
+                break;
             }
         }
-
+    }
+    
+    // Prioritas 3: Cek jika image_urls adalah string JSON
+    if (!imageUrl && item.image_urls && typeof item.image_urls === 'string') {
+        try {
+            const parsedImages = JSON.parse(item.image_urls);
+            if (Array.isArray(parsedImages) && parsedImages.length > 0) {
+                imageUrl = parsedImages[0];
+                console.log('[DEBUG] Parsed image_urls string, using first image:', imageUrl);
+            }
+        } catch (e) {
+            console.log('[DEBUG] Failed to parse image_urls string:', e);
+        }
+    }
+    
+    // Prioritas 4: Coba ambil gambar default berdasarkan menu_id
+    if (!imageUrl && item.menu_id) {
+        console.log('[DEBUG] No image URL found, trying to get default image for menu_id:', item.menu_id);
+        
+        // Coba beberapa nama file default yang mungkin
+        const defaultImageNames = [
+            `menu-${item.menu_id}.jpg`,
+            `menu-${item.menu_id}.webp`,
+            `menu-${item.menu_id}.png`,
+            `default-${item.menu_id}.jpg`,
+            `default-${item.menu_id}.webp`,
+            `default-${item.menu_id}.png`
+        ];
+        
+        // Gunakan nama file default pertama
+        imageUrl = defaultImageNames[0];
+        console.log('[DEBUG] Using default image name:', imageUrl);
+    }
+    
+    // Prioritas 5: Coba ambil gambar berdasarkan ID item
+    if (!imageUrl && item.id) {
+        console.log('[DEBUG] No image URL found, trying to get default image for item_id:', item.id);
+        
+        // Coba beberapa nama file default yang mungkin
+        const defaultImageNames = [
+            `menu-${item.id}.jpg`,
+            `menu-${item.id}.webp`,
+            `menu-${item.id}.png`,
+            `default-${item.id}.jpg`,
+            `default-${item.id}.webp`,
+            `default-${item.id}.png`
+        ];
+        
+        // Gunakan nama file default pertama
+        imageUrl = defaultImageNames[0];
+        console.log('[DEBUG] Using default image name based on item ID:', imageUrl);
+    }
+    
+    // Prioritas 6: Coba ambil gambar berdasarkan nama produk
+    if (!imageUrl && item.name) {
+        console.log('[DEBUG] No image URL found, trying to get default image based on product name:', item.name);
+        
+        // Buat nama file dari nama produk (hapus karakter khusus dan spasi)
+        const sanitizedName = item.name
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-|-$/g, '');
+        
+        if (sanitizedName) {
+            imageUrl = `${sanitizedName}.jpg`;
+            console.log('[DEBUG] Using default image name based on product name:', imageUrl);
+        }
+    }
+    
+    if (!imageUrl) {
+        console.log('[DEBUG] No image URL found, using placeholder');
+        return 'https://placehold.co/300x200/e2e8f0/64748b?text=No+Image';
+    }
+    
+    // Jika URL sudah lengkap (dimulai dengan http), gunakan apa adanya
+    if (imageUrl.startsWith('http')) {
+        console.log('[DEBUG] Using full URL:', imageUrl);
+        return imageUrl;
+    }
+    
+    // Jika URL dimulai dengan /uploads/menu/, tambahkan BASE_URL tanpa menambah path lagi
+    if (imageUrl.startsWith('/uploads/menu/')) {
+        const fullUrl = `${BASE_URL}${imageUrl}`;
+        console.log('[DEBUG] Using uploads/menu path:', fullUrl);
+        return fullUrl;
+    }
+    
+    // Jika URL dimulai dengan / (path relatif dari root), tambahkan BASE_URL
+    if (imageUrl.startsWith('/')) {
+        const fullUrl = `${BASE_URL}${imageUrl}`;
+        console.log('[DEBUG] Using root path:', fullUrl);
+        return fullUrl;
+    }
+    
+    // Jika hanya nama file, tambahkan path uploads/menu
+    const fullUrl = `${BASE_URL}/uploads/menu/${imageUrl}`;
+    console.log('[DEBUG] Using filename with path:', fullUrl);
+    return fullUrl;
+}
         function getPaymentProofUrl(paymentProof) {
             if (!paymentProof) return `${BASE_URL}/uploads/menu/placeholder.jpg`;
             
@@ -778,113 +892,120 @@
         }
 
         // Render orders list
-        function renderOrders(ordersToRender) {
+function renderOrders(ordersToRender) {
+    try {
+        console.log('[DEBUG ORDERS] Rendering orders:', ordersToRender);
+        
+        const container = document.getElementById('orders-container');
+        const emptyState = document.getElementById('empty-state');
+        
+        if (!container) {
+            console.error('Orders container not found');
+            return;
+        }
+        
+        container.innerHTML = '';
+        
+        // Pastikan ordersToRender adalah array
+        if (!Array.isArray(ordersToRender)) {
+            console.error('[DEBUG ORDERS] ordersToRender is not an array:', ordersToRender);
+            ordersToRender = [];
+        }
+        
+        if (ordersToRender.length === 0) {
+            if (emptyState) emptyState.classList.remove('hidden');
+            return;
+        }
+        
+        if (emptyState) emptyState.classList.add('hidden');
+        
+        ordersToRender.forEach((order, index) => {
             try {
-                console.log('[DEBUG ORDERS] Rendering orders:', ordersToRender);
-                
-                const container = document.getElementById('orders-container');
-                const emptyState = document.getElementById('empty-state');
-                
-                if (!container) {
-                    console.error('Orders container not found');
+                // Validasi order object
+                if (!order || typeof order !== 'object') {
+                    console.error('[DEBUG ORDERS] Invalid order object at index', index, ':', order);
                     return;
                 }
                 
-                container.innerHTML = '';
+                const orderCard = document.createElement('div');
+                orderCard.className = 'order-card bg-card-light dark:bg-card-dark rounded-2xl shadow-lg p-4 sm:p-6 cursor-pointer';
+                orderCard.onclick = () => viewOrderDetail(order.id);
                 
-                // Pastikan ordersToRender adalah array
-                if (!Array.isArray(ordersToRender)) {
-                    console.error('[DEBUG ORDERS] ordersToRender is not an array:', ordersToRender);
-                    ordersToRender = [];
+                // Format order date
+                const orderDate = formatDate(order.created_at);
+                
+                // Format order total
+                const orderTotal = formatCurrency(order.total);
+                
+                // Calculate item count and prepare items display
+                const itemCount = order.items ? order.items.length : 0;
+                const itemsToDisplay = order.items ? order.items.slice(0, 3) : [];
+                const hasMoreItems = itemCount > 3;
+                
+                // Generate items HTML
+                let itemsHtml = '';
+                if (itemsToDisplay.length > 0) {
+                    itemsHtml = itemsToDisplay.map(item => {
+                        const itemTotal = (item.price || 0) * (item.quantity || 0);
+                        const imageUrl = getImageUrl(item);
+                        
+                        return `
+                            <div class="flex items-center space-x-3 py-2">
+                                <div class="flex-shrink-0">
+                                    <img src="${imageUrl}" 
+                                         alt="${item.name || 'Produk'}" 
+                                         class="w-12 h-12 rounded-lg object-cover"
+                                         onerror="this.src='https://placehold.co/300x200/e2e8f0/64748b?text=Error'">
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-medium text-sm truncate">${item.name || 'Tidak ada nama'}</h4>
+                                    <p class="text-xs text-neutral-text">${item.quantity || 0}x ${formatCurrency(item.price || 0)}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-medium text-sm">${formatCurrency(itemTotal)}</p>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    if (hasMoreItems) {
+                        itemsHtml += `
+                            <div class="text-center py-2">
+                                <p class="text-sm text-neutral-text">+${itemCount - 3} item lagi</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    itemsHtml = `
+                        <div class="text-center py-4">
+                            <p class="text-sm text-neutral-text">Tidak ada item dalam pesanan</p>
+                        </div>
+                    `;
                 }
                 
-                if (ordersToRender.length === 0) {
-                    if (emptyState) emptyState.classList.remove('hidden');
-                    return;
-                }
-                
-                if (emptyState) emptyState.classList.add('hidden');
-                
-                ordersToRender.forEach((order, index) => {
-                    try {
-                        // Validasi order object
-                        if (!order || typeof order !== 'object') {
-                            console.error('[DEBUG ORDERS] Invalid order object at index', index, ':', order);
-                            return;
-                        }
+                orderCard.innerHTML = `
+                    <div class="space-y-4">
+                        <!-- Order Header -->
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-bold text-text-dark dark:text-text-light">#${order.id || 'N/A'}</h3>
+                                <p class="text-sm text-neutral-text">${orderDate}</p>
+                            </div>
+                            <span class="status-badge ${getStatusClass(order.status || 'pending')}">${getStatusText(order.status || 'pending')}</span>
+                        </div>
                         
-                        const orderCard = document.createElement('div');
-                        orderCard.className = 'order-card bg-card-light dark:bg-card-dark rounded-2xl shadow-lg p-4 sm:p-6 cursor-pointer';
-                        orderCard.onclick = () => viewOrderDetail(order.id);
+                        <!-- Items List -->
+                        <div>
+                            <p class="text-sm font-medium mb-2">Item Pesanan (${itemCount}):</p>
+                            <div class="items-scroll space-y-1 max-h-48 overflow-y-auto">
+                                ${itemsHtml}
+                            </div>
+                        </div>
                         
-                        // Format order date
-                        const orderDate = formatDate(order.created_at);
-                        
-                        // Format order total
-                        const orderTotal = formatCurrency(order.total);
-                        
-                        // Calculate item count and prepare items display
-                        const itemCount = order.items ? order.items.length : 0;
-                        const itemsToDisplay = order.items ? order.items.slice(0, 3) : [];
-                        const hasMoreItems = itemCount > 3;
-                        
-                        // Generate items HTML
-                        let itemsHtml = '';
-                        if (itemsToDisplay.length > 0) {
-                            itemsHtml = itemsToDisplay.map(item => {
-                                const itemTotal = (item.price || 0) * (item.quantity || 0);
-                                return `
-                                    <div class="flex items-center space-x-3 py-2">
-                                        <img src="${getImageUrl(item)}" alt="${item.name || 'Produk'}" class="w-12 h-12 rounded-lg object-cover">
-                                        <div class="flex-1">
-                                            <h4 class="font-medium text-sm">${item.name || 'Tidak ada nama'}</h4>
-                                            <p class="text-xs text-neutral-text">${item.quantity || 0}x ${formatCurrency(item.price || 0)}</p>
-                                        </div>
-                                        <div class="text-right">
-                                            <p class="font-medium text-sm">${formatCurrency(itemTotal)}</p>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('');
-                            
-                            if (hasMoreItems) {
-                                itemsHtml += `
-                                    <div class="text-center py-2">
-                                        <p class="text-sm text-neutral-text">+${itemCount - 3} item lagi</p>
-                                    </div>
-                                `;
-                            }
-                        } else {
-                            itemsHtml = `
-                                <div class="text-center py-4">
-                                    <p class="text-sm text-neutral-text">Tidak ada item dalam pesanan</p>
-                                </div>
-                            `;
-                        }
-                        
-                        orderCard.innerHTML = `
-                            <div class="space-y-4">
-                                <!-- Order Header -->
-                                <div class="flex justify-between items-start">
-                                    <div>
-                                        <h3 class="text-lg font-bold text-text-dark dark:text-text-light">#${order.id || 'N/A'}</h3>
-                                        <p class="text-sm text-neutral-text">${orderDate}</p>
-                                    </div>
-                                    <span class="status-badge ${getStatusClass(order.status || 'pending')}">${getStatusText(order.status || 'pending')}</span>
-                                </div>
-                                
-                                <!-- Items List -->
-                                <div>
-                                    <p class="text-sm font-medium mb-2">Item Pesanan (${itemCount}):</p>
-                                    <div class="items-scroll space-y-1 max-h-48 overflow-y-auto">
-                                        ${itemsHtml}
-                                    </div>
-                                </div>
-                                
-                                <!-- Order Total -->
-                                <div class="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-gray-700">
-                                    <span class="text-sm font-medium">Total:</span>
-                                    <span class="text-xl font-bold text-cool-primary dark:text-cool-accent">${orderTotal}</span>
+                        <!-- Order Total -->
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-gray-700">
+                            <span class="text-sm font-medium">Total:</span>
+                            <span class="text-xl font-bold text-cool-primary dark:text-cool-accent">${orderTotal}</span>
                                 </div>
                                 
                                 <!-- Action Button -->
@@ -907,7 +1028,6 @@
                 showNotification('Terjadi kesalahan saat menampilkan pesanan', 'error');
             }
         }
-
         // Filter orders by status
         function filterOrders(status) {
             currentFilter = status;

@@ -6,7 +6,7 @@
     <title>AnterTah | Kuliner</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     
     <script>
@@ -15,24 +15,29 @@
             theme: {
                 extend: {
                     colors: {
-                        'cool-primary': '#1d4ed8',
+                        'cool-primary': '#3b82f6',
                         'cool-accent': '#06b6d4',
-                        'bg-light': '#f1f5f9',
+                        'bg-light': '#f8fafc',
                         'bg-dark': '#0f172a',
                         'card-light': '#ffffff',
                         'card-dark': '#1e293b',
                         'text-light': '#f1f5f9',
                         'text-dark': '#1e293b',
                         'neutral-text': '#64748b',
+                        'success': '#10b981',
+                        'warning': '#f59e0b',
+                        'danger': '#ef4444',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
                     },
                     animation: {
                         'fade-in': 'fadeIn 0.5s ease-out',
                         'slide-up': 'slideUp 0.5s ease-out',
                         'scale-in': 'scaleIn 0.3s ease-out',
                         'slide-down': 'slideDown 0.3s ease-out',
+                        'pulse-slow': 'pulse 3s infinite',
                     },
                     keyframes: {
                         fadeIn: {
@@ -188,7 +193,7 @@
 
         /* Bottom Nav Active State */
         .bottom-nav-item.active {
-            color: #1d4ed8;
+            color: #3b82f6;
         }
 
         .bottom-nav-item {
@@ -199,40 +204,309 @@
         input:focus {
             transform: scale(1.01);
         }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Search View Styles */
+        .search-view {
+            display: none;
+        }
+
+        .search-view.active {
+            display: block;
+        }
+
+        .home-view {
+            display: block;
+        }
+
+        .home-view.hidden {
+            display: none;
+        }
+
+        /* Menu Card Styles */
+        .menu-card {
+            transition: all 0.3s ease;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.15);
+        }
+
+        .menu-card img {
+            transition: transform 0.3s ease;
+        }
+
+        .menu-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Back Button Styles */
+        .back-button {
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            transform: translateX(-4px);
+        }
+
+        /* Category Badge Styles */
+        .category-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .dark .category-badge {
+            background-color: rgba(6, 182, 212, 0.1);
+            color: #06b6d4;
+        }
+
+        /* Grid 2 Column for Search Results */
+        .grid-cols-2-custom {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid-cols-2-custom {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .grid-cols-2-custom {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        /* Enhanced Mobile Styles */
+        @media (max-width: 640px) {
+            .mobile-full-width {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            .mobile-text-sm {
+                font-size: 0.875rem;
+            }
+            
+            .mobile-card-padding {
+                padding: 0.75rem;
+            }
+        }
+
+        /* Notification Toast Styles */
+        .notification-toast {
+            z-index: 9999;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Enhanced Card Styles */
+        .enhanced-card {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .enhanced-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: #334155;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+            transform: translateY(-1px);
+        }
+
+        .dark .btn-secondary {
+            background-color: #334155;
+            color: #f1f5f9;
+        }
+
+        .dark .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 40;
+            transition: all 0.3s ease;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        .dark .skeleton {
+            background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
+            background-size: 200% 100%;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        @keyframes spin-smooth {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+        }
+
+        .animate-spin-smooth {
+        animation: spin-smooth 0.9s linear infinite;
+        }
+
+        /* Pull to Refresh */
+        .pull-to-refresh {
+            position: relative;
+            padding-top: 50px;
+            margin-top: -50px;
+            transition: all 0.3s ease;
+        }
+
+        .pull-to-refresh-indicator {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pull-to-refresh.active .pull-to-refresh-indicator {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="bg-bg-light dark:bg-bg-dark text-text-dark dark:text-text-light min-h-screen font-sans pb-16 md:pb-0">
     
-    <!-- Header Kuliner -->
-    <header class="bg-card-light dark:bg-card-dark shadow-md sticky top-0 z-50 backdrop-blur-md bg-opacity-95">
-        <div class="flex items-center justify-between p-4 h-16">
-            <!-- Back Button -->
-            <a href="home.html" class="text-cool-primary dark:text-cool-accent hover:scale-110 transition transform">
-                <i class="fas fa-arrow-left text-xl"></i>
-            </a>
+<!-- Header Kuliner -->
+<header class="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-sm">
+  <div class="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
 
-            <!-- Title -->
-            <h1 class="absolute left-1/2 transform -translate-x-1/2 text-lg font-bold text-text-dark dark:text-text-light">
-                Kuliner
-            </h1>
+    <!-- Tombol Back -->
+    <a
+      id="backButton"
+      href="home.html"
+      class="text-cool-primary dark:text-cool-accent hover:scale-110 transition-transform hidden sm:inline-flex"
+    >
+      <i class="fas fa-arrow-left text-lg"></i>
+    </a>
 
-            <!-- Right Actions -->
-            <div class="flex items-center gap-2">
-                <!-- Dark Mode Toggle -->
-                <div id="darkModeToggle" class="dark-mode-toggle">
-                    <div class="toggle-circle">
-                        <i class="fas fa-sun text-yellow-500 text-xs"></i>
-                    </div>
-                </div>
+    <!-- Judul Halaman -->
+    <h1
+      id="pageTitle"
+      class="text-base sm:text-lg md:text-xl font-bold text-gray-800 dark:text-gray-100 text-center flex-1"
+    >
+      Kuliner
+    </h1>
 
-                <!-- Shopping Cart -->
-                <a id="cartButton" href="keranjang.html" class="relative">
-                    <i class="fas fa-shopping-basket text-xl text-neutral-text dark:text-gray-300"></i>
-                    <span id="cartBadge" class="absolute -top-1 -right-1 w-4 h-4 text-xs font-bold text-white bg-red-600 rounded-full flex items-center justify-center">0</span>
-                </a>
-            </div>
-        </div>
-    </header>
+    <!-- Aksi di Kanan -->
+    <div class="flex items-center gap-3 sm:gap-4">
+      <!-- Toggle Mode Gelap -->
+      <button
+        id="darkModeToggle"
+        class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+        title="Toggle Mode Gelap"
+      >
+        <i class="fas fa-sun text-yellow-500 text-sm dark:hidden"></i>
+        <i class="fas fa-moon text-gray-300 text-sm hidden dark:inline"></i>
+      </button>
+
+      <!-- Keranjang -->
+      <a id="cartButton" href="keranjang.html" class="relative">
+        <i class="fas fa-shopping-basket text-lg text-gray-700 dark:text-gray-300"></i>
+        <span
+          id="cartBadge"
+          class="absolute -top-1.5 -right-1.5 w-4 h-4 text-[10px] font-bold text-white bg-red-600 rounded-full flex items-center justify-center"
+        >
+          0
+        </span>
+      </a>
+    </div>
+  </div>
+</header>
+
 
     <main class="pb-20 md:pb-8">
         <!-- Search Bar -->
@@ -246,285 +520,240 @@
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-            <!-- Kategori Kuliner -->
-            <div class="py-4">
-                <h2 class="text-base font-bold mb-3 text-text-dark dark:text-text-light">Kategori</h2>
-
-                <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-3">
-                    <!-- Category Cards -->
-                    <a href="nasi-lauk.html" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
-                        <div class="text-3xl mb-2">🍔</div>
-                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Nasi & Lauk</span>
-                    </a>
-                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
-                        <div class="text-3xl mb-2">☕</div>
-                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Minuman</span>
-                    </a>
-                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
-                        <div class="text-3xl mb-2">🥗</div>
-                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Sehat</span>
-                    </a>
-                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
-                        <div class="text-3xl mb-2">🍰</div>
-                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Kue</span>
-                    </a>
-                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
-                        <div class="text-3xl mb-2">🍨</div>
-                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Dessert</span>
-                    </a>
-                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
-                        <div class="text-3xl mb-2">🌭</div>
-                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Jajanan</span>
-                    </a>
-                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
-                        <div class="text-3xl mb-2">🍕</div>
-                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Pizza</span>
-                    </a>
-                    <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md">
-                        <div class="text-3xl mb-2">🍜</div>
-                        <span class="text-xs font-medium text-text-dark dark:text-text-light">Mie</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Restoran Populer -->
-            <div class="py-4">
-                <h2 class="text-base font-bold mb-3 text-text-dark dark:text-text-light">Restoran Populer</h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <!-- Restaurant Card 1 -->
-                    <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
-                        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
-                            <img src="https://placehold.co/60x60/1d4ed8/FFFFFF?text=R1" class="w-full h-full object-cover" alt="Restoran">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Restoran Nasi Uduk Mantap</h3>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
-                                <span class="text-xs text-gray-400">•</span>
-                                <span class="text-xs text-yellow-500">★ 4.8</span>
+        <!-- Home View -->
+        <div id="homeView" class="home-view">
+            <div id="main-content" class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+                <!-- Banner Promo -->
+                <div class="py-4">
+                    <div class="enhanced-card bg-gradient-to-r from-blue-500 to-cyan-500 p-4 rounded-xl text-white">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold mb-1">Promo Spesial Hari Ini</h2>
+                                <p class="text-sm opacity-90">Dapatkan diskon hingga 50% untuk menu pilihan</p>
+                                <button class="mt-2 bg-white text-blue-500 px-3 py-1 rounded-lg text-sm font-medium">
+                                    Lihat Promo
+                                </button>
                             </div>
-                            <p class="text-xs text-cool-primary dark:text-cool-accent font-medium mt-1">Gratis ongkir min. Rp 25K</p>
+                            <div class="text-5xl">🍔</div>
                         </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
-                    </div>
-
-                    <!-- Restaurant Card 2 -->
-                    <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
-                        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
-                            <img src="https://placehold.co/60x60/06b6d4/FFFFFF?text=R2" class="w-full h-full object-cover" alt="Restoran">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Warung Kopi Senja</h3>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-xs text-red-600 dark:text-red-400 font-medium">Tutup</span>
-                                <span class="text-xs text-gray-400">•</span>
-                                <span class="text-xs text-yellow-500">★ 4.5</span>
-                            </div>
-                            <p class="text-xs text-neutral-text dark:text-gray-400 mt-1">Ongkir Rp 5.000</p>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
-                    </div>
-
-                    <!-- Restaurant Card 3 -->
-                    <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
-                        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
-                            <img src="https://placehold.co/60x60/f59e0b/FFFFFF?text=R3" class="w-full h-full object-cover" alt="Restoran">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Martabak Manis Gila</h3>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
-                                <span class="text-xs text-gray-400">•</span>
-                                <span class="text-xs text-yellow-500">★ 4.9</span>
-                            </div>
-                            <p class="text-xs text-orange-500 font-medium mt-1">Promo Member</p>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
-                    </div>
-
-                    <!-- Restaurant Card 4 -->
-                    <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
-                        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
-                            <img src="https://placehold.co/60x60/10b981/FFFFFF?text=R4" class="w-full h-full object-cover" alt="Restoran">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Bakso Malang Cak Imin</h3>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
-                                <span class="text-xs text-gray-400">•</span>
-                                <span class="text-xs text-yellow-500">★ 4.7</span>
-                            </div>
-                            <p class="text-xs text-neutral-text dark:text-gray-400 mt-1">Ongkir Rp 3.000</p>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
-                    </div>
-
-                    <!-- Restaurant Card 5 -->
-                    <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
-                        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
-                            <img src="https://placehold.co/60x60/8b5cf6/FFFFFF?text=R5" class="w-full h-full object-cover" alt="Restoran">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Sate Ayam Pak Kumis</h3>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
-                                <span class="text-xs text-gray-400">•</span>
-                                <span class="text-xs text-yellow-500">★ 4.6</span>
-                            </div>
-                            <p class="text-xs text-cool-primary dark:text-cool-accent font-medium mt-1">Gratis ongkir min. Rp 20K</p>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
-                    </div>
-
-                    <!-- Restaurant Card 6 -->
-                    <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
-                        <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
-                            <img src="https://placehold.co/60x60/ec4899/FFFFFF?text=R6" class="w-full h-full object-cover" alt="Restoran">
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Ayam Geprek Bensu</h3>
-                            <div class="flex items-center gap-2 mt-1">
-                                <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
-                                <span class="text-xs text-gray-400">•</span>
-                                <span class="text-xs text-yellow-500">★ 4.8</span>
-                            </div>
-                            <p class="text-xs text-cool-primary dark:text-cool-accent font-medium mt-1">Gratis ongkir min. Rp 30K</p>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
                     </div>
                 </div>
+
+                <!-- Kategori Kuliner -->
+                <div class="py-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-base font-bold text-text-dark dark:text-text-light">Kategori</h2>
+                        <a href="#" class="text-cool-primary text-sm font-medium">Lihat Semua</a>
+                    </div>
+
+                    <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-3">
+                        <!-- Category Cards -->
+                        <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md" data-category="Makanan Utama">
+                            <div class="text-3xl mb-2">🍔</div>
+                            <span class="text-xs font-medium text-text-dark dark:text-text-light">Nasi & Lauk</span>
+                        </a>
+                        <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md" data-category="Minuman">
+                            <div class="text-3xl mb-2">☕</div>
+                            <span class="text-xs font-medium text-text-dark dark:text-text-light">Minuman</span>
+                        </a>
+                        <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md" data-category="Sehat">
+                            <div class="text-3xl mb-2">🥗</div>
+                            <span class="text-xs font-medium text-text-dark dark:text-text-light">Sehat</span>
+                        </a>
+                        <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md" data-category="Kue">
+                            <div class="text-3xl mb-2">🍰</div>
+                            <span class="text-xs font-medium text-text-dark dark:text-text-light">Kue</span>
+                        </a>
+                        <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md" data-category="Dessert">
+                            <div class="text-3xl mb-2">🍨</div>
+                            <span class="text-xs font-medium text-text-dark dark:text-text-light">Dessert</span>
+                        </a>
+                        <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md" data-category="Jajanan">
+                            <div class="text-3xl mb-2">🌭</div>
+                            <span class="text-xs font-medium text-text-dark dark:text-text-light">Jajanan</span>
+                        </a>
+                        <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md" data-category="Pizza">
+                            <div class="text-3xl mb-2">🍕</div>
+                            <span class="text-xs font-medium text-text-dark dark:text-text-light">Pizza</span>
+                        </a>
+                        <a href="#" class="category-card bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm text-center hover:shadow-md" data-category="Mie">
+                            <div class="text-3xl mb-2">🍜</div>
+                            <span class="text-xs font-medium text-text-dark dark:text-text-light">Mie</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Restoran Populer -->
+                <div class="py-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-base font-bold text-text-dark dark:text-text-light">Restoran Populer</h2>
+                        <a href="#" class="text-cool-primary text-sm font-medium">Lihat Semua</a>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <!-- Restaurant Card 1 -->
+                        <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
+                            <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="https://placehold.co/60x60/3b82f6/FFFFFF?text=R1" class="w-full h-full object-cover" alt="Restoran">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Restoran Nasi Uduk Mantap</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
+                                    <span class="text-xs text-gray-400">•</span>
+                                    <span class="text-xs text-yellow-500">★ 4.8</span>
+                                </div>
+                                <p class="text-xs text-cool-primary dark:text-cool-accent font-medium mt-1">Gratis ongkir min. Rp 25K</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
+                        </div>
+
+                        <!-- Restaurant Card 2 -->
+                        <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
+                            <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="https://placehold.co/60x60/06b6d4/FFFFFF?text=R2" class="w-full h-full object-cover" alt="Restoran">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Warung Kopi Senja</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs text-red-600 dark:text-red-400 font-medium">Tutup</span>
+                                    <span class="text-xs text-gray-400">•</span>
+                                    <span class="text-xs text-yellow-500">★ 4.5</span>
+                                </div>
+                                <p class="text-xs text-neutral-text dark:text-gray-400 mt-1">Ongkir Rp 5.000</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
+                        </div>
+
+                        <!-- Restaurant Card 3 -->
+                        <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
+                            <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="https://placehold.co/60x60/f59e0b/FFFFFF?text=R3" class="w-full h-full object-cover" alt="Restoran">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Martabak Manis Gila</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
+                                    <span class="text-xs text-gray-400">•</span>
+                                    <span class="text-xs text-yellow-500">★ 4.9</span>
+                                </div>
+                                <p class="text-xs text-orange-500 font-medium mt-1">Promo Member</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
+                        </div>
+
+                        <!-- Restaurant Card 4 -->
+                        <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
+                            <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="https://placehold.co/60x60/10b981/FFFFFF?text=R4" class="w-full h-full object-cover" alt="Restoran">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Bakso Malang Cak Imin</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
+                                    <span class="text-xs text-gray-400">•</span>
+                                    <span class="text-xs text-yellow-500">★ 4.7</span>
+                                </div>
+                                <p class="text-xs text-neutral-text dark:text-gray-400 mt-1">Ongkir Rp 3.000</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
+                        </div>
+
+                        <!-- Restaurant Card 5 -->
+                        <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
+                            <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="https://placehold.co/60x60/8b5cf6/FFFFFF?text=R5" class="w-full h-full object-cover" alt="Restoran">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Sate Ayam Pak Kumis</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
+                                    <span class="text-xs text-gray-400">•</span>
+                                    <span class="text-xs text-yellow-500">★ 4.6</span>
+                                </div>
+                                <p class="text-xs text-cool-primary dark:text-cool-accent font-medium mt-1">Gratis ongkir min. Rp 20K</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
+                        </div>
+
+                        <!-- Restaurant Card 6 -->
+                        <div class="restaurant-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm flex items-center gap-3 cursor-pointer">
+                            <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="https://placehold.co/60x60/ec4899/FFFFFF?text=R6" class="w-full h-full object-cover" alt="Restoran">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="text-sm font-bold text-text-dark dark:text-text-light truncate">Ayam Geprek Bensu</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs text-green-600 dark:text-green-400 font-medium">Buka</span>
+                                    <span class="text-xs text-gray-400">•</span>
+                                    <span class="text-xs text-yellow-500">★ 4.8</span>
+                                </div>
+                                <p class="text-xs text-cool-primary dark:text-cool-accent font-medium mt-1">Gratis ongkir min. Rp 30K</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400 text-sm flex-shrink-0"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu Makanan -->
+                <div class="py-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="text-base font-bold text-text-dark dark:text-text-light">Menu Makanan</h2>
+                        <a href="#" class="text-cool-primary text-sm font-medium">Lihat Semua</a>
+                    </div>
+
+                    <div id="menuItemsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Menu items will be populated here from API -->
+                    </div>
+                </div>
             </div>
+        </div>
 
-            <!-- Menu Makanan -->
-            <div class="py-4">
-                <h2 class="text-base font-bold mb-3 text-text-dark dark:text-text-light">Menu Makanan</h2>
+        <!-- Search View -->
+        <div id="searchView" class="search-view">
+            <div class="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
+                <!-- Search Results Header -->
+                <div class="py-4 flex items-center justify-between">
+                    <h2 id="searchResultsTitle" class="text-base font-bold text-text-dark dark:text-text-light">Hasil Pencarian</h2>
+                    <span id="searchResultsCount" class="text-sm text-neutral-text dark:text-gray-400">0 hasil</span>
+                </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Menu Item 1 -->
-                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-                        <div class="flex gap-3">
-                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                                <img src="https://placehold.co/80x80/1d4ed8/FFFFFF?text=🍛" class="w-full h-full object-cover" alt="Nasi Gudeg">
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">Nasi Gudeg</h3>
-                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">Nasi dengan gudeg, tempe, dan sambal</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-bold text-cool-primary">Rp 15.000</span>
-                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
-                                            data-id="1" data-name="Nasi Gudeg" data-price="15000" data-image="https://placehold.co/80x80/1d4ed8/FFFFFF?text=🍛">
-                                        <i class="fas fa-plus mr-1"></i>Tambah
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Search Results Container -->
+                <div id="searchResultsContainer" class="grid-cols-2-custom">
+                    <!-- Search results will be populated here -->
+                </div>
 
-                    <!-- Menu Item 2 -->
-                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-                        <div class="flex gap-3">
-                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                                <img src="https://placehold.co/80x80/06b6d4/FFFFFF?text=☕" class="w-full h-full object-cover" alt="Kopi Susu">
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">Kopi Susu</h3>
-                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">Kopi hitam dengan susu segar</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-bold text-cool-primary">Rp 8.000</span>
-                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
-                                            data-id="2" data-name="Kopi Susu" data-price="8000" data-image="https://placehold.co/80x80/06b6d4/FFFFFF?text=☕">
-                                        <i class="fas fa-plus mr-1"></i>Tambah
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Loading State -->
+                <!-- Loading State -->
+                <div id="searchLoadingState" class="hidden py-12">
+                <div class="flex flex-col items-center justify-center">
+                    <!-- Spinner -->
+                    <div class="loading-spinner w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin-smooth mb-4"></div>
 
-                    <!-- Menu Item 3 -->
-                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-                        <div class="flex gap-3">
-                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                                <img src="https://placehold.co/80x80/059669/FFFFFF?text=🍜" class="w-full h-full object-cover" alt="Bakso">
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">Bakso Malang</h3>
-                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">Bakso dengan mie dan sayuran segar</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-bold text-cool-primary">Rp 12.000</span>
-                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
-                                            data-id="3" data-name="Bakso Malang" data-price="12000" data-image="https://placehold.co/80x80/059669/FFFFFF?text=🍜">
-                                        <i class="fas fa-plus mr-1"></i>Tambah
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Text -->
+                    <p class="text-gray-600 dark:text-gray-400 text-sm font-medium tracking-wide animate-pulse">
+                    Memuat data...
+                    </p>
+                </div>
+                </div>
 
-                    <!-- Menu Item 4 -->
-                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-                        <div class="flex gap-3">
-                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                                <img src="https://placehold.co/80x80/f59e0b/FFFFFF?text=🍰" class="w-full h-full object-cover" alt="Kue">
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">Kue Lapis</h3>
-                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">Kue lapis legit dengan keju</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-bold text-cool-primary">Rp 20.000</span>
-                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
-                                            data-id="4" data-name="Kue Lapis" data-price="20000" data-image="https://placehold.co/80x80/f59e0b/FFFFFF?text=🍰">
-                                        <i class="fas fa-plus mr-1"></i>Tambah
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Menu Item 5 -->
-                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-                        <div class="flex gap-3">
-                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                                <img src="https://placehold.co/80x80/ef4444/FFFFFF?text=🍕" class="w-full h-full object-cover" alt="Pizza">
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">Pizza Margherita</h3>
-                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">Pizza dengan tomat, mozzarella, dan basil</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-bold text-cool-primary">Rp 35.000</span>
-                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
-                                            data-id="5" data-name="Pizza Margherita" data-price="35000" data-image="https://placehold.co/80x80/ef4444/FFFFFF?text=🍕">
-                                        <i class="fas fa-plus mr-1"></i>Tambah
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Menu Item 6 -->
-                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-                        <div class="flex gap-3">
-                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                                <img src="https://placehold.co/80x80/8b5cf6/FFFFFF?text=🥗" class="w-full h-full object-cover" alt="Salad">
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">Salad Buah</h3>
-                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">Campuran buah segar dengan yogurt</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-bold text-cool-primary">Rp 18.000</span>
-                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
-                                            data-id="6" data-name="Salad Buah" data-price="18000" data-image="https://placehold.co/80x80/8b5cf6/FFFFFF?text=🥗">
-                                        <i class="fas fa-plus mr-1"></i>Tambah
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                <!-- Empty State -->
+                <div id="searchEmptyState" class="hidden py-12">
+                    <div class="flex flex-col items-center justify-center">
+                        <i class="fas fa-search text-4xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">Tidak ada hasil</h3>
+                        <p class="text-sm text-gray-400 dark:text-gray-500">Coba kata kunci lain atau kategori berbeda</p>
                     </div>
                 </div>
             </div>
         </div>
     </main>
+
+    <!-- Floating Action Button -->
+    <div class="fab">
+        <i class="fas fa-filter"></i>
+    </div>
 
     <!-- Bottom Navigation (Mobile) -->
     <footer class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
@@ -585,13 +814,15 @@
             </div>
         </div>
     </div>
-<script src="config.js"></script>
+
+    <script src="config.js"></script>
     <script>
- 
+
         // ===================================
         // CART SYSTEM (dengan sinkron ke API)
         // ===================================
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let menuData = []; // Data menu dari API
         
         // Check if user is authenticated
         function checkAuth() {
@@ -616,7 +847,7 @@
                 const res = await fetch(`${BASE_URL}/api/cart`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ id: item.id, name: item.name, price: item.price, image: item.image })
+                    body: JSON.stringify({ id: item.id, name: item.name, price: item.price, image: item.image_url })
                 });
                 if (!res.ok) throw new Error('post-failed');
                 showAddToCartAnimation(item.name);
@@ -687,7 +918,7 @@
             } else {
                 cartItems.innerHTML = cart.map(item => `
                     <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                        <img src="${item.image}" alt="${item.name}" class="w-12 h-12 rounded-lg object-cover">
+                        <img src="${item.image_url || 'https://placehold.co/80x80/3b82f6/FFFFFF?text=🍛'}" alt="${item.name}" class="w-12 h-12 rounded-lg object-cover">
                         <div class="flex-1">
                             <h4 class="font-medium text-sm text-text-dark dark:text-text-light">${item.name}</h4>
                             <p class="text-xs text-gray-500 dark:text-gray-400">Rp ${item.price.toLocaleString()}</p>
@@ -812,6 +1043,313 @@
         }
 
         // ===================================
+        // MENU API FUNCTIONALITY
+        // ===================================
+        // Fetch menu data from API
+        async function fetchMenuData() {
+            try {
+                const response = await fetch(`${BASE_URL}/api/menu/public`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch menu data');
+                }
+                const data = await response.json();
+                menuData = data;
+                renderMenuItems(data);
+                return data;
+            } catch (error) {
+                console.error('Error fetching menu data:', error);
+                showNotification('Gagal memuat data menu. Silakan coba lagi.', 'error');
+                return [];
+            }
+        }
+
+        // Render menu items to the page
+        function renderMenuItems(menuItems) {
+            const container = document.getElementById('menuItemsContainer');
+            if (!container) return;
+            
+            if (menuItems.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <i class="fas fa-utensils text-4xl text-gray-300 dark:text-gray-600 mb-2"></i>
+                        <p class="text-gray-500 dark:text-gray-400">Tidak ada menu yang tersedia</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Limit to 6 items for the home view
+            const limitedItems = menuItems.slice(0, 6);
+            
+            container.innerHTML = limitedItems.map(item => {
+                // Construct image URL using BASE_URL/uploads/menu/filename
+                const imageUrl = item.image_url ? 
+                    (item.image_url.startsWith('http') ? item.image_url : `${BASE_URL}/uploads/menu/${item.image_url}`) : 
+                    'https://placehold.co/80x80/3b82f6/FFFFFF?text=🍛';
+                
+                return `
+                    <div class="menu-card bg-card-light dark:bg-card-dark rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+                        <div class="flex gap-3">
+                            <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                <img src="${imageUrl}" class="w-full h-full object-cover" alt="${item.name}">
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-text-dark dark:text-text-light text-sm">${item.name}</h3>
+                                <p class="text-xs text-neutral-text dark:text-gray-400 mb-2">${item.description || 'Tidak ada deskripsi'}</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-bold text-cool-primary">Rp ${item.price.toLocaleString()}</span>
+                                    <button class="add-to-cart-btn bg-cool-primary text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors" 
+                                            data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-image="${imageUrl}">
+                                        <i class="fas fa-plus mr-1"></i>Tambah
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add event listeners to the new add to cart buttons
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const item = {
+                        id: parseInt(button.dataset.id),
+                        name: button.dataset.name,
+                        price: parseInt(button.dataset.price),
+                        image_url: button.dataset.image
+                    };
+                    addToCart(item);
+                });
+            });
+        }
+
+        // ===================================
+        // SEARCH FUNCTIONALITY
+        // ===================================
+        // Show search view
+        function showSearchView() {
+            document.getElementById('homeView').classList.add('hidden');
+            document.getElementById('searchView').classList.add('active');
+            document.getElementById('backButton').classList.remove('hidden');
+            document.getElementById('pageTitle').textContent = 'Pencarian';
+        }
+
+        // Show home view
+        function showHomeView() {
+            document.getElementById('searchView').classList.remove('active');
+            document.getElementById('homeView').classList.remove('hidden');
+            document.getElementById('backButton').classList.add('hidden');
+            document.getElementById('pageTitle').textContent = 'Kuliner';
+            document.getElementById('searchInput').value = '';
+        }
+
+        // Show loading state
+        function showSearchLoadingState() {
+            document.getElementById('searchLoadingState').classList.remove('hidden');
+            document.getElementById('searchResultsContainer').innerHTML = '';
+            document.getElementById('searchEmptyState').classList.add('hidden');
+        }
+
+        // Hide loading state
+        function hideSearchLoadingState() {
+            document.getElementById('searchLoadingState').classList.add('hidden');
+        }
+
+        // Show empty state
+        function showSearchEmptyState() {
+            document.getElementById('searchEmptyState').classList.remove('hidden');
+            document.getElementById('searchResultsContainer').innerHTML = '';
+        }
+
+        // Hide empty state
+        function hideSearchEmptyState() {
+            document.getElementById('searchEmptyState').classList.add('hidden');
+        }
+
+ // Render search results with responsive modern grid layout
+function renderSearchResults(results, query = '') {
+  const container = document.getElementById('searchResultsContainer');
+  const countElement = document.getElementById('searchResultsCount');
+  const titleElement = document.getElementById('searchResultsTitle');
+
+  // Update title and count
+  if (query) {
+    titleElement.textContent = `Hasil Pencarian untuk "${query}"`;
+  } else {
+    titleElement.textContent = 'Semua Menu';
+  }
+  countElement.textContent = `${results.length} hasil`;
+
+  // Hide loading and empty states
+  hideSearchLoadingState();
+  hideSearchEmptyState();
+
+  if (results.length === 0) {
+    showSearchEmptyState();
+    return;
+  }
+
+  // Responsive grid
+  container.className =
+    "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 mt-4 px-2 sm:px-4";
+
+  container.innerHTML = results
+    .map((item) => {
+      const imageUrl = item.image_url
+        ? item.image_url.startsWith("http")
+          ? item.image_url
+          : `${BASE_URL}/uploads/menu/${item.image_url}`
+        : "https://placehold.co/300x200/3b82f6/FFFFFF?text=🍛";
+
+      return `
+<div 
+  class="menu-card bg-white dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group border border-gray-100 dark:border-gray-800 cursor-pointer"
+  onclick="openProductDetail(${item.id}, '${item.category}')"
+>
+  <!-- Image -->
+  <div class="relative h-40 sm:h-44 md:h-48 overflow-hidden">
+    <img src="${imageUrl}" alt="${item.name}" 
+         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+    ${
+      item.is_available
+        ? ""
+        : `<div class="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-sm font-semibold">Habis</div>`
+    }
+  </div>
+
+  <!-- Content -->
+  <div class="p-3 sm:p-4 flex flex-col justify-between h-[150px]">
+    <div>
+      <h3 class="font-semibold text-gray-800 dark:text-gray-100 text-sm sm:text-base mb-1 line-clamp-1">
+        ${item.name}
+      </h3>
+      <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-2 line-clamp-2">
+        ${item.description || "Tidak ada deskripsi"}
+      </p>
+    </div>
+
+    <div class="flex items-center justify-between mt-auto">
+      <span class="text-sm sm:text-base font-bold text-blue-600 dark:text-blue-400">
+        Rp ${item.price.toLocaleString()}
+      </span>
+
+      <button
+        class="add-to-cart-btn flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors"
+        data-id="${item.id}"
+        data-name="${item.name}"
+        data-price="${item.price}"
+        data-image="${imageUrl}"
+        onclick="event.stopPropagation(); addToCart({ id: ${item.id}, name: '${item.name}', price: ${item.price}, image_url: '${imageUrl}' });"
+      >
+        <i class="fas fa-plus text-[10px] sm:text-xs"></i>
+        Tambah
+      </button>
+    </div>
+  </div>
+</div>
+
+      `;
+    })
+    .join("");
+
+  // Add event listeners for "Tambah" buttons
+  document.querySelectorAll(".add-to-cart-btn").forEach((button) => {
+    button.addEventListener("click", (e) => {
+      const item = {
+        id: parseInt(button.dataset.id),
+        name: button.dataset.name,
+        price: parseInt(button.dataset.price),
+        image_url: button.dataset.image,
+      };
+      addToCart(item);
+    });
+  });
+}
+
+function openProductDetail(id, category) {
+  // Simpan info produk di localStorage
+  localStorage.setItem('selectedProductId', id);
+  localStorage.setItem('selectedCategory', category);
+  
+  // Arahkan ke halaman detail
+  window.location.href = 'produk.html';
+}
+
+        // Perform search
+        async function performSearch(query) {
+            showSearchView();
+            showSearchLoadingState();
+            
+            try {
+                // If we already have menu data, filter it locally
+                if (menuData.length > 0) {
+                    const filteredResults = menuData.filter(item => {
+                        const searchTerm = query.toLowerCase();
+                        return (
+                            item.name.toLowerCase().includes(searchTerm) ||
+                            (item.category && item.category.toLowerCase().includes(searchTerm)) ||
+                            (item.description && item.description.toLowerCase().includes(searchTerm)) ||
+                            (item.location_name && item.location_name.toLowerCase().includes(searchTerm))
+                        );
+                    });
+                    
+                    // Simulate API delay for better UX
+                    setTimeout(() => {
+                        renderSearchResults(filteredResults, query);
+                    }, 300);
+                } else {
+                    // Fetch menu data if not already loaded
+                    const data = await fetchMenuData();
+                    const filteredResults = data.filter(item => {
+                        const searchTerm = query.toLowerCase();
+                        return (
+                            item.name.toLowerCase().includes(searchTerm) ||
+                            (item.category && item.category.toLowerCase().includes(searchTerm)) ||
+                            (item.description && item.description.toLowerCase().includes(searchTerm)) ||
+                            (item.location_name && item.location_name.toLowerCase().includes(searchTerm))
+                        );
+                    });
+                    
+                    renderSearchResults(filteredResults, query);
+                }
+            } catch (error) {
+                console.error('Error performing search:', error);
+                hideSearchLoadingState();
+                showNotification('Gagal melakukan pencarian. Silakan coba lagi.', 'error');
+            }
+        }
+
+        // Filter by category
+        async function filterByCategory(category) {
+            showSearchView();
+            showSearchLoadingState();
+            
+            try {
+                // Fetch fresh data from API for the specific category
+                const response = await fetch(`${BASE_URL}/api/menu/public`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch menu data');
+                }
+                const data = await response.json();
+                
+                // Filter by category
+                const filteredResults = data.filter(item => {
+                    return item.category === category;
+                });
+                
+                // Update menuData with fresh data
+                menuData = data;
+                
+                renderSearchResults(filteredResults);
+                document.getElementById('searchResultsTitle').textContent = `Kategori: ${category}`;
+            } catch (error) {
+                console.error('Error filtering by category:', error);
+                hideSearchLoadingState();
+                showNotification('Gagal memfilter kategori. Silakan coba lagi.', 'error');
+            }
+        }
+
+        // ===================================
         // INITIALIZATION
         // ===================================
         document.addEventListener('DOMContentLoaded', () => {
@@ -826,15 +1364,57 @@
                 darkModeToggle.addEventListener('click', toggleDarkMode);
             }
 
-            // Search functionality (placeholder)
+            // Fetch menu data from API
+            fetchMenuData();
+
+            // Search functionality
             const searchInput = document.getElementById('searchInput');
+            
             if (searchInput) {
+                // Event listener untuk input pencarian
+                let searchTimeout;
                 searchInput.addEventListener('input', (e) => {
-                    const query = e.target.value.toLowerCase();
-                    console.log('Searching for:', query);
-                    // TODO: Implement search logic
+                    clearTimeout(searchTimeout);
+                    const query = e.target.value.trim();
+                    
+                    if (query.length > 0) {
+                        searchTimeout = setTimeout(() => {
+                            performSearch(query);
+                        }, 500); // Debounce search
+                    } else {
+                        showHomeView();
+                    }
+                });
+                
+                // Event listener untuk tombol Enter
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const query = searchInput.value.trim();
+                        if (query) {
+                            performSearch(query);
+                        }
+                    }
                 });
             }
+
+            // Back button functionality
+            const backButton = document.getElementById('backButton');
+            if (backButton) {
+                backButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showHomeView();
+                });
+            }
+
+            // Category cards functionality - Direct API call
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const category = card.dataset.category;
+                    filterByCategory(category);
+                });
+            });
 
             // Refresh badge dari API saat halaman siap
             refreshCartBadge();
@@ -847,25 +1427,9 @@
                 });
             }
 
-            // Hapus handler modal keranjang lama (kini diarahkan ke keranjang.html)
-
-            // Add to cart buttons
-            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const item = {
-                        id: parseInt(button.dataset.id),
-                        name: button.dataset.name,
-                        price: parseInt(button.dataset.price),
-                        image: button.dataset.image
-                    };
-                    addToCart(item);
-                });
-            });
-
             // Initialize cart UI
             updateCartUI();
         });
     </script>
 </body>
 </html>
-
