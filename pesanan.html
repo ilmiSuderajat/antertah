@@ -355,7 +355,7 @@
             </div>
         </div>
     </div>
-    <footer class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
+    <footer id="footer" class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
         <div class="flex justify-around items-center h-16">
             <a href="home.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
                 <i class="fas fa-home text-xl mb-1"></i>
@@ -658,6 +658,9 @@ function getImageUrl(item) {
                             <div class="skeleton h-10 w-28 rounded-lg"></div>
                         </div>
                     </div>
+
+                    
+
                 `;
                 skeletonState.appendChild(skeletonCard);
             }
@@ -686,6 +689,7 @@ function getImageUrl(item) {
             const modal = document.getElementById('order-modal');
             if (modal) {
                 modal.classList.remove('active');
+                footer.classList.remove('hidden');
             }
         }
 
@@ -1010,7 +1014,7 @@ function renderOrders(ordersToRender) {
                                 
                                 <!-- Action Button -->
                                 <div class="flex justify-end">
-                                    <button class="px-4 py-2 bg-cool-primary hover:bg-blue-700 text-white rounded-lg transition-all" onclick="event.stopPropagation(); viewOrderDetail(${order.id})">
+                                    <button class="px-4 py-2 bg-cool-primary hover:bg-blue-700 text-white rounded-lg transition-all" onclick="detail(); viewOrderDetail(${order.id})">
                                         <i class="fas fa-eye mr-2"></i>
                                         Lihat Detail
                                     </button>
@@ -1060,6 +1064,16 @@ function renderOrders(ordersToRender) {
             }
         }
 
+        function detail() {
+            const modal = document.getElementById('order-modal');
+            const footer = document.getElementById('footer');
+            if (modal) {
+                modal.classList.add('active');
+                footer.classList.add('hidden');
+            }else{
+                footer.classList.remove('hidden');
+            }
+        }
         // View order detail
         async function viewOrderDetail(orderId) {
             try {
@@ -1180,11 +1194,12 @@ function renderOrders(ordersToRender) {
                                             <h4 class="font-medium">${item.name || 'Tidak ada nama'}</h4>
                                             <p class="text-sm text-neutral-text">${item.quantity || 0}x ${formatCurrency(item.price || 0)}</p>
                                             ${item.shippingCost > 0 ? `
-                                                <p class="text-xs text-neutral-text mt-1">
-                                                    <i class="fas fa-truck mr-1"></i>
-                                                    Ongkir: ${formatCurrency(item.shippingCost)}
-                                                    ${item.distance > 0 ? `(${item.distance.toFixed(2)} km)` : ''}
-                                                </p>
+                                               <p class="text-xs text-neutral-text mt-1">
+                                                        <i class="fas fa-truck mr-1"></i>
+                                                        Ongkir: ${formatCurrency(item.shippingCost)}
+                                                        ${!isNaN(item.distance) ? `(${parseFloat(item.distance).toFixed(2)} km)` : ''}
+                                                    </p>
+
                                             ` : ''}
                                         </div>
                                         <div class="text-right">
@@ -1298,7 +1313,7 @@ function renderOrders(ordersToRender) {
             const token = localStorage.getItem('authToken');
             if (!token) {
                 showNotification('Silakan login terlebih dahulu', 'error');
-                setTimeout(() => window.location.href = 'login.html', 2000);
+                setTimeout(() => window.location.href = 'login.html', 1000);
                 return;
             }
             

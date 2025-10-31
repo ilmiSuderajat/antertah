@@ -892,7 +892,11 @@ async function loadOrder() {
                                 <h4 class="font-semibold text-gray-900">${item.name}</h4>
                                 <p class="text-sm text-gray-500">${item.category || 'Tidak ada kategori'}</p>
                                 <p class="text-sm text-gray-500">${item.quantity}x @ ${formatCurrency(item.price)}</p>
-                                <p class="text-xs text-gray-400">Jarak: ${item.distance ? item.distance.toFixed(2) : '0'} km, Ongkir: ${formatCurrency(item.shipping || 0)}</p>
+                                <p class="text-xs text-gray-400">
+                                    Jarak: ${!isNaN(parseFloat(item.distance)) ? parseFloat(item.distance).toFixed(2) : '0'} km,
+                                    Ongkir: ${formatCurrency(item.shipping || 0)}
+                                    </p>
+
                             </div>
                             <div class="text-right">
                                 <p class="font-medium text-gray-900">${formatCurrency(item.price * item.quantity)}</p>

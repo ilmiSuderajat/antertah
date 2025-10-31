@@ -834,6 +834,7 @@
                 <ul>
                     <li><a href="#" class="nav-link active" data-target="ringkasan"><i class="fas fa-chart-line"></i> Ringkasan</a></li>
                     <li><a href="#" class="nav-link" data-target="pengguna"><i class="fas fa-users"></i> Manajemen Pengguna</a></li>
+                    <li><a onclick="home()" class="nav-link" data-target="pengguna"><i class="fas fa-home"></i> Kembali Ke Home</a></li>
                 </ul>
             </nav>
             <button id="logout-btn" class="btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -979,6 +980,7 @@
         </main>
     </div>
 
+    <script src="config.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const loginContainer = document.getElementById('login-container');
@@ -1133,7 +1135,7 @@
             // 1. Muat Statistik
             async function loadStatistics() {
                 try {
-                    const data = await fetchWithAuth(`${API_BASE_URL}/api/admin/statistics`);
+                    const data = await fetchWithAuth(`${BASE_URL}/api/admin/statistics`);
                     document.getElementById('stat-sales').textContent = `Rp ${data.totalSales.toLocaleString('id-ID')}`;
                     document.getElementById('stat-orders').textContent = data.totalOrders;
                     document.getElementById('stat-users').textContent = data.totalUsers;
@@ -1336,6 +1338,10 @@
             });
 
         });
+
+        function home() {
+            window.location.href = "admin-menu.html";
+        }
     </script>
 
 </body>
