@@ -429,84 +429,86 @@
         <span class="font-semibold">Memperbarui...</span>
     </div>
 
-    <!-- Header -->
-    <header class="bg-card-light dark:bg-card-dark shadow-lg sticky top-0 z-50 backdrop-blur-md bg-opacity-95 m-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Desktop Header -->
-            <div class="hidden md:flex justify-between items-center h-16">
-                <a href="#" class="inline-flex items-center text-2xl font-extrabold text-cool-primary dark:text-cool-accent transition-all hover:scale-105">
-                    <i class="fas fa-motorcycle mr-2 float-animation"></i> AnterTah
-                </a>
-                
-<div class="w-full px-4 sm:px-6 md:px-8 flex justify-center">
-  <div class="relative group flex-1 max-w-2xl ml-30">
-    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-cool-primary transition-colors"></i>
+ <!-- Header -->
+<header class="bg-card-light dark:bg-card-dark shadow-lg sticky top-0 z-50 backdrop-blur-md bg-opacity-95 m-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-    <input
-      type="text"
-      id="search-input"
-      placeholder="Cari kuliner, toko, atau layanan..."
-      class="w-full pl-12 pr-5 py-3 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-100 shadow-sm focus:shadow-md focus:outline-none focus:ring-2 focus:ring-cool-primary focus:border-transparent transition-all duration-200 placeholder-gray-400"
-    />
-  </div>
-</div>
-
-
-
-                <div class="flex items-center space-x-4">
-                    <!-- Dark Mode Toggle Button -->
-                    <div id="dark-mode-toggle">
-                        <div class="toggle-circle">
-                            <i class="toggle-icon fas fa-sun text-yellow-500"></i>
-                        </div>
-                    </div>
-
-                    <button class="text-neutral-text dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent transition relative group">
-                        <a href="keranjang.html"><i class="fas fa-shopping-basket text-xl group-hover:scale-110 transition-transform"></i></a>
-                        <span id="cart-item-count" class="cart-badge absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">0</span>
-                    </button>
-                    <button class="text-neutral-text dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent transition">
-                        <i class="fas fa-bell text-xl hover:scale-110 transition-transform"></i>
-                    </button>
+        <!-- Desktop Header -->
+        <div class="hidden md:flex justify-between items-center h-16">
+            <!-- Logo -->
+            <a href="ker" class="inline-flex items-center text-2xl font-extrabold text-cool-primary dark:text-cool-accent transition-all hover:scale-105">
+                <i class="fas fa-motorcycle mr-2 float-animation"></i> AnterTah
+            </a>
+            
+            <!-- Search -->
+            <div class="w-full px-4 flex justify-center">
+                <div class="relative flex-1 max-w-2xl">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-cool-primary transition-colors"></i>
+                    <input
+                        type="text"
+                        id="search-input"
+                        placeholder="Cari kuliner, toko, atau layanan..."
+                        class="w-full pl-12 pr-5 py-3 rounded-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-100 shadow-sm focus:shadow-md focus:outline-none focus:ring-2 focus:ring-cool-primary focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                    />
                 </div>
             </div>
-            
-            <!-- Mobile Header - Simplified with only search, cart, and notification -->
-            <div class="md:hidden flex items-center justify-between mobile-header">
-                <!-- Mobile Search Bar (Large) -->
-                <div class="mobile-search-container">
-                    <div class="relative">
-                        <input type="text" id="search-input-mobile" placeholder="Cari kuliner, toko, atau layanan..." 
-                                class="mobile-search-input w-full border-2 border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-cool-primary focus:border-transparent dark:bg-gray-700 dark:text-text-light">
-                        <i class="fas fa-search mobile-search-icon"></i>
-                    </div>
-                </div>
-                
-                <!-- Mobile Icons -->
-                <div class="mobile-icon-container">
-                    <!-- Mobile Cart -->
-                    <button class="text-neutral-text dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent transition relative group">
-                        <a href="keranjang.html"><i class="fas fa-shopping-basket mobile-icon group-hover:scale-110 transition-transform"></i></a>
-                        <span id="cart-item-count-mobile" class="cart-badge absolute -top-1.5 -right-1.5 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">0</span>
-                    </button>
-                    
-                    <!-- Mobile Notification -->
-                    <button class="text-neutral-text dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent transition">
-                        <i class="fas fa-bell mobile-icon hover:scale-110 transition-transform"></i>
-                    </button>
+
+            <!-- Desktop Icons -->
+            <div class="flex items-center space-x-4">
+                <!-- Cart (desktop only) -->
+                <button class="text-neutral-text hidden md:inline-flex dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent transition relative group">
+                    <a href="keranjang.html"><i class="fas fa-shopping-basket text-xl group-hover:scale-110 transition-transform"></i></a>
+                    <span id="cart-item-count-mobile" class="cart-badge absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">0</span>
+                </button>
+                <!-- Notification -->
+                <button class="text-neutral-text dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent transition">
+                    <i class="fas fa-bell text-xl hover:scale-110 transition-transform"></i>
+                </button>
                 </div>
             </div>
         </div>
-    </header>
+
+        <!-- Mobile Header -->
+        <div class="md:hidden flex items-center justify-between h-16">
+            <!-- Mobile Search -->
+            <div class="flex-1 px-2">
+                <div class="relative">
+                    <input
+                        type="text"
+                        id="search-input-mobile"
+                        placeholder="Cari kuliner, toko, atau layanan..."
+                        class="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cool-primary dark:bg-gray-700 dark:text-text-light placeholder-gray-400 transition"
+                    />
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Mobile Icons (optional: only notification) -->
+            <div class="flex items-center space-x-3 ml-2">
+                <button class="text-neutral-text dark:text-gray-300 hover:text-cool-primary dark:hover:text-cool-accent transition">
+                    <i class="fas fa-bell text-xl hover:scale-110 transition-transform"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" id="main-content">
         
+
+
         <!-- Welcome Section -->
-        <div class="mb-8 p-6 bg-gradient-to-br from-cool-primary via-blue-600 to-cool-accent rounded-2xl shadow-2xl text-text-light animate-fade-in">
+        <div class="mb-8 p-6 bg-gradient-to-br from-cool-primary via-blue-600 to-cool-accent rounded-2xl shadow-sm text-text-light animate-fade-in">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-3xl font-bold">
                     Hi, <span id="user-greeting-name" class="font-extrabold">Pengguna!</span> 👋
                 </h2>
+                      <div id="dark-mode-toggle">
+                        <div class="toggle-circle">
+                            <i class="toggle-icon fas fa-sun text-yellow-500"></i>
+                        </div>
+            </div>
             </div>
             
             <div class="flex items-center glass-effect p-4 rounded-xl cursor-pointer hover:bg-white/40 transition-all group" id="address-section">
@@ -518,7 +520,13 @@
                 <i class="fas fa-chevron-right opacity-70 group-hover:translate-x-1 transition-transform"></i>
             </div>
         </div>
-        
+        <a href="lokasi.html" class="flex items-center p-3 bg-bg-light dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-shadow">
+    <i class="fas fa-map-marker-alt text-red-500 mr-3 text-xl"></i>
+    <div>
+        <p class="font-semibold text-gray-800 dark:text-gray-100">Cari Berdasarkan Lokasi</p>
+        <p class="text-xs text-center text-gray-500 dark:text-gray-400">Temukan menu terdekat atau terjauh</p>
+    </div>
+</a>
         <!-- Services Grid -->
         <h3 class="text-xl font-bold mb-4 text-text-dark dark:text-text-light">Layanan Utama</h3>
         <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-4 mb-8 animate-slide-up">
@@ -644,22 +652,37 @@
             </div>
         </div>
     </main>
-        <footer class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
+        <footer id="footer" class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light/95 dark:bg-card-dark/95 border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md">
         <div class="flex justify-around items-center h-16">
-            <a href="home.html" class="bottom-nav-item text-cool-primary  dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
-                <i class="fas fa-home text-xl mb-1"></i>
+            <!-- Beranda -->
+            <a href="home.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-cool-primary dark:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-home text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Beranda</span>
             </a>
-            <a href="kuliner.html" class="bottom-nav-item  text-neutral-text  flex flex-col items-center text-xs font-bold transition">
-                <i class="fas fa-search text-xl mb-1"></i>
+
+            <!-- Cari -->
+            <a href="kuliner.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-search text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Cari</span>
             </a>
-            <a href="pesanan.html" class="bottom-nav-item text-neutral-text  dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
-                <i class="fas fa-list-alt text-xl mb-1"></i>
+
+            <!-- Pesanan -->
+            <a href="pesanan.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-list-alt text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Pesanan</span>
             </a>
-            <a href="profile.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
-                <i class="fas fa-user text-xl mb-1"></i>
+
+            <!-- Keranjang (dengan badge) -->
+            <a href="keranjang.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-shopping-basket text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                <span>Keranjang</span>
+                <!-- Badge untuk jumlah item -->
+                <span id="cart-item-count" class="cart-badge absolute top-1 right-1/4 translate-x-1/2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-y-1 bg-red-600 rounded-full">0</span>
+            </a>
+
+            <!-- Akun -->
+            <a href="profile.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-user text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Akun</span>
             </a>
         </div>
@@ -1002,116 +1025,202 @@
             }
         }
 
-        function renderRecommendations(menuItems) {
-            const container = document.getElementById('recommendation-list-container');
-            container.innerHTML = '';
+ /**
+ * Fungsi untuk merender kartu rekomendasi produk.
+ * Versi ini sudah diperbaiki untuk mengambil rating dari API dan menampilkan jarak.
+ */
+function renderRecommendations(menuItems) {
+    const container = document.getElementById('recommendation-list-container');
+    container.innerHTML = '';
 
-            if (menuItems.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-12">
-                        <i class="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
-                        <p class="text-neutral-text">Belum ada menu tersedia</p>
+    if (menuItems.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
+                <p class="text-neutral-text">Belum ada menu tersedia di sekitar Anda</p>
+            </div>
+        `;
+        return;
+    }
+
+    menuItems.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = "product-card bg-card-light dark:bg-card-dark rounded-2xl shadow-lg overflow-hidden cursor-pointer animate-scale-in";
+        card.style.animationDelay = `${index * 0.05}s`;
+
+        // Ambil semua gambar dari image_urls
+        const imageUrls = item.image_urls 
+            ? (typeof item.image_urls === 'string' ? JSON.parse(item.image_urls) : item.image_urls)
+            : (item.image_url ? [item.image_url] : []);
+
+        const imagesHtml = imageUrls.length > 0 
+            ? imageUrls.map(url => {
+                const fullUrl = url.startsWith('http') ? url : `${BASE_URL}/uploads/menu/${url}`;
+                return `
+                    <div class="swiper-slide">
+                        <img src="${fullUrl}" alt="${item.name}" class="w-full h-36 object-cover" 
+                            onerror="this.src='https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'">
+                    </div>`;
+            }).join('')
+            : `
+                <div class="swiper-slide">
+                    <img src="https://placehold.co/400x300/e2e8f0/64748b?text=No+Image" class="w-full h-36 object-cover">
+                </div>`;
+
+        const priceText = item.price ? `Rp ${parseInt(item.price).toLocaleString('id-ID')}` : 'Hubungi';
+        
+        // --- PERUBAHAN: TAMBAHKAN HTML UNTUK JARAK ---
+        // Tampilkan jarak hanya jika ada properti 'distance' pada item
+        const distanceHtml = (item.distance !== undefined && item.distance !== null)
+            ? `<p class="text-xs text-neutral-text dark:text-gray-400 mb-2 flex items-center">
+                 <i class="fas fa-map-marker-alt mr-1 text-red-500"></i>
+                 ${parseFloat(item.distance).toFixed(1)} km dari Anda
+               </p>`
+            : '';
+
+        card.innerHTML = `
+            <div class="menu-card bg-white dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group border border-gray-100 dark:border-gray-800 cursor-pointer"
+                 onclick="openProductDetail(${item.id}, '${item.category}')">
+                <div class="relative bg-gray-200 dark:bg-gray-700 rounded-t-2xl overflow-hidden">
+                    <div class="swiper mySwiper-${index}">
+                        <div class="swiper-wrapper">${imagesHtml}</div>
+                        <div class="swiper-pagination"></div>
                     </div>
-                `;
-                return;
+                    ${item.promo ? `<span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">${item.promo}</span>` : ''}
+                    ${!item.is_available ? `<div class="absolute inset-0 bg-black/50 flex items-center justify-center"><span class="text-white font-bold">Tidak Tersedia</span></div>` : ''}
+                </div>
+                <div class="p-4">
+                    <h4 class="font-bold text-base line-clamp-2 mb-2 min-h-[2.5rem]">${item.name}</h4>
+                    <p class="text-xs text-neutral-text dark:text-gray-400 mb-2 flex items-center">
+                        <i class="fas fa-tag mr-1"></i> ${item.category || 'Lainnya'}
+                    </p>
+                    <!-- TAMBAHKAN ELEMEN JARAK DI SINI -->
+                    ${distanceHtml}
+                    <div class="flex items-center justify-between mt-3">
+                        <div class="flex items-center text-sm" id="rating-${item.id}">
+                            <span class="text-yellow-500 mr-1"><i class="fas fa-star"></i></span>
+                            <span class="font-semibold">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-center justify-between">
+                        <span class="text-cool-primary dark:text-cool-accent font-bold text-lg">${priceText}</span>
+                        <button class="bg-cool-primary hover:bg-blue-700 text-white p-2 rounded-lg transition-all transform hover:scale-110 shadow-md" onclick="${checkLoginStatus() ? `addToCart(${item.id}, event)` : `showLoginPrompt(event)`}">
+                            <i class="fas fa-plus text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        card.addEventListener('click', (e) => {
+            if (!e.target.closest('button')) {
+                showProductDetail(item);
             }
+        });
 
-            menuItems.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = "product-card bg-card-light dark:bg-card-dark rounded-2xl shadow-lg overflow-hidden cursor-pointer animate-scale-in";
-                card.style.animationDelay = `${index * 0.05}s`;
+        container.appendChild(card);
+        fetchProductRating(item.id); // Panggil fungsi rating
+    });
 
-                // Ambil semua gambar dari image_urls (bisa string JSON atau array)
-                const imageUrls = item.image_urls 
-                    ? (typeof item.image_urls === 'string' ? JSON.parse(item.image_urls) : item.image_urls)
-                    : (item.image_url ? [item.image_url] : []);
-
-                // Generate HTML untuk setiap gambar dalam slider
-                const imagesHtml = imageUrls.length > 0 
-                    ? imageUrls.map(url => {
-                        const fullUrl = url.startsWith('http') 
-                            ? url 
-                            : `${BASE_URL}/uploads/menu/${url}`;
-                        return `
-                            <div class="swiper-slide">
-                                <img src="${fullUrl}" alt="${item.name}" class="w-full h-36 object-cover" 
-                                    onerror="this.src='https://placehold.co/400x300/e2e8f0/64748b?text=No+Image'">
-                            </div>`;
-                    }).join('')
-                    : `
-                        <div class="swiper-slide">
-                            <img src="https://placehold.co/400x300/e2e8f0/64748b?text=No+Image" 
-                                 class="w-full h-36 object-cover">
-                        </div>`;
-
-                // Bangun isi kartu produk
-                const priceText = item.price ? `Rp ${parseInt(item.price).toLocaleString('id-ID')}` : 'Hubungi';
-                card.innerHTML = `
-                        <div 
-                class="menu-card bg-white dark:bg-gray-900 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group border border-gray-100 dark:border-gray-800 cursor-pointer"
-                onclick="openProductDetail(${item.id}, '${item.category}')"
-                >
-                    <div class="relative bg-gray-200 dark:bg-gray-700 rounded-t-2xl overflow-hidden">
-                        <!-- Swiper Container -->
-                        <div class="swiper mySwiper-${index}">
-                            <div class="swiper-wrapper">
-                                ${imagesHtml}
-                            </div>
-                            <div class="swiper-pagination"></div>
-                        </div>
-
-                        ${item.promo 
-                            ? `<span class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">${item.promo}</span>` 
-                            : ''}
-                        ${!item.is_available 
-                            ? `<div class="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                <span class="text-white font-bold">Tidak Tersedia</span>
-                               </div>` 
-                            : ''}
-                    </div>
-
-                    <div class="p-4">
-                        <h4 class="font-bold text-base line-clamp-2 mb-2 min-h-[2.5rem]">${item.name}</h4>
-                        <p class="text-xs text-neutral-text dark:text-gray-400 mb-2 flex items-center">
-                            <i class="fas fa-tag mr-1"></i>
-                            ${item.category || 'Lainnya'}
-                        </p>
-                        <div class="flex items-center justify-between mt-3">
-                            <div class="flex items-center text-sm">
-                                <span class="text-yellow-500 mr-1"><i class="fas fa-star"></i></span>
-                                <span class="font-semibold">${item.rating || '4.5'}</span>
-                            </div>
-                        </div>
-                        <div class="mt-3 flex items-center justify-between">
-                            <span class="text-cool-primary dark:text-cool-accent font-bold text-lg">${priceText}</span>
-                            <button class="bg-cool-primary hover:bg-blue-700 text-white p-2 rounded-lg transition-all transform hover:scale-110 shadow-md" onclick="${checkLoginStatus() ? `addToCart(${item.id}, event)` : `showLoginPrompt(event)`}">
-                                <i class="fas fa-plus text-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-
-                // Event klik kartu → buka detail produk
-                card.addEventListener('click', (e) => {
-                    if (!e.target.closest('button')) {
-                        showProductDetail(item);
-                    }
-                });
-
-                container.appendChild(card);
+    // Aktifkan Swiper slider
+    setTimeout(() => {
+        document.querySelectorAll('.swiper').forEach((el) => {
+            new Swiper(el, {
+                loop: true,
+                autoplay: { delay: 2500, disableOnInteraction: false },
+                pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
             });
+        });
+    }, 100);
+}
 
-            // Setelah semua kartu dirender, aktifkan semua slider Swiper
-            setTimeout(() => {
-                document.querySelectorAll('.swiper').forEach((el) => {
-                    new Swiper(el, {
-                        loop: true,
-                        autoplay: { delay: 2500, disableOnInteraction: false },
-                        pagination: { el: el.querySelector('.swiper-pagination'), clickable: true },
-                    });
-                });
-            }, 100);
+// Fungsi fetchProductRating tetap sama seperti sebelumnya
+async function fetchProductRating(productId) {
+    // ... (kode fungsi fetchProductRating dari jawaban sebelumnya) ...
+    const ratingElement = document.getElementById(`rating-${productId}`);
+    if (!ratingElement) return;
+
+    try {
+        const response = await fetch(`${BASE_URL}/api/reviews/${productId}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        
+        if (data.success && data.total > 0) {
+            ratingElement.innerHTML = `
+                <span class="text-yellow-500 mr-1"><i class="fas fa-star"></i></span>
+                <span class="font-semibold">${data.average_rating.toFixed(1)}</span>
+                <span class="text-xs text-gray-500 ml-1">(${data.total})</span>
+            `;
+        } else {
+            ratingElement.innerHTML = `
+                <span class="text-yellow-500 mr-1"><i class="fas fa-star"></i></span>
+                <span class="font-semibold text-gray-400">Belum ada rating</span>
+            `;
         }
+    } catch (error) {
+        console.error(`Gagal mengambil rating untuk produk ${productId}:`, error);
+        ratingElement.innerHTML = `
+            <span class="text-yellow-500 mr-1"><i class="fas fa-star"></i></span>
+            <span class="font-semibold text-gray-400">Gagal memuat</span>
+        `;
+    }
+}
+
+/**
+ * Fungsi untuk mengambil lokasi pengguna, memanggil API menu terdekat,
+ * dan merender hasilnya.
+ */
+async function fetchAndRenderNearbyMenus() {
+    const token = localStorage.getItem('authToken');
+    const container = document.getElementById('recommendation-list-container');
+    container.innerHTML = `<p class="text-center col-span-full py-8 text-gray-500">Mencari menu terdekat...</p>`;
+
+    if (!navigator.geolocation) {
+        container.innerHTML = `<p class="text-center col-span-full py-8 text-red-500">Browser Anda tidak mendukung fitur lokasi.</p>`;
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            const { latitude, longitude } = position.coords;
+            console.log(`[DEBUG] Lokasi ditemukan: Lat ${latitude}, Lon ${longitude}`);
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/menu/nearby?lat=${latitude}&lon=${longitude}&radius=10`);
+                
+                
+                // Cek jika respons tidak OK (misalnya 404, 500)
+                if (!response.ok) {
+                    throw new Error(`Server merespon dengan status ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('[DEBUG] Response dari server:', result);
+
+                // Backend yang sudah diperbaiki akan mengirim { success: true, data: [...] }
+                if (result.success) {
+                    renderRecommendations(result.data); // <-- Menggunakan key 'data'
+                } else {
+                    // Tangani error dari backend, misalnya jika parameter tidak valid
+                    throw new Error(result.error || 'Tidak ada menu terdekat yang ditemukan.');
+                }
+            } catch (error) {
+                console.error('[DEBUG] Error fetching nearby menus:', error);
+                container.innerHTML = `<p class="text-center col-span-full py-8 text-red-500">Gagal memuat menu terdekat. ${error.message}</p>`;
+            }
+        },
+        (error) => {
+            console.error('Geolocation error:', error);
+            let message = 'Gagal mendapatkan lokasi Anda. ';
+            if (error.code === error.PERMISSION_DENIED) {
+                message += 'Izinkan akses lokasi untuk menggunakan fitur ini.';
+            } else {
+                message += 'Pastikan GPS Anda aktif.';
+            }
+            container.innerHTML = `<p class="text-center col-span-full py-8 text-red-500">${message}</p>`;
+        }
+    );
+}
 
         // ========== CATEGORY FILTER ==========
         document.querySelectorAll('.category-tab').forEach(tab => {
@@ -1154,8 +1263,14 @@
                 const res = await fetch(`${BASE_URL}/api/cart`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ id: item.id, name: item.name, price: item.price, image: item.image_url })
-                });
+                    body: JSON.stringify({ 
+                    item_id: item.id,  // ganti dari 'id' menjadi 'item_id'
+                    name: item.name, 
+                    price: item.price, 
+                    image_url: item.image_url,
+                    quantity: 1          // tambahkan quantity default
+                })
+                                });
                 if (!res.ok) throw new Error('post-failed');
                 await refreshCartCountFromAPI();
                 showNotification('✅ Ditambahkan ke keranjang!', 'success');
@@ -1644,7 +1759,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     initSearch();
-
+    fetchAndRenderNearbyMenus();
     showSlide(currentSlideIndex);
     startAutoSlide();
 });

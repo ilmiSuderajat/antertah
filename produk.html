@@ -100,6 +100,11 @@
         body.no-scroll {
             overflow: hidden;
         }
+
+        /* Animasi untuk rating bar */
+        .rating-bar {
+            transition: width 0.5s ease-in-out;
+        }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
@@ -112,30 +117,30 @@
             <h1 class="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-100">Detail Produk</h1>
             <div class="flex items-center space-x-2">
                 <!-- Tombol utama Bagikan -->
-<button class="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative" 
-        aria-label="Bagikan"
-        onclick="setCurrentProduct('${item.id}', '${item.name}', '${item.image_url}'); toggleShareMenu(this)">
-    <i class="fas fa-share-alt text-lg"></i>
-</button>
+                <button class="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative" 
+                        aria-label="Bagikan"
+                        onclick="setCurrentProduct('${item.id}', '${item.name}', '${item.image_url}'); toggleShareMenu(this)">
+                    <i class="fas fa-share-alt text-lg"></i>
+                </button>
 
-<!-- Menu pilihan platform (hidden by default) -->
-<div id="shareMenu" class="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg w-48 hidden z-50">
-    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" onclick="shareTo('whatsapp')">
-        <i class="fab fa-whatsapp mr-2"></i> WhatsApp
-    </button>
-    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" onclick="shareTo('telegram')">
-        <i class="fab fa-telegram-plane mr-2"></i> Telegram
-    </button>
-    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" onclick="shareTo('twitter')">
-        <i class="fab fa-twitter mr-2"></i> Twitter
-    </button>
-    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" onclick="shareTo('email')">
-        <i class="fas fa-envelope mr-2"></i> Email
-    </button>
-    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" onclick="copyLink()">
-        <i class="fas fa-link mr-2"></i> Salin Link
-    </button>
-</div>
+                <!-- Menu pilihan platform (hidden by default) -->
+                <div id="shareMenu" class="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg w-48 hidden z-50">
+                    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" onclick="shareTo('whatsapp')">
+                        <i class="fab fa-whatsapp mr-2"></i> WhatsApp
+                    </button>
+                    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" onclick="shareTo('telegram')">
+                        <i class="fab fa-telegram-plane mr-2"></i> Telegram
+                    </button>
+                    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" onclick="shareTo('twitter')">
+                        <i class="fab fa-twitter mr-2"></i> Twitter
+                    </button>
+                    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" onclick="shareTo('email')">
+                        <i class="fas fa-envelope mr-2"></i> Email
+                    </button>
+                    <button class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700" onclick="copyLink()">
+                        <i class="fas fa-link mr-2"></i> Salin Link
+                    </button>
+                </div>
 
                 <button onclick="toggleCart()" class="relative p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="Keranjang">
                     <i class="fas fa-shopping-cart text-lg"></i>
@@ -224,22 +229,37 @@
             <span id="imageCounter">1 / 1</span>
         </div>
     </div>
-     <footer id="footer" class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
+     <footer id="footer" class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light/95 dark:bg-card-dark/95 border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md">
         <div class="flex justify-around items-center h-16">
-            <a href="home.html" class="bottom-nav-item text-neutral-text  dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
-                <i class="fas fa-home text-xl mb-1"></i>
+            <!-- Beranda -->
+            <a href="home.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-home text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Beranda</span>
             </a>
-            <a href="kuliner.html" class="bottom-nav-item  text-neutral-text  flex flex-col items-center text-xs font-bold transition">
-                <i class="fas fa-search text-xl mb-1"></i>
+
+            <!-- Cari -->
+            <a href="kuliner.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-search text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Cari</span>
             </a>
-            <a href="pesanan.html" class="bottom-nav-item text-neutral-text  dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
-                <i class="fas fa-list-alt text-xl mb-1"></i>
+
+            <!-- Pesanan -->
+            <a href="pesanan.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-list-alt text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Pesanan</span>
             </a>
-            <a href="profile.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
-                <i class="fas fa-user text-xl mb-1"></i>
+
+            <!-- Keranjang (dengan badge) -->
+            <a href="keranjang.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-shopping-basket text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                <span>Keranjang</span>
+                <!-- Badge untuk jumlah item -->
+                <span id="cart-item-count" class="cart-badge absolute top-1 right-1/4 translate-x-1/2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-y-1 bg-red-600 rounded-full">0</span>
+            </a>
+
+            <!-- Akun -->
+            <a href="profile.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-user text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Akun</span>
             </a>
         </div>
@@ -255,6 +275,7 @@
         let isZoomed = false;
         let touchStartX = 0;
         let touchEndX = 0;
+        let userLocation = null; // Menyimpan lokasi pengguna
 
         // Inisialisasi saat DOM dimuat
         document.addEventListener('DOMContentLoaded', async () => {
@@ -275,8 +296,47 @@
                 return;
             }
 
+            // Dapatkan lokasi pengguna terlebih dahulu
+            await getUserLocation();
+            // Kemudian ambil detail produk
             await fetchProductDetail(id);
         });
+
+        // Fungsi untuk mendapatkan lokasi pengguna
+        function getUserLocation() {
+            return new Promise((resolve, reject) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            userLocation = {
+                                lat: position.coords.latitude,
+                                lon: position.coords.longitude
+                            };
+                            resolve(userLocation);
+                        },
+                        (error) => {
+                            console.error("Error getting location:", error);
+                            resolve(null); // Lanjutkan tanpa lokasi
+                        }
+                    );
+                } else {
+                    console.error("Geolocation is not supported by this browser.");
+                    resolve(null); // Lanjutkan tanpa lokasi
+                }
+            });
+        }
+
+        // Fungsi untuk menghitung jarak menggunakan formula Haversine
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius bumi dalam km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                0.5 - Math.cos(dLat)/2 + 
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                (1 - Math.cos(dLon))/2;
+            return R * 2 * Math.asin(Math.sqrt(a));
+        }
 
         // Fungsi untuk mengambil detail produk
         async function fetchProductDetail(id) {
@@ -299,6 +359,9 @@
                 const currentProductId = productData.product.id;
                 const filteredRecommendations = productData.related.filter(p => p.id !== currentProductId);
                 renderRecommendations(filteredRecommendations);
+
+                // Ambil ulasan setelah produk dirender
+                await fetchProductReviews(currentProductId);
                 
             } catch (error) {
                 console.error("Kesalahan saat fetching produk:", error);
@@ -354,6 +417,18 @@
             const safePrice = parseInt(rawPrice) || 0; 
             const formattedPrice = safePrice.toLocaleString('id-ID');
 
+            // Hitung jarak jika lokasi pengguna dan produk tersedia
+            let distanceHtml = '';
+            if (userLocation && product.latitude && product.longitude) {
+                const distance = calculateDistance(userLocation.lat, userLocation.lon, product.latitude, product.longitude);
+                distanceHtml = `
+                    <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        <i class="fas fa-map-marker-alt mr-2 text-red-500"></i>
+                        <span>${distance.toFixed(2)} km dari lokasi Anda</span>
+                    </div>
+                `;
+            }
+
             container.innerHTML = `
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden animate-slide-up">
                     <!-- Image Gallery -->
@@ -394,16 +469,20 @@
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                             <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-0">${product.name}</h2>
                             <div class="flex items-center space-x-2">
-                                <div class="flex items-center">
+                                <div class="flex items-center" id="productRating">
+                                    <!-- Rating akan diisi oleh JavaScript -->
                                     <i class="fas fa-star text-yellow-400"></i>
                                     <i class="fas fa-star text-yellow-400"></i>
                                     <i class="fas fa-star text-yellow-400"></i>
                                     <i class="fas fa-star text-yellow-400"></i>
                                     <i class="fas fa-star-half-alt text-yellow-400"></i>
                                 </div>
-                                <span class="text-sm text-gray-500 dark:text-gray-400">(4.5)</span>
+                                <span class="text-sm text-gray-500 dark:text-gray-400" id="productRatingText">(4.5)</span>
                             </div>
                         </div>
+                        
+                        <!-- Tambahkan HTML untuk jarak -->
+                        ${distanceHtml}
                         
                         <div class="flex items-baseline mb-6">
                             <p class="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">Rp ${formattedPrice}</p>
@@ -413,6 +492,25 @@
                         <div class="mb-6">
                             <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">Deskripsi Produk</h3>
                             <p class="text-gray-600 dark:text-gray-400 leading-relaxed">${product.description || 'Tidak ada deskripsi.'}</p>
+                        </div>
+
+                        <!-- Tambahkan section untuk ulasan -->
+                        <div id="reviewsSection" class="mb-6">
+                            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">Ulasan Pembeli</h3>
+                            <div id="reviewsSummary" class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4">
+                                <!-- Ringkasan ulasan akan diisi oleh JavaScript -->
+                            </div>
+                            <div id="reviewsList" class="space-y-4">
+                                <!-- Daftar ulasan akan diisi oleh JavaScript -->
+                            </div>
+                            <div class="flex justify-between items-center mt-4">
+                                <button onclick="showAllReviews()" class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                                    Lihat Semua Ulasan
+                                </button>
+                                <button onclick="writeReview()" class="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+                                    <i class="fas fa-pen mr-1"></i> Tulis Ulasan
+                                </button>
+                            </div>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4 mb-6">
@@ -447,6 +545,206 @@
                     </div>
                 </div>
             `;
+        }
+
+        // Fungsi untuk mengambil ulasan produk
+// Fungsi untuk mengambil ulasan produk
+async function fetchProductReviews(productId) {
+    try {
+        const response = await fetch(`${BASE_URL}/api/reviews/${productId}`);
+        if (!response.ok) {
+            throw new Error(`Gagal mengambil ulasan. Status: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        // --- TAMBAHKAN DEBUG LOG ---
+        // Ini akan membantu Anda melihat apa saja yang dikembalikan oleh API
+        console.log('[DEBUG] Raw reviews data from API:', data);
+        
+        renderReviews(data);
+    } catch (error) {
+        console.error("[DEBUG] Error fetching reviews:", error); // Log error yang lebih detail
+        document.getElementById('reviewsSection').innerHTML = `
+            <p class="text-gray-500 dark:text-gray-400">Gagal memuat ulasan. ${error.message}</p>
+        `;
+    }
+}
+
+// Fungsi untuk merender ulasan
+function renderReviews(data) {
+    const summaryContainer = document.getElementById('reviewsSummary');
+    const listContainer = document.getElementById('reviewsList');
+    const ratingContainer = document.getElementById('productRating');
+    const ratingTextContainer = document.getElementById('productRatingText');
+
+    // --- PERBAIKAN: Berikan nilai default untuk mencegah error ---
+    // Jika data.success tidak ada, anggap saja false
+    if (!data || !data.success || data.total === 0) {
+        summaryContainer.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Belum ada ulasan untuk produk ini.</p>';
+        listContainer.innerHTML = '';
+        ratingContainer.innerHTML = '<i class="fas fa-star text-gray-400"></i>'.repeat(5);
+        ratingTextContainer.textContent = '(Belum ada ulasan)';
+        return;
+    }
+
+    // --- PERBAIKAN: Gunakan nilai default jika rating_summary tidak ada ---
+    const averageRating = data.average_rating || 0;
+    const totalReviews = data.total || 0;
+    // Jika rating_summary tidak ada, gunakan objek kosong untuk mencegah error
+    const ratingSummary = data.rating_summary || { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+    // Render ringkasan ulasan
+    summaryContainer.innerHTML = `
+        <div class="flex items-center justify-between">
+            <div>
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold mr-2">${averageRating.toFixed(1)}</span>
+                    <div class="flex">
+                        ${generateStarRating(averageRating)}
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">${totalReviews} ulasan</p>
+            </div>
+            <div class="text-right">
+                ${Object.entries(ratingSummary).reverse().map(([star, count]) => `
+                    <div class="flex items-center mb-1">
+                        <span class="text-xs mr-2">${star} ⭐</span>
+                        <div class="w-20 bg-gray-200 dark:bg-gray-600 rounded-full h-2 mr-2">
+                            <div class="bg-yellow-400 h-2 rounded-full rating-bar" style="width: ${totalReviews > 0 ? (count / totalReviews) * 100 : 0}%"></div>
+                        </div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">${count}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    // Update rating di bagian atas
+    ratingContainer.innerHTML = generateStarRating(averageRating);
+    ratingTextContainer.textContent = `(${totalReviews})`;
+
+    // --- PERBAIKAN: Gunakan nilai default jika data.reviews tidak ada ---
+    const reviewsList = data.reviews || [];
+    // Render daftar ulasan (hanya 3 pertama)
+    const reviewsToShow = reviewsList.slice(0, 3);
+    listContainer.innerHTML = reviewsToShow.map(review => `
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center">
+                    <img src="https://placehold.co/40x40/3b82f6/FFFFFF?text=${(review.user_name || 'U').charAt(0).toUpperCase()}" alt="${review.user_name || 'User'}" class="w-10 h-10 rounded-full mr-3">
+                    <div>
+                        <h4 class="font-semibold text-sm">${review.user_name || 'Anonim'}</h4>
+                        <div class="flex items-center">
+                            ${generateStarRating(review.rating)}
+                            <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">${review.created_at || 'Tanggal tidak diketahui'}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">${review.comment || 'Tidak ada komentar.'}</p>
+        </div>
+    `).join('');
+}
+
+        // Fungsi untuk merender ulasan
+        function renderReviews(data) {
+            const summaryContainer = document.getElementById('reviewsSummary');
+            const listContainer = document.getElementById('reviewsList');
+            const ratingContainer = document.getElementById('productRating');
+            const ratingTextContainer = document.getElementById('productRatingText');
+
+            if (!data.success || data.total === 0) {
+                summaryContainer.innerHTML = '<p class="text-gray-500 dark:text-gray-400">Belum ada ulasan.</p>';
+                listContainer.innerHTML = '';
+                ratingContainer.innerHTML = '<i class="fas fa-star text-gray-400"></i>'.repeat(5);
+                ratingTextContainer.textContent = '(Belum ada ulasan)';
+                return;
+            }
+
+            // Render ringkasan ulasan
+            const averageRating = data.average_rating;
+            const totalReviews = data.total;
+            const ratingSummary = data.rating_summary;
+
+            summaryContainer.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center">
+                            <span class="text-2xl font-bold mr-2">${averageRating.toFixed(1)}</span>
+                            <div class="flex">
+                                ${generateStarRating(averageRating)}
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">${totalReviews} ulasan</p>
+                    </div>
+                    <div class="text-right">
+                        ${Object.entries(ratingSummary).reverse().map(([star, count]) => `
+                            <div class="flex items-center mb-1">
+                                <span class="text-xs mr-2">${star} ⭐</span>
+                                <div class="w-20 bg-gray-200 dark:bg-gray-600 rounded-full h-2 mr-2">
+                                    <div class="bg-yellow-400 h-2 rounded-full rating-bar" style="width: ${(count / totalReviews) * 100}%"></div>
+                                </div>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">${count}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Update rating di bagian atas
+            ratingContainer.innerHTML = generateStarRating(averageRating);
+            ratingTextContainer.textContent = `(${totalReviews})`;
+
+            // Render daftar ulasan (hanya 3 pertama)
+            const reviewsToShow = data.reviews.slice(0, 3);
+            listContainer.innerHTML = reviewsToShow.map(review => `
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center">
+                            <img src="https://placehold.co/40x40/3b82f6/FFFFFF?text=${review.user_name.charAt(0).toUpperCase()}" alt="${review.user_name}" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <h4 class="font-semibold text-sm">${review.user_name}</h4>
+                                <div class="flex items-center">
+                                    ${generateStarRating(review.rating)}
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">${review.created_at}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">${review.comment}</p>
+                </div>
+            `).join('');
+        }
+
+        // Fungsi pembantu untuk generate star rating HTML
+        function generateStarRating(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i class="fas fa-star text-yellow-400"></i>';
+                } else if (i - 0.5 <= rating) {
+                    stars += '<i class="fas fa-star-half-alt text-yellow-400"></i>';
+                } else {
+                    stars += '<i class="far fa-star text-yellow-400"></i>';
+                }
+            }
+            return stars;
+        }
+
+        // Fungsi untuk menampilkan semua ulasan (placeholder)
+        // Fungsi untuk menampilkan semua ulasan
+        function showAllReviews() {
+            if (!currentProduct || !currentProduct.id) {
+                showNotification('ID produk tidak valid.', 'error');
+                return;
+            }
+            // Arahkan ke halaman ulasan dengan membawa ID produk sebagai parameter
+            window.location.href = `ulasan.html?id=${currentProduct.id}`;
+        }
+
+        // Fungsi untuk menulis ulasan (placeholder)
+        function writeReview() {
+            showNotification('Harus Beli Produk Ini Terlebih Dahulu!', 'info');
         }
 
         // Fungsi untuk merender rekomendasi

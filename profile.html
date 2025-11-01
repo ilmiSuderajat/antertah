@@ -424,22 +424,37 @@
     </div>
 
     <!-- Bottom Navigation (Mobile Only) -->
-    <footer class="lg:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
+    <footer id="footer" class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light/95 dark:bg-card-dark/95 border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md">
         <div class="flex justify-around items-center h-16">
-            <a href="home.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium">
-                <i class="fas fa-home text-xl mb-1"></i>
+            <!-- Beranda -->
+            <a href="home.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-home text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Beranda</span>
             </a>
-            <a href="kuliner.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium">
-                <i class="fas fa-search text-xl mb-1"></i>
+
+            <!-- Cari -->
+            <a href="kuliner.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-search text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Cari</span>
             </a>
-            <a href="pesanan.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium">
-                <i class="fas fa-list-alt text-xl mb-1"></i>
+
+            <!-- Pesanan -->
+            <a href="pesanan.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-list-alt text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Pesanan</span>
             </a>
-            <a href="profile.html" class="bottom-nav-item active text-cool-primary flex flex-col items-center text-xs font-semibold">
-                <i class="fas fa-user text-xl mb-1"></i>
+
+            <!-- Keranjang (dengan badge) -->
+            <a href="keranjang.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-shopping-basket text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                <span>Keranjang</span>
+                <!-- Badge untuk jumlah item -->
+                <span id="cart-item-count" class="cart-badge absolute top-1 right-1/4 translate-x-1/2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-y-1 bg-red-600 rounded-full">0</span>
+            </a>
+
+            <!-- Akun -->
+            <a href="profile.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-cool-primary dark:text-cool-primary hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-user text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Akun</span>
             </a>
         </div>
@@ -1022,9 +1037,14 @@ function editAddress(id) {
         logDebug(`Alamat ID ${id} tidak ditemukan dalam state.`, 'warn');
         return;
     }
+
     logDebug(`Memuat data alamat ID ${id} untuk diedit.`, 'info');
 
-    window.location= 'setup_profile.html';
+    // Simpan data ke sessionStorage biar bisa diambil di halaman setup_profile.html
+    sessionStorage.setItem('editAddressData', JSON.stringify(addressToEdit));
+
+    // Redirect ke halaman form edit
+    window.location = 'setup_profile.html';
 }
 
 async function deleteAddress(id) {

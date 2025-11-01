@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semua Ulasan - Nama Toko</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Konfigurasi Tailwind Kustom (sama seperti produk.html) -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'cool-primary': '#1d4ed8',
+                        'cool-accent': '#06b6d4',
+                        'bg-light': '#f1f5f9',
+                        'bg-dark': '#0f172a',
+                        'card-light': '#ffffff',
+                        'card-dark': '#1e293b',
+                        'text-light': '#f1f5f9',
+                        'text-dark': '#1e293b',
+                        'neutral-text': '#64748b',
+                        'wa-success': '#25D366'
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    animation: { 'fade-in': 'fadeIn 0.5s ease-out', 'slide-up': 'slideUp 0.5s ease-out' },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .rating-bar { transition: width 0.5s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-gray-800">
+        <div class="max-w-4xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
+            <button onclick="history.back()" class="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" aria-label="Kembali">
+                <i class="fas fa-arrow-left text-lg"></i>
+            </button>
+            <h1 class="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-100">Semua Ulasan</h1>
+            <div class="w-9"></div> <!-- Placeholder untuk menjaga judul di tengah -->
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="reviewsMainContent" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Loading State -->
+        <div id="loadingState" class="flex flex-col items-center justify-center min-h-[60vh]">
+            <div class="inline-flex items-center justify-center w-16 h-16 mb-4 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                <i class="fas fa-spinner fa-spin text-2xl text-blue-600 dark:text-blue-400"></i>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400">Memuat ulasan...</p>
+        </div>
+
+        <!-- Content Container (initially hidden) -->
+        <div id="contentContainer" class="hidden animate-slide-up">
+            <!-- Review Summary Card -->
+            <div id="reviewSummaryCard" class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
+                <!-- Isi akan di-generate oleh JavaScript -->
+            </div>
+
+            <!-- Reviews List -->
+            <div id="reviewsListContainer" class="space-y-4">
+                <!-- Isi akan di-generate oleh JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+ <footer id="footer" class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light/95 dark:bg-card-dark/95 border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md">
+        <div class="flex justify-around items-center h-16">
+            <!-- Beranda -->
+            <a href="home.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-home text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                <span>Beranda</span>
+            </a>
+
+            <!-- Cari -->
+            <a href="kuliner.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-search text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                <span>Cari</span>
+            </a>
+
+            <!-- Pesanan -->
+            <a href="pesanan.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-list-alt text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                <span>Pesanan</span>
+            </a>
+
+            <!-- Keranjang (dengan badge) -->
+            <a href="keranjang.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-shopping-basket text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                <span>Keranjang</span>
+                <!-- Badge untuk jumlah item -->
+                <span id="cart-item-count" class="cart-badge absolute top-1 right-1/4 translate-x-1/2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-y-1 bg-red-600 rounded-full">0</span>
+            </a>
+
+            <!-- Akun -->
+            <a href="profile.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-user text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                <span>Akun</span>
+            </a>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productId = getProductIdFromURL();
+            if (productId) {
+                fetchAndRenderReviews(productId);
+            } else {
+                showError('ID Produk tidak ditemukan di URL.');
+            }
+        });
+
+        // Fungsi untuk mendapatkan Product ID dari URL
+        function getProductIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        // Fungsi utama untuk mengambil dan merender ulasan
+        async function fetchAndRenderReviews(productId) {
+            try {
+                const response = await fetch(`${BASE_URL}/api/reviews/${productId}`);
+                if (!response.ok) {
+                    throw new Error(`Gagal mengambil ulasan. Status: ${response.status}`);
+                }
+                const data = await response.json();
+                renderReviews(data);
+            } catch (error) {
+                console.error("Error fetching reviews:", error);
+                showError(error.message);
+            }
+        }
+
+        // Fungsi untuk merender semua data ulasan ke halaman
+        function renderReviews(data) {
+            const loadingState = document.getElementById('loadingState');
+            const contentContainer = document.getElementById('contentContainer');
+            const summaryCard = document.getElementById('reviewSummaryCard');
+            const listContainer = document.getElementById('reviewsListContainer');
+
+            // Sembunyikan loading, tampilkan konten
+            loadingState.classList.add('hidden');
+            contentContainer.classList.remove('hidden');
+
+            // Handle jika tidak ada ulasan
+            if (!data.success || data.total === 0) {
+                summaryCard.innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-star text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Belum Ada Ulasan</h2>
+                        <p class="text-gray-500 dark:text-gray-400">Jadilah yang pertama memberikan ulasan untuk produk ini!</p>
+                    </div>
+                `;
+                listContainer.innerHTML = '';
+                return;
+            }
+
+            const averageRating = data.average_rating || 0;
+            const totalReviews = data.total || 0;
+            const reviewsList = data.reviews || [];
+            
+            // Hitung rating_summary jika tidak ada dari backend
+            let ratingSummary = data.rating_summary;
+            if (!ratingSummary) {
+                ratingSummary = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+                reviewsList.forEach(review => {
+                    if (review.rating && ratingSummary[review.rating] !== undefined) {
+                        ratingSummary[review.rating]++;
+                    }
+                });
+            }
+
+            // Render Ringkasan Ulasan
+            summaryCard.innerHTML = `
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                    <div class="text-center md:text-left">
+                        <div class="flex items-center justify-center md:justify-start">
+                            <span class="text-5xl font-bold mr-3">${averageRating.toFixed(1)}</span>
+                            <div class="flex flex-col">
+                                <div class="flex text-2xl">${generateStarRating(averageRating)}</div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Berdasarkan ${totalReviews} ulasan</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1 max-w-sm">
+                        ${Object.entries(ratingSummary).reverse().map(([star, count]) => `
+                            <div class="flex items-center mb-2">
+                                <span class="text-sm w-4">${star} ⭐</span>
+                                <div class="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-3 mx-3">
+                                    <div class="bg-yellow-400 h-3 rounded-full rating-bar" style="width: ${totalReviews > 0 ? (count / totalReviews) * 100 : 0}%"></div>
+                                </div>
+                                <span class="text-sm text-gray-500 dark:text-gray-400 w-8 text-right">${count}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Render Daftar Ulasan
+            listContainer.innerHTML = reviewsList.map(review => `
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 border border-gray-100 dark:border-gray-700">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg mr-4">
+                                ${(review.user_name || 'U').charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-base">${review.user_name || 'Anonim'}</h4>
+                                <div class="flex items-center mt-1">
+                                    ${generateStarRating(review.rating)}
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap ml-4">${review.created_at || 'Tanggal tidak diketahui'}</span>
+                    </div>
+                    <p class="text-gray-700 dark:text-gray-300 leading-relaxed">${review.comment || 'Pengguna tidak memberikan komentar.'}</p>
+                </div>
+            `).join('');
+        }
+
+        // Fungsi untuk menampilkan pesan error
+        function showError(message) {
+            const mainContent = document.getElementById('reviewsMainContent');
+            mainContent.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-[60vh]">
+                    <div class="inline-flex items-center justify-center w-16 h-16 mb-4 bg-red-100 dark:bg-red-900/30 rounded-full">
+                        <i class="fas fa-exclamation-triangle text-2xl text-red-600 dark:text-red-400"></i>
+                    </div>
+                    <p class="text-center text-red-500 dark:text-red-400">Terjadi kesalahan: ${message}</p>
+                    <button onclick="history.back()" class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                        Kembali
+                    </button>
+                </div>
+            `;
+        }
+
+        // Fungsi helper untuk generate star rating HTML
+        function generateStarRating(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i class="fas fa-star text-yellow-400"></i>';
+                } else if (i - 0.5 <= rating) {
+                    stars += '<i class="fas fa-star-half-alt text-yellow-400"></i>';
+                } else {
+                    stars += '<i class="far fa-star text-yellow-400"></i>';
+                }
+            }
+            return stars;
+        }
+    </script>
+</body>
+</html>

@@ -9,8 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     
-    <!-- Google Maps API - Ganti YOUR_GOOGLE_MAPS_API_KEY dengan kunci API yang valid -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMap"></script>
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Leaflet Control Geocoder -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
     
     <script>
         tailwind.config = {
@@ -491,59 +496,46 @@
     <script src="config.js"></script>
     <script>
 // ===================================
-// GOOGLE MAPS & GPS LOCATION FEATURES
+// LEAFLET MAP & GPS LOCATION FEATURES
 // ===================================
 
 let map;
 let marker;
-let geocoder;
 let selectedLocation = null;
 let mapInitialized = false;
 
-// Initialize Google Maps
+// Initialize Leaflet Map
 function initMap() {
-    console.log('Google Maps API loaded');
+    console.log('Initializing Leaflet Map');
     
     // Default location (Jakarta)
-    const defaultLocation = { lat: -6.2088, lng: 106.8456 };
+    const defaultLocation = [-6.2088, 106.8456];
     
     // Initialize map
-    map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 15,
-        center: defaultLocation,
-        mapTypeId: 'roadmap',
-        styles: [
-            {
-                featureType: 'poi',
-                elementType: 'labels',
-                stylers: [{ visibility: 'off' }]
-            }
-        ]
-    });
+    map = L.map('map').setView(defaultLocation, 15);
     
-    // Initialize geocoder
-    geocoder = new google.maps.Geocoder();
+    // Add tile layer (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
     
     // Add click listener to map
-    map.addListener('click', (event) => {
-        const lat = event.latLng.lat();
-        const lng = event.latLng.lng();
+    map.on('click', function(e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
         
         // Update marker position
         if (marker) {
-            marker.setPosition(event.latLng);
+            marker.setLatLng(e.latlng);
         } else {
-            marker = new google.maps.Marker({
-                position: event.latLng,
-                map: map,
-               draggable: true,
-                title: 'Lokasi Terpilih'
-            });
+            marker = L.marker(e.latlng, {
+                draggable: true
+            }).addTo(map);
             
             // Add drag listener to marker
-            marker.addListener('dragend', (event) => {
-                const dragLat = event.latLng.lat();
-                const dragLng = event.latLng.lng();
+            marker.on('dragend', function(event) {
+                const dragLat = event.target.getLatLng().lat;
+                const dragLng = event.target.getLatLng().lng;
                 getAddressFromCoordinates(dragLat, dragLng);
                 selectedLocation = { lat: dragLat, lng: dragLng };
                 updateLocationInfo(dragLat, dragLng);
@@ -592,46 +584,44 @@ function getCurrentLocation() {
             document.getElementById('latitude').value = lat;
             document.getElementById('longitude').value = lng;
             
-            // Update map center and add marker
-            if (mapInitialized) {
-                map.setCenter({ lat, lng });
-                map.setZoom(18);
-                
-                if (marker) {
-                    marker.setPosition({ lat, lng });
-                } else {
-                    marker = new google.maps.Marker({
-                        position: { lat, lng },
-                        map: map,
-                        draggable: true,
-                        title: 'Lokasi Anda',
-                        animation: google.maps.Animation.DROP
-                    });
-                    
-                    // Add drag listener to marker
-                    marker.addListener('dragend', (event) => {
-                        const dragLat = event.latLng.lat();
-                        const dragLng = event.latLng.lng();
-                        getAddressFromCoordinates(dragLat, dragLng);
-                        selectedLocation = { lat: dragLat, lng: dragLng };
-                        updateLocationInfo(dragLat, dragLng);
-                        
-                        // Update form fields
-                        document.getElementById('latitude').value = dragLat;
-                        document.getElementById('longitude').value = dragLng;
-                    });
-                }
-                
-                // Get address from coordinates
-                getAddressFromCoordinates(lat, lng);
-                
-                // Update selected location
-                selectedLocation = { lat, lng };
-                updateLocationInfo(lat, lng);
-                
-                // Show map and success message
-                mapContainer.classList.remove('hidden');
+            // Initialize map if not already done
+            if (!mapInitialized) {
+                initMap();
             }
+            
+            // Update map center and add marker
+            map.setView([lat, lng], 18);
+            
+            if (marker) {
+                marker.setLatLng([lat, lng]);
+            } else {
+                marker = L.marker([lat, lng], {
+                    draggable: true
+                }).addTo(map);
+                
+                // Add drag listener to marker
+                marker.on('dragend', function(event) {
+                    const dragLat = event.target.getLatLng().lat;
+                    const dragLng = event.target.getLatLng().lng;
+                    getAddressFromCoordinates(dragLat, dragLng);
+                    selectedLocation = { lat: dragLat, lng: dragLng };
+                    updateLocationInfo(dragLat, dragLng);
+                    
+                    // Update form fields
+                    document.getElementById('latitude').value = dragLat;
+                    document.getElementById('longitude').value = dragLng;
+                });
+            }
+            
+            // Get address from coordinates
+            getAddressFromCoordinates(lat, lng);
+            
+            // Update selected location
+            selectedLocation = { lat, lng };
+            updateLocationInfo(lat, lng);
+            
+            // Show map and success message
+            mapContainer.classList.remove('hidden');
             
             locationStatus.innerHTML = `<i class="fas fa-check-circle mr-1 text-wa-success"></i>Lokasi ditemukan! (Akurasi: ${Math.round(accuracy)}m)`;
             
@@ -670,75 +660,266 @@ function getCurrentLocation() {
     );
 }
 
-// Get address from coordinates using reverse geocoding
-function getAddressFromCoordinates(lat, lng) {
-    if (!geocoder) {
-        console.error('Geocoder not initialized');
-        return;
+// Get address from coordinates using Nominatim API (OpenStreetMap)
+const geocodeCache = new Map();
+const CACHE_EXPIRY = 3600000; // 1 jam dalam milliseconds
+
+// Debounce timer untuk menghindari request berlebihan
+let geocodeTimer = null;
+
+// ========== OPTIMIZED GEOCODING FUNCTION ==========
+function getAddressFromCoordinates(lat, lng, immediate = false) {
+    // Round koordinat ke 4 desimal untuk caching (akurasi ~11 meter)
+    const roundedLat = parseFloat(lat.toFixed(4));
+    const roundedLng = parseFloat(lng.toFixed(4));
+    const cacheKey = `${roundedLat},${roundedLng}`;
+    
+    // Cek cache terlebih dahulu
+    const cached = geocodeCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp) < CACHE_EXPIRY) {
+        console.log('📦 Using cached address');
+        updateAddressUI(cached.data, roundedLat, roundedLng);
+        return Promise.resolve(cached.data);
     }
     
-    const latlng = { lat, lng };
+    // Tampilkan loading state
+    showGeocodingLoading();
     
-    geocoder.geocode({ location: latlng }, (results, status) => {
-        if (status === 'OK' && results[0]) {
-            const address = results[0].formatted_address;
-            console.log('Address found:', address);
+    // Clear timer sebelumnya jika ada (debouncing)
+    if (geocodeTimer && !immediate) {
+        clearTimeout(geocodeTimer);
+    }
+    
+    // Function untuk melakukan request
+    const doGeocode = () => {
+        // Gunakan Nominatim dengan User-Agent yang proper
+        const url = `https://nominatim.openstreetmap.org/reverse?` + 
+                    `format=json&lat=${roundedLat}&lon=${roundedLng}` +
+                    `&accept-language=id&zoom=18&addressdetails=1`;
+        
+        return fetch(url, {
+            headers: {
+                'User-Agent': 'AnterTah App (https://antertah.com)' // Required by Nominatim
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.display_name) {
+                console.log('✅ Address found:', data.display_name);
+                
+                // Simpan ke cache
+                geocodeCache.set(cacheKey, {
+                    data: data,
+                    timestamp: Date.now()
+                });
+                
+                // Update UI
+                updateAddressUI(data, roundedLat, roundedLng);
+                
+                return data;
+            } else {
+                throw new Error('No address found');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Geocoding error:', error);
             
-            // Update selected location info
-            document.getElementById('selected-address').textContent = address;
-            document.getElementById('selected-coords').textContent = `Koordinat: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-            
-            // Show selected location info
+            // Fallback: tampilkan koordinat saja
+            document.getElementById('selected-address').textContent = 
+                `Koordinat: ${roundedLat.toFixed(6)}, ${roundedLng.toFixed(6)}`;
+            document.getElementById('selected-coords').textContent = 
+                'Tidak dapat mengambil alamat lengkap';
             document.getElementById('selected-location').classList.remove('hidden');
             
-            // Auto-fill address fields if possible
-            autoFillAddressFields(results[0]);
-        } else {
-            console.error('Geocoding failed:', status);
-            document.getElementById('selected-address').textContent = 'Alamat tidak ditemukan';
-        }
+            // Hide loading
+            hideGeocodingLoading();
+            
+            throw error;
+        });
+    };
+    
+    // Jika immediate (misal saat klik tombol), langsung request
+    if (immediate) {
+        return doGeocode();
+    }
+    
+    // Jika tidak immediate, gunakan debouncing (300ms)
+    return new Promise((resolve, reject) => {
+        geocodeTimer = setTimeout(() => {
+            doGeocode().then(resolve).catch(reject);
+        }, 300);
     });
 }
 
+// ========== UPDATE UI FUNCTION ==========
+function updateAddressUI(data, lat, lng) {
+    const address = data.display_name;
+    
+    // Update selected location info
+    document.getElementById('selected-address').textContent = address;
+    document.getElementById('selected-coords').textContent = 
+        `Koordinat: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    
+    // Show selected location info
+    document.getElementById('selected-location').classList.remove('hidden');
+    
+    // Auto-fill address fields if possible
+    autoFillAddressFields(data);
+    
+    // Hide loading
+    hideGeocodingLoading();
+}
+
+// ========== LOADING STATE ==========
+function showGeocodingLoading() {
+    const addressEl = document.getElementById('selected-address');
+    const coordsEl = document.getElementById('selected-coords');
+    
+    if (addressEl) {
+        addressEl.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mencari alamat...';
+    }
+    if (coordsEl) {
+        coordsEl.textContent = '';
+    }
+    
+    document.getElementById('selected-location')?.classList.remove('hidden');
+}
+
+function hideGeocodingLoading() {
+    // Loading sudah dihilangkan saat update UI
+}
+
+// ========== AUTO-FILL ADDRESS FIELDS (OPTIMIZED) ==========
+function autoFillAddressFields(data) {
+    if (!data.address) return;
+    
+    const addr = data.address;
+    
+    // Gunakan requestIdleCallback untuk update form agar tidak blocking
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+            fillAddressInputs(addr);
+        });
+    } else {
+        // Fallback untuk browser yang tidak support
+        setTimeout(() => {
+            fillAddressInputs(addr);
+        }, 0);
+    }
+}
+
+function fillAddressInputs(addr) {
+    // Coba isi field kota
+    const cityField = document.getElementById('city') || document.getElementById('address-city');
+    if (cityField && !cityField.value) {
+        cityField.value = addr.city || addr.town || addr.village || addr.municipality || '';
+    }
+    
+    // Coba isi field kode pos
+    const postalField = document.getElementById('postal_code') || document.getElementById('address-postal');
+    if (postalField && !postalField.value) {
+        postalField.value = addr.postcode || '';
+    }
+    
+    // Coba isi field detail alamat (jalan)
+    const detailField = document.getElementById('address_detail') || document.getElementById('address-detail');
+    if (detailField && !detailField.value) {
+        const street = addr.road || addr.street || '';
+        const suburb = addr.suburb || addr.neighbourhood || '';
+        const detail = [street, suburb].filter(Boolean).join(', ');
+        detailField.value = detail;
+    }
+}
+
+// ========== PRELOAD MAP UNTUK PERFORMA LEBIH BAIK ==========
+// Gunakan intersection observer untuk lazy load map
+function initLazyMapLoading() {
+    const mapContainer = document.getElementById('map');
+    if (!mapContainer) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Map container visible, load map
+                if (typeof initMap === 'function') {
+                    initMap();
+                }
+                observer.disconnect();
+            }
+        });
+    }, {
+        rootMargin: '50px' // Load sedikit sebelum masuk viewport
+    });
+    
+    observer.observe(mapContainer);
+}
+
+// ========== CACHE MANAGEMENT ==========
+// Clear cache jika sudah terlalu banyak (max 50 entries)
+function manageCacheSize() {
+    if (geocodeCache.size > 50) {
+        // Hapus 10 entry tertua
+        const entries = Array.from(geocodeCache.entries())
+            .sort((a, b) => a[1].timestamp - b[1].timestamp);
+        
+        for (let i = 0; i < 10; i++) {
+            geocodeCache.delete(entries[i][0]);
+        }
+        
+        console.log('🧹 Cache cleaned, new size:', geocodeCache.size);
+    }
+}
+
+// Jalankan cache management setiap 5 menit
+setInterval(manageCacheSize, 300000);
+
+// ========== BATCH GEOCODING (Jika perlu geocode banyak lokasi) ==========
+async function batchGeocode(coordinates, delayMs = 1000) {
+    const results = [];
+    
+    for (let i = 0; i < coordinates.length; i++) {
+        const { lat, lng } = coordinates[i];
+        
+        try {
+            const result = await getAddressFromCoordinates(lat, lng, true);
+            results.push(result);
+            
+            // Delay antar request untuk menghormati rate limit Nominatim (1 req/sec)
+            if (i < coordinates.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, delayMs));
+            }
+        } catch (error) {
+            console.error(`Failed to geocode ${lat}, ${lng}:`, error);
+            results.push(null);
+        }
+    }
+    
+    return results;
+}
 // Auto-fill address fields based on geocoding results
 function autoFillAddressFields(result) {
-    const addressComponents = result.address_components;
+    const addressComponents = result.address;
+    
+    if (!addressComponents) return;
     
     // Try to extract address components
-    let streetNumber = '';
-    let route = '';
-    let sublocality = '';
-    let locality = '';
-    let administrativeAreaLevel2 = '';
-    let administrativeAreaLevel1 = '';
-    
-    addressComponents.forEach(component => {
-        const types = component.types;
-        
-        if (types.includes('street_number')) {
-            streetNumber = component.long_name;
-        }
-        if (types.includes('route')) {
-            route = component.long_name;
-        }
-        if (types.includes('sublocality') || types.includes('sublocality_level_1')) {
-            sublocality = component.long_name;
-        }
-        if (types.includes('locality')) {
-            locality = component.long_name;
-        }
-        if (types.includes('administrative_area_level_2')) {
-            administrativeAreaLevel2 = component.long_name;
-        }
-        if (types.includes('administrative_area_level_1')) {
-            administrativeAreaLevel1 = component.long_name;
-        }
-    });
+    const road = addressComponents.road || '';
+    const houseNumber = addressComponents.house_number || '';
+    const suburb = addressComponents.suburb || '';
+    const village = addressComponents.village || addressComponents.hamlet || '';
+    const county = addressComponents.county || '';
+    const city = addressComponents.city || addressComponents.town || '';
+    const state = addressComponents.state || '';
     
     // Update kampung field with street info
     const kampungField = document.getElementById('kampung');
-    if (kampungField && (streetNumber || route)) {
-        const streetInfo = [streetNumber, route].filter(Boolean).join(' ');
+    if (kampungField && (road || houseNumber)) {
+        const streetInfo = [road, houseNumber].filter(Boolean).join(' ');
         if (streetInfo) {
             kampungField.value = streetInfo;
         }

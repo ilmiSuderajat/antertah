@@ -25,6 +25,7 @@
                         'text-light': '#f1f5f9',
                         'text-dark': '#1e293b',
                         'neutral-text': '#64748b',
+                        'wa-success': '#25D366'
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -98,6 +99,11 @@
         }
         
         .status-delivered {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+        
+        .status-selesai {
             background-color: #d1fae5;
             color: #059669;
         }
@@ -246,6 +252,48 @@
         .dark .items-scroll::-webkit-scrollbar-thumb {
             background: #6b7280;
         }
+        
+        /* Star rating styles */
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+        
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+        
+        .star-rating label {
+            cursor: pointer;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d1d5db;
+            transition: color 0.2s;
+        }
+        
+        .star-rating label:before {
+            content: '\f005';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 1.5rem;
+        }
+        
+        .star-rating input[type="radio"]:checked ~ label:before {
+            color: #fbbf24;
+        }
+        
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #fbbf24;
+        }
+        
+        .star-rating label:hover ~ label:before {
+            color: #fbbf24;
+        }
     </style>
 </head>
 <body class="bg-bg-light dark:bg-bg-dark text-text-dark dark:text-text-light min-h-screen font-sans">
@@ -289,6 +337,9 @@
                 </button>
                 <button onclick="filterOrders('delivered')" class="status-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" data-status="delivered">
                     Terkirim
+                </button>
+                <button onclick="filterOrders('selesai')" class="status-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" data-status="selesai">
+                    Selesai
                 </button>
                 <button onclick="filterOrders('cancelled')" class="status-tab px-4 py-2 rounded-lg text-sm font-medium transition-all bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300" data-status="cancelled">
                     Dibatalkan
@@ -340,6 +391,22 @@
         </div>
     </div>
 
+    <!-- Review Modal -->
+    <div id="review-modal" class="modal">
+        <div class="modal-content w-full max-w-2xl mx-4 my-4 p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Beri Ulasan Produk</h2>
+                <button onclick="closeReviewModal()" class="text-neutral-text hover:text-red-500 transition p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div id="review-content">
+                <!-- Review form will be populated here -->
+            </div>
+        </div>
+    </div>
+
     <!-- Payment Proof Modal -->
     <div id="payment-proof-modal" class="modal">
         <div class="modal-content w-full max-w-2xl mx-4 my-4 p-6">
@@ -355,22 +422,37 @@
             </div>
         </div>
     </div>
-    <footer id="footer" class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light dark:bg-card-dark border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md bg-opacity-95">
+    <footer id="footer" class="md:hidden fixed bottom-0 left-0 right-0 bg-card-light/95 dark:bg-card-dark/95 border-t border-gray-200 dark:border-gray-700 shadow-2xl z-50 backdrop-blur-md">
         <div class="flex justify-around items-center h-16">
-            <a href="home.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
-                <i class="fas fa-home text-xl mb-1"></i>
+            <!-- Beranda -->
+            <a href="home.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-home text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Beranda</span>
             </a>
-            <a href="kuliner.html" class="bottom-nav-item  text-neutral-text  flex flex-col items-center text-xs font-bold transition">
-                <i class="fas fa-search text-xl mb-1"></i>
+
+            <!-- Cari -->
+            <a href="kuliner.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-search text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Cari</span>
             </a>
-            <a href="pesanan.html" class="bottom-nav-item text-cool-primary  dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
-                <i class="fas fa-list-alt text-xl mb-1"></i>
+
+            <!-- Pesanan -->
+            <a href="pesanan.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-cool-primary dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-list-alt text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Pesanan</span>
             </a>
-            <a href="profile.html" class="bottom-nav-item text-neutral-text dark:text-gray-400 hover:text-cool-primary flex flex-col items-center text-xs font-medium transition">
-                <i class="fas fa-user text-xl mb-1"></i>
+
+            <!-- Keranjang (dengan badge) -->
+            <a href="keranjang.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-shopping-basket text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                <span>Keranjang</span>
+                <!-- Badge untuk jumlah item -->
+                <span id="cart-item-count" class="cart-badge absolute top-1 right-1/4 translate-x-1/2 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white transform translate-y-1 bg-red-600 rounded-full">0</span>
+            </a>
+
+            <!-- Akun -->
+            <a href="profile.html" class="bottom-nav-item group flex flex-col items-center justify-center text-xs font-medium text-neutral-text dark:text-gray-400 hover:text-cool-primary transition-all duration-200 relative w-full h-full">
+                <i class="fas fa-user text-xl mb-1 group-hover:scale-110 transition-transform"></i>
                 <span>Akun</span>
             </a>
         </div>
@@ -387,6 +469,7 @@
         let currentFilter = 'all';
         let selectedOrder = null;
         let isLoading = false;
+        let reviewingItem = null;
 
         // Helper functions
         function getStatusClass(status) {
@@ -396,6 +479,7 @@
                 case 'processing': return 'status-processing';
                 case 'ready': return 'status-ready';
                 case 'delivered': return 'status-delivered';
+                case 'selesai': return 'status-selesai';
                 case 'cancelled': return 'status-cancelled';
                 default: return 'status-pending';
             }
@@ -408,6 +492,7 @@
                 case 'processing': return 'Diproses';
                 case 'ready': return 'Siap Dikirim';
                 case 'delivered': return 'Terkirim';
+                case 'selesai': return 'Selesai';
                 case 'cancelled': return 'Dibatalkan';
                 default: return 'Tidak Diketahui';
             }
@@ -690,6 +775,14 @@ function getImageUrl(item) {
             if (modal) {
                 modal.classList.remove('active');
                 footer.classList.remove('hidden');
+            }
+        }
+
+        function closeReviewModal() {
+            const modal = document.getElementById('review-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                reviewingItem = null;
             }
         }
 
@@ -1112,7 +1205,7 @@ function renderOrders(ordersToRender) {
                 }
 
                 const orderData = await response.json();
-                console.log('[DEBUG ORDERS] Order data received:', orderData);
+                console.log('[DEBUG ORDER] Returning order data:', orderData);
                 
                 selectedOrder = orderData;
                 renderOrderDetail(selectedOrder);
@@ -1172,6 +1265,15 @@ function renderOrders(ordersToRender) {
                     };
                 });
                 
+                // Check if order can be reviewed (status is 'selesai' or 'delivered')
+                const canReview = order.status === 'selesai' || order.status === 'delivered';
+                console.log('[DEBUG ORDERS] Order status:', order.status, 'Can review:', canReview);
+                
+                // Get user phone from order data
+                const userPhone = (order.customer && order.customer.phone) || 
+                                 (order.address && order.address.phone) || 
+                                 '';
+                
                 modalContent.innerHTML = `
                     <div class="space-y-6">
                         <!-- Order Info -->
@@ -1181,6 +1283,7 @@ function renderOrders(ordersToRender) {
                                 <span class="status-badge ${getStatusClass(order.status || 'pending')}">${getStatusText(order.status || 'pending')}</span>
                             </div>
                             <p class="text-sm text-neutral-text">Tanggal: ${formatDate(order.created_at)}</p>
+                            ${canReview ? '<p class="text-xs text-green-600 mt-1"><i class="fas fa-check-circle mr-1"></i>Pesanan dapat diulas</p>' : ''}
                         </div>
                         
                         <!-- Items -->
@@ -1204,6 +1307,11 @@ function renderOrders(ordersToRender) {
                                         </div>
                                         <div class="text-right">
                                             <p class="font-medium">${formatCurrency(item.total)}</p>
+                                            ${canReview ? `
+                                                <button onclick="openReviewModal(${JSON.stringify(item).replace(/"/g, '&quot;')}, ${order.id}, '${userPhone}')" class="mt-1 text-xs text-cool-primary hover:underline">
+                                                    <i class="fas fa-star mr-1"></i>Beri Ulasan
+                                                </button>
+                                            ` : ''}
                                         </div>
                                     </div>
                                 `).join('')}
@@ -1214,8 +1322,8 @@ function renderOrders(ordersToRender) {
                         <div>
                             <h3 class="font-bold mb-3">Alamat Pengiriman</h3>
                             <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                                <p class="font-medium">${(order.address && order.address.recipient_name) || order.customer_name || 'Tidak ada'}</p>
-                                <p class="text-sm text-neutral-text">${(order.address && order.address.phone) || order.customer_phone || 'Tidak ada'}</p>
+                                <p class="font-medium">${(order.address && order.address.recipient_name) || (order.customer && order.customer.name) || 'Tidak ada'}</p>
+                                <p class="text-sm text-neutral-text">${(order.address && order.address.phone) || (order.customer && order.customer.phone) || 'Tidak ada'}</p>
                                 <p class="text-sm text-neutral-text">${(order.address && order.address.address_detail) || 'Tidak ada'}</p>
                                 <p class="text-sm text-neutral-text">${(order.address && order.address.city) || 'Tidak ada'}, ${(order.address && order.address.postal_code) || 'Tidak ada'}</p>
                             </div>
@@ -1306,6 +1414,144 @@ function renderOrders(ordersToRender) {
                 showNotification('Terjadi kesalahan saat menampilkan detail pesanan', 'error');
             }
         }
+
+        // Open review modal
+        function openReviewModal(item, orderId, userPhone) {
+            reviewingItem = item;
+            const modal = document.getElementById('review-modal');
+            const content = document.getElementById('review-content');
+            
+            if (!modal || !content) return;
+            
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <img src="${getImageUrl(item)}" alt="${item.name || 'Produk'}" class="w-20 h-20 rounded-lg object-cover">
+                        <div>
+                            <h3 class="font-bold text-lg">${item.name || 'Tidak ada nama'}</h3>
+                            <p class="text-sm text-neutral-text">${formatCurrency(item.price || 0)}</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Rating</label>
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5">
+                            <label for="star5"></label>
+                            <input type="radio" id="star4" name="rating" value="4">
+                            <label for="star4"></label>
+                            <input type="radio" id="star3" name="rating" value="3">
+                            <label for="star3"></label>
+                            <input type="radio" id="star2" name="rating" value="2">
+                            <label for="star2"></label>
+                            <input type="radio" id="star1" name="rating" value="1">
+                            <label for="star1"></label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="review-comment" class="block text-sm font-medium mb-2">Komentar (Opsional)</label>
+                        <textarea id="review-comment" rows="4" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cool-primary dark:bg-gray-700" placeholder="Bagikan pengalaman Anda dengan produk ini..."></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="closeReviewModal()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                            Batal
+                        </button>
+                        <button onclick="submitReview(${orderId}, ${item.menu_id}, '${userPhone}')" class="px-4 py-2 bg-cool-primary hover:bg-blue-700 text-white rounded-lg transition">
+                            Kirim Ulasan
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        // Submit review
+async function submitReview(orderId, productId, userPhone) {
+    try {
+        const rating = document.querySelector('input[name="rating"]:checked');
+        const comment = document.getElementById('review-comment').value;
+        const token = localStorage.getItem('authToken'); // Ambil token dari localStorage
+
+        if (!rating) {
+            showNotification('Silakan pilih rating', 'error');
+            return;
+        }
+
+        if (!userPhone) {
+            showNotification('Data user tidak lengkap. Silakan login kembali.', 'error');
+            return;
+        }
+
+        const reviewData = {
+            menu_id: productId,
+            order_id: orderId,
+            product_id: productId,
+            user_phone: userPhone,
+            rating: parseInt(rating.value),
+            comment: comment || ''
+        };
+
+        console.log('[DEBUG REVIEW] Submitting review:', reviewData);
+        console.log('[DEBUG REVIEW] Token:', token);
+
+        const response = await fetch(`${BASE_URL}/api/reviews`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`, // <-- harus di sini
+                'ngrok-skip-browser-warning': 'true'
+            },
+            body: JSON.stringify(reviewData)
+        });
+
+        console.log('[DEBUG REVIEW] Response status:', response.status);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('[DEBUG REVIEW] Error response text:', errorText);
+
+            let errorData;
+            try {
+                errorData = JSON.parse(errorText);
+            } catch (e) {
+                errorData = { error: errorText };
+            }
+
+            console.error('[DEBUG REVIEW] Error response:', errorData);
+
+            if (response.status === 400) {
+                showNotification(errorData.error || 'Data ulasan tidak valid', 'error');
+            } else if (response.status === 404) {
+                showNotification(errorData.error || 'User tidak ditemukan', 'error');
+            } else if (response.status === 401 || response.status === 403) {
+                showNotification('Token tidak valid atau kadaluwarsa. Silakan login kembali.', 'error');
+                localStorage.removeItem('authToken'); // hapus token yang tidak valid
+                setTimeout(() => window.location.href = 'login.html', 1000);
+            } else {
+                showNotification(errorData.error || `Gagal mengirim ulasan (${response.status})`, 'error');
+            }
+            return;
+        }
+
+        const result = await response.json();
+        console.log('[DEBUG REVIEW] Success response:', result);
+
+        showNotification('Ulasan berhasil dikirim', 'success');
+        closeReviewModal();
+
+        // Reload order details untuk update button review
+        if (selectedOrder && selectedOrder.id === orderId) {
+            viewOrderDetail(orderId);
+        }
+
+    } catch (error) {
+        console.error('[DEBUG REVIEW] Submit review error:', error);
+        showNotification('Terjadi kesalahan saat mengirim ulasan: ' + error.message, 'error');
+    }
+}
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
