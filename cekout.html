@@ -354,6 +354,23 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+        
+        /* Shipping distance badge */
+        .distance-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #1e40af;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .dark .distance-badge {
+            background-color: rgba(6, 182, 212, 0.1);
+            color: #0e7490;
+        }
     </style>
 </head>
 <body class="bg-bg-light dark:bg-bg-dark text-text-dark dark:text-text-light min-h-screen font-sans pb-32 md:pb-8">
@@ -803,6 +820,106 @@ async function loadCartFromServer() {
     }
 }
 
+    // ========== UPDATE SHIPPING PROMPT ==========
+    function updateShippingPrompt() {
+        const shippingInfoEl = document.getElementById('shipping-info');
+        const shippingDistanceEl = document.getElementById('shipping-distance');
+        
+        if (shippingInfoEl && shippingDistanceEl) {
+            shippingInfoEl.classList.remove('hidden');
+            
+            if (!selectedAddress) {
+                shippingDistanceEl.textContent = 'Pilih alamat untuk menghitung ongkir';
+            } else if (!shippingCalculated) {
+                shippingDistanceEl.textContent = 'Menghitung ongkir...';
+            }
+        }
+    }
+
+
+    // ========== CALCULATE SHIPPING COSTS ==========
+  async function calculateAllShippingCosts() {
+  if (!selectedAddress) {
+    console.warn('Tidak dapat menghitung ongkir: alamat belum dipilih');
+    return;
+  }
+
+  const shippingLoadingEl = document.getElementById('shipping-loading');
+  const shippingInfoEl = document.getElementById('shipping-info');
+  const shippingDistanceEl = document.getElementById('shipping-distance');
+
+  if (shippingLoadingEl) shippingLoadingEl.classList.remove('hidden');
+  if (shippingInfoEl) {
+    shippingInfoEl.classList.remove('hidden');
+    if (shippingDistanceEl) shippingDistanceEl.textContent = 'Menghitung jarak...';
+  }
+
+  totalShippingCost = 0;
+  shippingCosts = {};
+  shippingCalculated = false;
+
+  const shippingPromises = cart.map(async (item) => {
+    try {
+      const menuId = item.menu_id || item.id;
+      if (!menuId) {
+        console.error('Item tidak memiliki ID:', item);
+        return null;
+      }
+
+      const response = await fetch(`${BASE_URL}/api/shipping-cost/${menuId}?address_id=${selectedAddress.id}`, {
+        headers: { 
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'ngrok-skip-browser-warning': 'true'
+        }
+      });
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const data = await response.json();
+
+      console.log(`[ONGKIR] ${item.name}: ${data.distance_km} km → Rp${data.shipping_cost}`);
+
+      const itemKey = item.id;
+      shippingCosts[itemKey] = {
+        cost: data.shipping_cost,
+        distance: parseFloat(data.distance_km)
+      };
+
+      totalShippingCost += data.shipping_cost;
+      return data;
+    } catch (error) {
+      console.error(`Error calculating shipping for ${item.name}:`, error);
+      const defaultCost = SHIPPING_COST;
+      const itemKey = item.id;
+      shippingCosts[itemKey] = {
+        cost: defaultCost,
+        distance: 0,
+        error: true
+      };
+      totalShippingCost += defaultCost;
+      return null;
+    }
+  });
+
+  await Promise.all(shippingPromises);
+
+  shippingCalculated = true;
+  if (shippingLoadingEl) shippingLoadingEl.classList.add('hidden');
+  updateSummary();
+
+  if (shippingInfoEl && shippingDistanceEl && Object.keys(shippingCosts).length > 0) {
+    const distances = Object.values(shippingCosts)
+      .filter(cost => !cost.error)
+      .map(cost => cost.distance);
+
+    if (distances.length > 0) {
+      const maxDistance = Math.max(...distances);
+      shippingDistanceEl.textContent = `Total Jarak: ${maxDistance.toFixed(2)} km`;
+    } else {
+      shippingDistanceEl.textContent = 'Tidak dapat menghitung jarak, menggunakan ongkir default';
+    }
+  }
+}
     // ========== RENDER ADDRESSES ==========
     function renderAddresses() {
         const container = document.getElementById('addresses-container');
@@ -1087,7 +1204,7 @@ function renderCart() {
                 <p class="text-xs text-neutral-text">
                     <i class="fas fa-truck mr-1"></i>
                     Ongkir: Rp ${cost.toLocaleString('id-ID')}
-                    ${distance ? `(${distance.toFixed(2)} km)` : ''}
+                    ${distance ? `<span class="distance-badge ml-1">${distance.toFixed(2)} km</span>` : ''}
                 </p>
             `;
         }
@@ -1289,15 +1406,6 @@ function updateSummary() {
             shippingInfo.classList.remove('hidden');
             shippingDistance.textContent = 'Pilih alamat untuk menghitung ongkir';
         }
-    }
-    
-    function calculateAllShippingCosts() {
-        // This function would calculate shipping costs based on selected address
-        // For now, we'll just set a fixed cost
-        totalShippingCost = SHIPPING_COST;
-        shippingCalculated = true;
-        updateSummary();
-        updateShippingPrompt();
     }
     
     function openAddressModal() {
